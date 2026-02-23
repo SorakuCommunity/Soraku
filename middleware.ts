@@ -1,57 +1,50 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-const isPublicRoute = createRouteMatcher([
-  "/",
-  "/about",
-  "/community",
-  "/blog",
-  "/blog/(.*)",
-  "/events",
-  "/events/(.*)",
-  "/vtuber",
-  "/vtuber/(.*)",
-  "/gallery",
-  "/maintenance",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/api/discord(.*)",
-  "/api/blog(.*)",
-  "/api/events(.*)",
-  "/api/vtuber(.*)",
-  "/api/gallery(.*)",
-]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/maintenance",
+  "/community",
+  "/blog(.*)",
+  "/events(.*)",
+  "/vtuber(.*)",
+  "/gallery",
+  "/api/discord(.*)",
+  "/api/spotify(.*)",
+  "/api/maintenance",
+  "/api/webhooks(.*)",
+]);
 
-export default clerkMiddleware(async (auth, req: NextRequest) => {
-  const maintenanceMode = process.env.MAINTENANCE_MODE === "true";
-  const url = req.nextUrl.clone();
+export default clerkMiddleware(async (auth, req) => {
+  const url = req.nextUrl;
 
-  // Maintenance mode redirect
+  // Maintenance mode check
   if (
-    maintenanceMode &&
+    process.env.MAINTENANCE_MODE === "true" &&
     url.pathname !== "/maintenance" &&
-    !url.pathname.startsWith("/api") &&
-    !url.pathname.startsWith("/_next")
+    !url.pathname.startsWith("/api/") &&
+    !url.pathname.startsWith("/admin")
   ) {
-    url.pathname = "/maintenance";
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL("/maintenance", req.url));
   }
 
   // Protect admin routes
   if (isAdminRoute(req)) {
-    const { userId } = await auth();
-    if (!userId) {
-      url.pathname = "/sign-in";
-      return NextResponse.redirect(url);
-    }
+    await auth.protect();
+    return NextResponse.next();
   }
 
-  if (!isPublicRoute(req)) {
-    await auth.protect();
+  // Allow public routes
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
   }
+
+  // Protect everything else
+  await auth.protect();
+  return NextResponse.next();
 });
 
 export const config = {

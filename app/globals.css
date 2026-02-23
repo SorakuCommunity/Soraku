@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Zen+Dots&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #4FA3D1;
+  --dark-base: #1C1E22;
+  --secondary: #6E8FA6;
+  --light-base: #D9DDE3;
+  --accent: #E8C2A8;
+  --glass-bg: rgba(28, 30, 34, 0.6);
+  --glass-border: rgba(79, 163, 209, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #1C1E22;
+  color: #D9DDE3;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1C1E22;
+}
+::-webkit-scrollbar-thumb {
+  background: #4FA3D1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6E8FA6;
+}
+
+/* ─── Glassmorphism ─────────────────────────────────── */
+.glass {
+  background: rgba(28, 30, 34, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(79, 163, 209, 0.15);
+}
+
+.glass-strong {
+  background: rgba(28, 30, 34, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(79, 163, 209, 0.25);
+}
+
+.glass-card {
+  background: rgba(28, 30, 34, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(79, 163, 209, 0.2);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(79, 163, 209, 0.4);
+  box-shadow: 0 0 30px rgba(79, 163, 209, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ─── Glow Effects ──────────────────────────────────── */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(79, 163, 209, 0.4);
+}
+
+.glow-accent {
+  box-shadow: 0 0 20px rgba(232, 194, 168, 0.3);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(79, 163, 209, 0.6);
+}
+
+/* ─── Gradient Text ─────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #4FA3D1, #E8C2A8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-primary {
+  background: linear-gradient(135deg, #4FA3D1, #6E8FA6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Anime Background Overlays ─────────────────────── */
+.anime-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.anime-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(79, 163, 209, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(232, 194, 168, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(110, 143, 166, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Neon Border ───────────────────────────────────── */
+.neon-border {
+  position: relative;
+}
+
+.neon-border::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(79, 163, 209, 0.5), transparent, rgba(232, 194, 168, 0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ─── Button Styles ─────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, #4FA3D1, #6E8FA6);
+  color: white;
+  padding: 0.625rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 20px rgba(79, 163, 209, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #4FA3D1;
+  padding: 0.625rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(79, 163, 209, 0.4);
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: rgba(79, 163, 209, 0.1);
+  border-color: #4FA3D1;
+}
+
+/* ─── Particle Dots (decorative) ─────────────────────── */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(79, 163, 209, 0.4);
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ─── Page Transition ───────────────────────────────── */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.4s ease;
+}
+
+/* ─── Input Styles ──────────────────────────────────── */
+.input-glass {
+  background: rgba(28, 30, 34, 0.6);
+  border: 1px solid rgba(79, 163, 209, 0.3);
+  border-radius: 8px;
+  color: #D9DDE3;
+  padding: 0.625rem 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.input-glass:focus {
+  outline: none;
+  border-color: #4FA3D1;
+  box-shadow: 0 0 10px rgba(79, 163, 209, 0.2);
+}
+
+.input-glass::placeholder {
+  color: rgba(217, 221, 227, 0.4);
+}
+
+/* ─── Badge ─────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+/* ─── Loading Shimmer ───────────────────────────────── */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(79, 163, 209, 0.05) 0%,
+    rgba(79, 163, 209, 0.15) 50%,
+    rgba(79, 163, 209, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
