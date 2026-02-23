@@ -9,7 +9,7 @@ async function getGenerations() {
     .order("generation");
 
   if (!data) return [];
-  const unique = [...new Set(data.map((v: { generation: number }) => v.generation))];
+  const unique = Array.from(new Set(data.map((v: { generation: number }) => v.generation)));
   return unique;
 }
 
