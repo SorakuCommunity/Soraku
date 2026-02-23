@@ -1,18 +1,12 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdn.discordapp.com" },
-      { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "**.supabase.co" },
       { protocol: "https", hostname: "img.clerk.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
-  },
-  experimental: {
-    serverActions: {
-      allowedOrigins: ["localhost:3000"],
-    },
   },
 };
 
