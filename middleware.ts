@@ -21,6 +21,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/events(.*)",
   "/api/vtuber(.*)",
   "/api/gallery(.*)",
+  "/api/settings(.*)",
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
@@ -49,8 +50,13 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     }
   }
 
+  // Protect non-public routes
   if (!isPublicRoute(req)) {
-    await auth.protect();
+    const { userId } = await auth();
+    if (!userId) {
+      url.pathname = "/sign-in";
+      return NextResponse.redirect(url);
+    }
   }
 });
 
