@@ -3,5 +3,7 @@ import { fetchDiscordStats } from '@/lib/discord'
 
 export async function GET() {
   const stats = await fetchDiscordStats()
-  return NextResponse.json(stats, { headers: { 'Cache-Control': 'public, max-age=300' } })
+  return NextResponse.json(stats, {
+    headers: { 'Cache-Control': 'public, max-age=300, stale-while-revalidate=600' },
+  })
 }

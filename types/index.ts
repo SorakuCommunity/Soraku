@@ -1,4 +1,4 @@
-export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'USER'
+export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'PREMIUM' | 'DONATE' | 'USER'
 export type GalleryStatus = 'pending' | 'approved' | 'rejected'
 export type BlogStatus = 'draft' | 'published'
 
@@ -47,7 +47,11 @@ export interface GalleryItem {
   hashtags: string[]
   status: GalleryStatus
   created_at: string
-  users?: { display_name: string | null; username: string | null; avatar_url: string | null }
+  users?: {
+    display_name: string | null
+    username: string | null
+    avatar_url: string | null
+  }
 }
 
 export interface BlogPost {
@@ -62,7 +66,11 @@ export interface BlogPost {
   deleted_at: string | null
   created_at: string
   updated_at: string
-  users?: { display_name: string | null; avatar_url: string | null }
+  users?: {
+    display_name: string | null
+    avatar_url: string | null
+    username: string | null
+  }
 }
 
 export interface Event {
@@ -76,17 +84,22 @@ export interface Event {
   created_at: string
 }
 
-export interface VtuberProfile {
+export interface AnimeProfile {
   id: string
   name: string
+  slug: string
   generation: string | null
   avatar_url: string | null
+  cover_url: string | null
   description: string | null
+  bio: string | null
   twitter: string | null
   youtube: string | null
   twitch: string | null
   instagram: string | null
   tiktok: string | null
+  website: string | null
+  tags: string[]
   created_at: string
 }
 
@@ -105,7 +118,10 @@ export interface GithubDiscussion {
   createdAt: string
   author: { login: string; avatarUrl: string }
   category: { name: string; emoji: string }
-  comments: { totalCount: number; nodes: GithubComment[] }
+  comments: {
+    totalCount: number
+    nodes: GithubComment[]
+  }
 }
 
 export interface GithubComment {
@@ -120,7 +136,10 @@ export interface SpotifyTrack {
   id: string
   name: string
   artists: { name: string }[]
-  album: { name: string; images: { url: string }[] }
+  album: {
+    name: string
+    images: { url: string }[]
+  }
   preview_url: string | null
   external_urls: { spotify: string }
   duration_ms: number

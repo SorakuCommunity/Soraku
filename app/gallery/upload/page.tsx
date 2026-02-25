@@ -10,22 +10,30 @@ import { galleryUploadSchema, type GalleryUploadFormData } from '@/lib/schemas'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
+const inputCls =
+  'w-full glass border border-soraku-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 bg-transparent placeholder:text-soraku-sub transition-colors'
+
 export default function GalleryUploadPage() {
   const router = useRouter()
   const supabase = createClient()
+
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
 
-  const { register, handleSubmit, formState: { errors } } = useForm<GalleryUploadFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<GalleryUploadFormData>({
     resolver: zodResolver(galleryUploadSchema),
     defaultValues: { caption: '', description: '', hashtags: [] },
   })
 
-  const onDrop = useCallback((files: File[]) => {
-    const f = files[0]
+  const onDrop = useCallback((accepted: File[]) => {
+    const f = accepted[0]
     if (!f) return
     setFile(f)
     setPreview(URL.createObjectURL(f))
@@ -41,25 +49,40 @@ export default function GalleryUploadPage() {
   const addTag = () => {
     const t = tagInput.trim().replace(/^#/, '').toLowerCase()
     if (t && !tags.includes(t) && tags.length < 10) {
-      setTags(p => [...p, t])
+      setTags((p) => [...p, t])
       setTagInput('')
     }
+  }
+
+  const removeTag = (tag: string) => setTags((p) => p.filter((x) => x !== tag))
+
+  const clearFile = () => {
+    if (preview) URL.revokeObjectURL(preview)
+    setFile(null)
+    setPreview(null)
   }
 
   const onSubmit = async (data: GalleryUploadFormData) => {
     if (!file) { toast.error('Pilih gambar dulu'); return }
     setUploading(true)
+
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (!user) { toast.error('Login dulu'); return }
 
-      const ext = file.name.split('.').pop()
+      const ext = file.name.split('.').pop() ?? 'jpg'
       const path = `gallery/${user.id}/${Date.now()}.${ext}`
-      const { error: upErr } = await supabase.storage.from('gallery').upload(path, file)
-      if (upErr) throw upErr
 
-      const { data: { publicUrl } } = supabase.storage.from('gallery').getPublicUrl(path)
-      const { error: insErr } = await supabase.from('gallery').insert({
+      const { error: uploadErr } = await supabase.storage.from('gallery').upload(path, file)
+      if (uploadErr) throw uploadErr
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('gallery').getPublicUrl(path)
+
+      const { error: insertErr } = await supabase.from('gallery').insert({
         user_id: user.id,
         image_url: publicUrl,
         caption: data.caption ?? null,
@@ -67,12 +90,12 @@ export default function GalleryUploadPage() {
         hashtags: tags,
         status: 'pending',
       })
-      if (insErr) throw insErr
+      if (insertErr) throw insertErr
 
       toast.success('Upload berhasil! Menunggu moderasi.')
       router.push('/gallery')
-    } catch (e) {
-      console.error(e)
+    } catch (err) {
+      console.error(err)
       toast.error('Upload gagal. Coba lagi.')
     } finally {
       setUploading(false)
@@ -86,7 +109,7 @@ export default function GalleryUploadPage() {
           Upload <span className="grad-text">Karya</span>
         </h1>
         <p className="text-soraku-sub mb-8">
-          Bagikan karya ke komunitas. Menunggu moderasi sebelum tampil.
+          Bagikan karyamu ke komunitas. Menunggu moderasi sebelum tampil di gallery.
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -94,13 +117,17 @@ export default function GalleryUploadPage() {
           <div>
             <label className="block text-sm font-medium mb-2">Gambar *</label>
             {preview ? (
-              <div className="relative rounded-2xl overflow-hidden">
+              <div className="relative rounded-2xl overflow-hidden bg-soraku-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={preview} alt="preview" className="w-full max-h-80 object-contain bg-soraku-card" />
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-full max-h-80 object-contain"
+                />
                 <button
                   type="button"
-                  onClick={() => { setFile(null); setPreview(null) }}
-                  className="absolute top-3 right-3 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600"
+                  onClick={clearFile}
+                  className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -119,7 +146,9 @@ export default function GalleryUploadPage() {
                 <p className="text-soraku-sub text-sm">
                   {isDragActive ? 'Lepas gambar di sini...' : 'Drag & drop atau klik untuk pilih'}
                 </p>
-                <p className="text-xs text-soraku-sub/60 mt-1">JPG, PNG, GIF, WEBP – Maks 10MB</p>
+                <p className="text-xs text-soraku-sub/60 mt-1">
+                  JPG, PNG, GIF, WEBP – Maks 10MB
+                </p>
               </div>
             )}
           </div>
@@ -131,9 +160,11 @@ export default function GalleryUploadPage() {
               {...register('caption')}
               placeholder="Caption singkat..."
               maxLength={200}
-              className="w-full glass border border-soraku-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 bg-transparent placeholder:text-soraku-sub"
+              className={inputCls}
             />
-            {errors.caption && <p className="text-red-400 text-xs mt-1">{errors.caption.message}</p>}
+            {errors.caption && (
+              <p className="text-red-400 text-xs mt-1">{errors.caption.message}</p>
+            )}
           </div>
 
           {/* Description */}
@@ -144,22 +175,28 @@ export default function GalleryUploadPage() {
               rows={3}
               maxLength={1000}
               placeholder="Ceritakan tentang karyamu..."
-              className="w-full glass border border-soraku-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 bg-transparent placeholder:text-soraku-sub resize-none"
+              className={`${inputCls} resize-none`}
             />
           </div>
 
           {/* Hashtags */}
           <div>
             <label className="block text-sm font-medium mb-1.5">
-              <Tag className="inline w-4 h-4 mr-1" /> Hashtag
+              <Tag className="inline w-4 h-4 mr-1" />
+              Hashtag
             </label>
             <div className="flex gap-2 mb-3">
               <input
                 value={tagInput}
-                onChange={e => setTagInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag() } }}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    addTag()
+                  }
+                }}
                 placeholder="Ketik dan tekan Enter..."
-                className="flex-1 glass border border-soraku-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 bg-transparent placeholder:text-soraku-sub"
+                className={`${inputCls} flex-1`}
               />
               <button
                 type="button"
@@ -171,13 +208,17 @@ export default function GalleryUploadPage() {
             </div>
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {tags.map(t => (
+                {tags.map((t) => (
                   <span
                     key={t}
                     className="inline-flex items-center gap-1 bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs px-3 py-1 rounded-full"
                   >
                     #{t}
-                    <button type="button" onClick={() => setTags(p => p.filter(x => x !== t))}>
+                    <button
+                      type="button"
+                      onClick={() => removeTag(t)}
+                      className="hover:text-white transition-colors"
+                    >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -189,7 +230,7 @@ export default function GalleryUploadPage() {
           <button
             type="submit"
             disabled={uploading || !file}
-            className="w-full bg-soraku-gradient text-white py-3.5 rounded-xl font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-soraku-gradient text-white py-3.5 rounded-xl font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-opacity"
           >
             {uploading ? (
               <>
@@ -198,7 +239,8 @@ export default function GalleryUploadPage() {
               </>
             ) : (
               <>
-                <Upload className="w-4 h-4" /> Upload Karya
+                <Upload className="w-4 h-4" />
+                Upload Karya
               </>
             )}
           </button>

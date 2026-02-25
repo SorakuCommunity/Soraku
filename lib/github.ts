@@ -1,10 +1,18 @@
-import { GithubDiscussion } from '@/types'
+import type { GithubDiscussion } from '@/types'
 
 const GH_API = 'https://api.github.com/graphql'
 
+function getGHHeaders() {
+  return {
+    Authorization: `bearer ${process.env.GITHUB_TOKEN}`,
+    'Content-Type': 'application/json',
+  }
+}
+
 export async function fetchDiscussions(): Promise<GithubDiscussion[]> {
-  const { GITHUB_TOKEN: token, GITHUB_REPO_OWNER: owner, GITHUB_REPO_NAME: repo } = process.env
-  if (!token || !owner || !repo) return []
+  const owner = process.env.GITHUB_REPO_OWNER
+  const repo = process.env.GITHUB_REPO_NAME
+  if (!process.env.GITHUB_TOKEN || !owner || !repo) return []
 
   const query = `query {
     repository(owner: "${owner}", name: "${repo}") {
@@ -25,19 +33,24 @@ export async function fetchDiscussions(): Promise<GithubDiscussion[]> {
   try {
     const res = await fetch(GH_API, {
       method: 'POST',
-      headers: { Authorization: `bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: getGHHeaders(),
       body: JSON.stringify({ query }),
       next: { revalidate: 60 },
     })
     if (!res.ok) return []
     const data = await res.json()
-    return data?.data?.repository?.discussions?.nodes ?? []
-  } catch { return [] }
+    return (data?.data?.repository?.discussions?.nodes ?? []) as GithubDiscussion[]
+  } catch {
+    return []
+  }
 }
 
-export async function fetchDiscussionByNumber(number: number): Promise<GithubDiscussion | null> {
-  const { GITHUB_TOKEN: token, GITHUB_REPO_OWNER: owner, GITHUB_REPO_NAME: repo } = process.env
-  if (!token || !owner || !repo) return null
+export async function fetchDiscussionByNumber(
+  number: number
+): Promise<GithubDiscussion | null> {
+  const owner = process.env.GITHUB_REPO_OWNER
+  const repo = process.env.GITHUB_REPO_NAME
+  if (!process.env.GITHUB_TOKEN || !owner || !repo) return null
 
   const query = `query {
     repository(owner: "${owner}", name: "${repo}") {
@@ -56,12 +69,14 @@ export async function fetchDiscussionByNumber(number: number): Promise<GithubDis
   try {
     const res = await fetch(GH_API, {
       method: 'POST',
-      headers: { Authorization: `bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: getGHHeaders(),
       body: JSON.stringify({ query }),
       next: { revalidate: 60 },
     })
     if (!res.ok) return null
     const data = await res.json()
-    return data?.data?.repository?.discussion ?? null
-  } catch { return null }
+    return (data?.data?.repository?.discussion ?? null) as GithubDiscussion | null
+  } catch {
+    return null
+  }
 }

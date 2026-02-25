@@ -1,81 +1,102 @@
-const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID!;
-const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET!;
-const SPOTIFY_REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN!;
+import type { SpotifyTrack } from '@/types'
 
-const basic = btoa(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`);
-const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
+interface TokenCache {
+  token: string
+  exp: number
+}
 
-export async function getAccessToken(): Promise<string> {
-  const response = await fetch(TOKEN_ENDPOINT, {
+let tokenCache: TokenCache | null = null
+
+async function getAccessToken(): Promise<string> {
+  if (tokenCache && Date.now() < tokenCache.exp) return tokenCache.token
+
+  const id = process.env.SPOTIFY_CLIENT_ID
+  const secret = process.env.SPOTIFY_CLIENT_SECRET
+  if (!id || !secret) throw new Error('Spotify credentials not configured')
+
+  const res = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
-      Authorization: `Basic ${basic}`,
       'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${Buffer.from(`${id}:${secret}`).toString('base64')}`,
     },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: SPOTIFY_REFRESH_TOKEN,
-    }),
-  });
+    body: 'grant_type=client_credentials',
+    cache: 'no-store',
+  })
 
-  if (!response.ok) {
-    throw new Error('Failed to get Spotify access token');
+  if (!res.ok) throw new Error('Spotify token request failed')
+
+  const data = await res.json()
+  tokenCache = {
+    token: data.access_token,
+    exp: Date.now() + (data.expires_in - 60) * 1000,
   }
-
-  const data = await response.json();
-  return data.access_token;
+  return tokenCache.token
 }
 
-export async function searchSpotifyTracks(query: string): Promise<any> {
-  const access_token = await getAccessToken();
+/**
+ * Fetch anime / lofi preview tracks from curated playlists.
+ */
+export async function fetchAnimeLofiTracks(): Promise<SpotifyTrack[]> {
+  try {
+    const token = await getAccessToken()
+    const PLAYLISTS = ['37i9dQZF1DWXbttAJcbphz', '37i9dQZF1DX5trt9i14X7j']
+    const playlistId = PLAYLISTS[Math.floor(Math.random() * PLAYLISTS.length)]
 
-  const response = await fetch(
-    `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`,
-    {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    }
-  );
+    const res = await fetch(
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=20&fields=items(track(id,name,artists,album,preview_url,external_urls,duration_ms))`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        next: { revalidate: 300 },
+      }
+    )
 
-  if (!response.ok) {
-    throw new Error('Failed to search Spotify tracks');
+    if (!res.ok) return []
+    const data = await res.json()
+
+    return (data.items as { track: SpotifyTrack }[])
+      .map((i) => i.track)
+      .filter((t) => t?.id && t?.preview_url)
+      .slice(0, 10)
+  } catch {
+    return []
   }
-
-  return response.json();
 }
 
-export async function getSpotifyTrack(id: string): Promise<any> {
-  const access_token = await getAccessToken();
+/**
+ * Search Spotify tracks by query string.
+ * Used by: app/api/spotify/search/route.ts
+ */
+export async function searchSpotifyTracks(query: string): Promise<SpotifyTrack[]> {
+  try {
+    const token = await getAccessToken()
+    const params = new URLSearchParams({ q: query, type: 'track', limit: '10' })
+    const res = await fetch(`https://api.spotify.com/v1/search?${params}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
 
-  const response = await fetch(`https://api.spotify.com/v1/tracks/${id}`, {
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch Spotify track');
+    if (!res.ok) return []
+    const data = await res.json()
+    return (data.tracks?.items ?? []) as SpotifyTrack[]
+  } catch {
+    return []
   }
-
-  return response.json();
 }
 
-export async function fetchAnimeLofiTracks(): Promise<any> {
-  const access_token = await getAccessToken();
+/**
+ * Get a single Spotify track by ID.
+ * Used by: app/api/spotify/track/route.ts
+ */
+export async function getSpotifyTrack(trackId: string): Promise<SpotifyTrack | null> {
+  try {
+    const token = await getAccessToken()
+    const res = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
 
-  const response = await fetch(
-    `https://api.spotify.com/v1/search?q=anime%20lofi&type=track&limit=50`,
-    {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch anime lofi tracks');
+    if (!res.ok) return null
+    return (await res.json()) as SpotifyTrack
+  } catch {
+    return null
   }
-
-  return response.json();
 }

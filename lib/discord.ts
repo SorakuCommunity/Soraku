@@ -1,9 +1,8 @@
-import { DiscordStats } from '@/types'
+import type { DiscordStats } from '@/types'
 
 export async function fetchDiscordStats(): Promise<DiscordStats> {
   const token = process.env.DISCORD_BOT_TOKEN
   const serverId = process.env.DISCORD_SERVER_ID
-
   if (!token || !serverId) return { memberCount: 0, onlineCount: 0 }
 
   try {
@@ -20,32 +19,39 @@ export async function fetchDiscordStats(): Promise<DiscordStats> {
       memberCount: data.approximate_member_count ?? 0,
       onlineCount: data.approximate_presence_count ?? 0,
     }
-  } catch { return { memberCount: 0, onlineCount: 0 } }
+  } catch {
+    return { memberCount: 0, onlineCount: 0 }
+  }
 }
 
-export async function sendDiscordWebhook(content: {
+export async function sendDiscordWebhook(payload: {
   title: string
-  description: string
-  startDate: string
-  endDate: string
+  description?: string | null
+  startDate?: string
+  endDate?: string
 }): Promise<void> {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL
-  if (!webhookUrl) return
+  const url = process.env.DISCORD_WEBHOOK_URL
+  if (!url) return
 
-  await fetch(webhookUrl, {
+  const embed = {
+    title: `🎉 Event Baru: ${payload.title}`,
+    description: payload.description ?? '',
+    color: 0x7c3aed,
+    fields: [
+      ...(payload.startDate
+        ? [{ name: '📅 Mulai', value: payload.startDate, inline: true }]
+        : []),
+      ...(payload.endDate
+        ? [{ name: '📅 Selesai', value: payload.endDate, inline: true }]
+        : []),
+    ],
+    footer: { text: 'Soraku Community' },
+    timestamp: new Date().toISOString(),
+  }
+
+  await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      embeds: [{
-        title: `🎉 Event Baru: ${content.title}`,
-        description: content.description ?? '',
-        color: 0x7C3AED,
-        fields: [
-          { name: '📅 Mulai', value: content.startDate, inline: true },
-          { name: '📅 Selesai', value: content.endDate, inline: true },
-        ],
-        footer: { text: 'Soraku Community' },
-      }],
-    }),
+    body: JSON.stringify({ embeds: [embed] }),
   }).catch(console.error)
 }
