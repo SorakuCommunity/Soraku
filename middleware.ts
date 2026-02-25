@@ -1,6 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
+// ✅ TYPE DEFINITION (Line 4-8)
+type Cookie = {
+  name: string
+  value: string
+  options?: any
+}
+
 const PROTECTED = ['/edit/profile', '/gallery/upload', '/Soraku_Admin']
 
 export async function middleware(request: NextRequest) {
@@ -11,11 +18,16 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return request.cookies.getAll() },
-        setAll(cs) {
+        getAll() { 
+          return request.cookies.getAll() 
+        },
+        // ✅ FIXED LINE 15: Explicit Cookie[] type
+        setAll(cs: Cookie[]) {
           cs.forEach(({ name, value }) => request.cookies.set(name, value))
           response = NextResponse.next({ request })
-          cs.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+          cs.forEach(({ name, value, options }) => 
+            response.cookies.set(name, value, options)
+          )
         },
       },
     }
@@ -30,7 +42,12 @@ export async function middleware(request: NextRequest) {
   }
 
   if (path.startsWith('/Soraku_Admin') && user) {
-    const { data } = await supabase.from('users').select('role').eq('id', user.id).single()
+    const { data } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    
     if (!data || !['OWNER', 'MANAGER', 'ADMIN', 'AGENSI'].includes(data.role)) {
       return NextResponse.redirect(new URL('/', request.url))
     }
@@ -40,5 +57,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
