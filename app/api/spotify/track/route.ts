@@ -1,16 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSpotifyTrack } from '@/lib/spotify'
+import { NextRequest, NextResponse } from 'next/server';
+import { getSpotifyTrack } from "@/lib/spotify";
 
-export async function GET(req: NextRequest) {
-  const id = req.nextUrl.searchParams.get('id')
-  if (!id) {
-    return NextResponse.json({ error: 'Track id is required' }, { status: 400 })
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) {
+      return NextResponse.json({ error: 'ID parameter is required' }, { status: 400 });
+    }
+
+    const track = await getSpotifyTrack(id);
+    return NextResponse.json(track);
+  } catch (error) {
+    console.error('Spotify track fetch error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const track = await getSpotifyTrack(id)
-  if (!track) {
-    return NextResponse.json({ error: 'Track not found' }, { status: 404 })
-  }
-
-  return NextResponse.json({ track })
 }

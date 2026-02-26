@@ -16,21 +16,20 @@ export function Footer() {
             <p className="text-soraku-sub text-sm leading-relaxed max-w-xs">
               Platform komunitas untuk penggemar Anime, Manga, dan Budaya Digital Jepang.
             </p>
-            <p className="text-soraku-sub/50 text-xs mt-3">Version 1.0.a3</p>
           </div>
           <div>
             <h4 className="font-semibold text-xs uppercase tracking-wider text-soraku-sub mb-4">Navigasi</h4>
             <ul className="space-y-2">
-              {[['/', 'Beranda'], ['/komunitas', 'Komunitas'], ['/Anime', 'Anime'], ['/gallery', 'Gallery']].map(([href, label]) => (
-                <li key={href}><Link href={href} className="text-soraku-sub hover:text-soraku-primary transition-colors text-sm">{label}</Link></li>
+              {[['/', 'Beranda'], ['/komunitas', 'Komunitas'], ['/Vtuber', 'Anime'], ['/gallery', 'Gallery']].map(([h, l]) => (
+                <li key={h}><Link href={h} className="text-soraku-sub hover:text-soraku-primary transition-colors text-sm">{l}</Link></li>
               ))}
             </ul>
           </div>
           <div>
             <h4 className="font-semibold text-xs uppercase tracking-wider text-soraku-sub mb-4">Info</h4>
             <ul className="space-y-2">
-              {[['/Blog', 'Blog'], ['/Tentang', 'Tentang Kami'], ['/gallery/upload', 'Upload Karya'], ['/login', 'Login']].map(([href, label]) => (
-                <li key={href}><Link href={href} className="text-soraku-sub hover:text-soraku-primary transition-colors text-sm">{label}</Link></li>
+              {[['/Blog', 'Blog'], ['/Tentang', 'Tentang Kami'], ['/gallery/upload', 'Upload Karya']].map(([h, l]) => (
+                <li key={h}><Link href={h} className="text-soraku-sub hover:text-soraku-primary transition-colors text-sm">{l}</Link></li>
               ))}
             </ul>
           </div>

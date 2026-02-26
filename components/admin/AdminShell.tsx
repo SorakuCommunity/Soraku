@@ -1,66 +1,103 @@
 'use client'
 
 import { useState } from 'react'
-import { LayoutDashboard, Users, FileText, Calendar, Star, Image, Settings, Menu } from 'lucide-react'
+import { LayoutDashboard, Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { UserRole } from '@/types'
+import { ROLE_LABELS, ROLE_COLORS } from '@/lib/roles'
+import type { User } from '@/types'
 
-const MENU = [
-  { id: 'dashboard', label: 'Dashboard',   Icon: LayoutDashboard, minLevel: 1 },
-  { id: 'users',     label: 'Pengguna',    Icon: Users,            minLevel: 3 },
-  { id: 'blog',      label: 'Blog',        Icon: FileText,         minLevel: 3 },
-  { id: 'events',    label: 'Events',      Icon: Calendar,         minLevel: 4 },
-  { id: 'vtubers',   label: 'Anime/Talent',Icon: Star,             minLevel: 4 },
-  { id: 'gallery',   label: 'Gallery',     Icon: Image,            minLevel: 3 },
-  { id: 'settings',  label: 'Settings',    Icon: Settings,         minLevel: 5 },
-] as const
-
-export type TabId = (typeof MENU)[number]['id']
-
-const LEVEL: Record<UserRole, number> = {
-  OWNER: 7, MANAGER: 6, ADMIN: 5, AGENSI: 4, PREMIUM: 3, DONATE: 2, USER: 1,
+interface Tab {
+  key: string
+  label: string
+  icon: React.ElementType
 }
 
 interface Props {
-  role: UserRole
-  children: (tab: TabId) => React.ReactNode
+  user: User
+  tabs: Tab[]
+  onTabChange: (tab: string) => void
+  children: (activeTab: string) => React.ReactNode
 }
 
-export function AdminShell({ role, children }: Props) {
-  const [active, setActive] = useState<TabId>('dashboard')
-  const [open, setOpen] = useState(false)
-  const level = LEVEL[role]
-  const allowed = MENU.filter(m => level >= m.minLevel)
+export function AdminShell({ user, tabs, onTabChange, children }: Props) {
+  const [activeTab, setActiveTab] = useState(tabs[0]?.key ?? 'dashboard')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const handleTabChange = (key: string) => {
+    setActiveTab(key)
+    setSidebarOpen(false)
+    onTabChange(key)
+  }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+    <div className="flex min-h-[calc(100vh-96px)]">
+      {/* ─── Mobile overlay ────────────────────────────────────────── */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* ─── Sidebar ───────────────────────────────────────────────── */}
       <aside className={cn(
-        'fixed inset-y-16 left-0 z-40 w-60 bg-soraku-card border-r border-soraku-border transition-transform duration-200',
-        'lg:relative lg:inset-auto lg:translate-x-0',
-        open ? 'translate-x-0' : '-translate-x-full'
+        'fixed top-16 bottom-0 left-0 z-40 w-60 bg-soraku-card border-r border-soraku-border',
+        'transform transition-transform duration-200',
+        'lg:relative lg:top-auto lg:bottom-auto lg:translate-x-0',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
-        <div className="p-4 h-full overflow-y-auto">
-          <nav className="space-y-1">
-            {allowed.map(({ id, label, Icon }) => (
-              <button key={id} onClick={() => { setActive(id); setOpen(false) }}
-                className={cn(
-                  'w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all',
-                  active === id ? 'bg-soraku-gradient text-white shadow-lg' : 'text-soraku-sub hover:text-soraku-text hover:bg-white/5'
-                )}>
-                <Icon className="w-4 h-4" />{label}
-              </button>
-            ))}
-          </nav>
+        {/* User info */}
+        <div className="p-4 border-b border-soraku-border">
+          <div className="flex items-center gap-3">
+            {user.avatar_url
+              ? <img src={user.avatar_url} alt="" className="w-8 h-8 rounded-full" />
+              : <div className="w-8 h-8 rounded-full bg-purple-500/20" />
+            }
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate">{user.display_name ?? user.username ?? 'Admin'}</p>
+              <span className={`text-xs px-2 py-0.5 rounded-full border ${ROLE_COLORS[user.role]}`}>
+                {ROLE_LABELS[user.role]}
+              </span>
+            </div>
+          </div>
         </div>
+
+        <nav className="p-3 space-y-0.5">
+          {tabs.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => handleTabChange(key)}
+              className={cn(
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+                activeTab === key
+                  ? 'bg-soraku-gradient text-white shadow-lg'
+                  : 'text-soraku-sub hover:text-soraku-text hover:bg-white/5'
+              )}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+              {label}
+            </button>
+          ))}
+        </nav>
       </aside>
-      {open && <div className="fixed inset-0 z-30 bg-black/50 lg:hidden" onClick={() => setOpen(false)} />}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-6">
-          <button onClick={() => setOpen(true)}
-            className="lg:hidden mb-4 p-2 rounded-lg glass text-soraku-sub hover:text-soraku-text">
+
+      {/* ─── Content ───────────────────────────────────────────────── */}
+      <div className="flex-1 min-w-0">
+        {/* Mobile header */}
+        <div className="lg:hidden flex items-center gap-3 px-6 py-4 border-b border-soraku-border">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-soraku-sub hover:text-soraku-text"
+          >
             <Menu className="w-5 h-5" />
           </button>
-          {children(active)}
+          <span className="font-semibold text-sm">
+            {tabs.find(t => t.key === activeTab)?.label ?? 'Admin'}
+          </span>
+        </div>
+
+        <div className="p-6">
+          {children(activeTab)}
         </div>
       </div>
     </div>

@@ -1,257 +1,139 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, AlertCircle, Sparkles } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import { DiscordIcon, GoogleIcon, FacebookIcon, SpotifyIcon } from '@/components/icons'
-import { toast } from 'sonner'
-import Link from 'next/link'
 import Image from 'next/image'
+import { createClient } from '@/lib/supabase/client'
+import { Music, Github, Chrome, Facebook, ArrowRight } from 'lucide-react'
+import { toast } from 'sonner'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-const PANEL_IMGS = [
-  'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=900&q=90',
-  'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=900&q=90',
-  'https://images.unsplash.com/photo-1535016120720-40c646be5580?w=900&q=90',
-]
+const DEFAULT_BG = 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1920&q=80'
+
+// Discord SVG icon (no external lib)
+function DiscordIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20.317 4.492c-1.53-.69-3.17-1.2-4.885-1.49a.075.075 0 0 0-.079.036c-.21.369-.444.85-.608 1.23a18.566 18.566 0 0 0-5.487 0 12.36 12.36 0 0 0-.617-1.23A.077.077 0 0 0 8.562 3c-1.714.29-3.354.8-4.885 1.491a.07.07 0 0 0-.032.027C.533 9.093-.32 13.555.099 17.961a.08.08 0 0 0 .031.055 20.03 20.03 0 0 0 5.993 2.98.078.078 0 0 0 .084-.026 13.83 13.83 0 0 0 1.226-1.963.074.074 0 0 0-.041-.104 13.175 13.175 0 0 1-1.872-.878.075.075 0 0 1-.008-.125c.126-.093.252-.19.372-.287a.075.075 0 0 1 .078-.01c3.927 1.764 8.18 1.764 12.061 0a.075.075 0 0 1 .079.009c.12.098.245.195.372.288a.075.075 0 0 1-.006.125c-.598.344-1.22.635-1.873.877a.075.075 0 0 0-.041.105c.36.687.772 1.341 1.225 1.962a.077.077 0 0 0 .084.028 19.963 19.963 0 0 0 6.002-2.981.076.076 0 0 0 .032-.054c.5-5.094-.838-9.52-3.549-13.442a.06.06 0 0 0-.031-.028z" />
+    </svg>
+  )
+}
 
 export default function LoginPage() {
   const supabase = createClient()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState<string | null>(null)
-  const [bgIdx, setBgIdx] = useState(0)
-  const [loginBg, setLoginBg] = useState<string | null>(null)
-  const [spotifyEnabled, setSpotifyEnabled] = useState(true)
-  const [spotifyWarning, setSpotifyWarning] = useState(false)
+  const [bgUrl, setBgUrl] = useState(DEFAULT_BG)
+
+  const next = searchParams.get('next') ?? '/'
 
   useEffect(() => {
-    const iv = setInterval(() => setBgIdx(i => (i + 1) % PANEL_IMGS.length), 4500)
-    supabase.from('site_settings').select('key,value')
-      .in('key', ['login_background_image', 'login_illustration_enabled', 'oauth_spotify_enabled'])
+    // Load custom BG from site_settings
+    supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'login_bg_url')
+      .single()
       .then(({ data }) => {
-        if (!data) return
-        const bg = data.find(s => s.key === 'login_background_image')?.value
-        const spotify = data.find(s => s.key === 'oauth_spotify_enabled')?.value
-        if (bg) setLoginBg(bg)
-        if (spotify === 'false') setSpotifyEnabled(false)
+        if (data?.value) setBgUrl(data.value)
       })
-    return () => clearInterval(iv)
   }, [supabase])
 
   const signIn = async (provider: 'discord' | 'google' | 'facebook' | 'spotify') => {
     setLoading(provider)
-    setSpotifyWarning(false)
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          scopes: provider === 'spotify' ? 'user-read-email user-read-private' : undefined,
-        },
-      })
-      if (error) throw error
-    } catch {
-      toast.error('Login gagal. Coba lagi.')
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
+    })
+    if (error) {
+      toast.error('Gagal login: ' + error.message)
       setLoading(null)
     }
   }
 
-  const handleSpotify = () => {
-    setSpotifyWarning(true)
-  }
-
-  const illustrationSrc = loginBg ?? PANEL_IMGS[bgIdx]
-
   return (
-    <div className="min-h-screen flex overflow-hidden" style={{ paddingTop: 0 }}>
-
-      {/* ── LEFT PANEL: Anime Illustration ── */}
-      <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div key={illustrationSrc}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2 }}
-            className="absolute inset-0">
-            <Image src={illustrationSrc} alt="Illustration" fill className="object-cover" priority />
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/20 to-soraku-dark/90" />
-
-        {/* Content on illustration */}
-        <div className="absolute inset-0 flex flex-col justify-between p-10">
-          {/* Top brand */}
-          <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.4 }}
-            className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-soraku-gradient flex items-center justify-center shadow-lg">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-display text-xl font-bold text-white drop-shadow">Soraku</span>
-          </motion.div>
-
-          {/* Bottom copy */}
-          <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.6 }}>
-            <h2 className="font-display text-4xl font-bold text-white mb-3 leading-tight drop-shadow-lg">
-              Komunitas Anime<br />&amp; Manga Terbaik
-            </h2>
-            <p className="text-white/70 text-sm max-w-xs leading-relaxed">
-              Bergabunglah dengan ribuan penggemar. Berbagi karya, diskusi seru, dan tumbuh bersama.
-            </p>
-            <div className="flex items-center gap-6 mt-6">
-              {[['10K+','Anggota'],['5K+','Karya'],['100+','Event']].map(([n,l]) => (
-                <div key={l}>
-                  <div className="font-display text-xl font-bold text-white">{n}</div>
-                  <div className="text-white/50 text-xs">{l}</div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Dot indicators */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-          {PANEL_IMGS.map((_, i) => (
-            <button key={i} onClick={() => setBgIdx(i)}
-              className={`w-2 h-2 rounded-full transition-all ${i === bgIdx ? 'bg-white w-5' : 'bg-white/40'}`} />
-          ))}
-        </div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden px-4">
+      {/* Background */}
+      <div className="absolute inset-0 z-0">
+        <Image src={bgUrl} alt="Login Background" fill className="object-cover blur-sm scale-105" priority />
+        <div className="absolute inset-0 bg-gradient-to-br from-soraku-dark/90 via-soraku-dark/80 to-purple-900/60" />
       </div>
 
-      {/* ── RIGHT PANEL: Login Form ── */}
-      <div className="flex-1 flex items-center justify-center bg-soraku-dark relative overflow-hidden p-6">
-        {/* BG glows */}
-        <div className="absolute top-0 right-0 w-72 h-72 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-600/5 rounded-full blur-3xl pointer-events-none" />
-
-        <motion.div
-          initial={{ opacity:0, y:24 }}
-          animate={{ opacity:1, y:0 }}
-          transition={{ duration:0.5, delay:0.1 }}
-          className="w-full max-w-md relative z-10"
-        >
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <div className="w-9 h-9 rounded-xl bg-soraku-gradient flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+      {/* Login Card */}
+      <div className="relative z-10 w-full max-w-md">
+        <div className="glass rounded-3xl p-8 border border-white/10 backdrop-blur-xl shadow-2xl shadow-purple-900/30">
+          {/* Logo / Brand */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-soraku-gradient flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/30">
+              <span className="font-display text-2xl font-black text-white">S</span>
             </div>
-            <span className="font-display text-2xl font-bold grad-text">Soraku</span>
+            <h1 className="font-display text-2xl font-bold mb-1">Masuk ke Soraku</h1>
+            <p className="text-soraku-sub text-sm">Bergabung dengan komunitas anime & manga Indonesia</p>
           </div>
 
-          {/* Card */}
-          <div className="glass rounded-3xl p-8 border border-white/10 shadow-2xl shadow-purple-900/30">
-            <div className="text-center mb-8">
-              <h1 className="font-display text-3xl font-bold mb-1">Masuk ke Soraku</h1>
-              <p className="text-soraku-sub text-sm">Pilih cara login kamu di bawah ini</p>
-            </div>
+          {/* ─── Discord (Primary) ─────────────────────────────────── */}
+          <button
+            onClick={() => signIn('discord')}
+            disabled={!!loading}
+            className="w-full flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white py-3.5 px-5 rounded-2xl font-semibold transition-all hover:scale-[1.02] active:scale-100 shadow-lg shadow-indigo-900/30 mb-3"
+          >
+            <DiscordIcon className="w-5 h-5 shrink-0" />
+            <span className="flex-1 text-left">
+              {loading === 'discord' ? 'Menghubungkan...' : 'Login dengan Discord'}
+            </span>
+            {loading !== 'discord' && <ArrowRight className="w-4 h-4" />}
+          </button>
 
-            {/* Spotify permission warning */}
-            <AnimatePresence>
-              {spotifyWarning && (
-                <motion.div
-                  initial={{ opacity:0, height:0 }}
-                  animate={{ opacity:1, height:'auto' }}
-                  exit={{ opacity:0, height:0 }}
-                  className="mb-4 overflow-hidden"
-                >
-                  <div className="flex gap-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
-                    <AlertCircle className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
-                    <div className="flex-1 text-sm">
-                      <p className="font-semibold text-yellow-300 mb-1">Izin Akses Spotify</p>
-                      <p className="text-yellow-200/70 text-xs mb-3">
-                        Soraku membutuhkan akses ke email dan profil Spotify kamu untuk membuat akun.
-                        Tidak ada data musik yang akan dibagikan.
-                      </p>
-                      <div className="flex gap-2">
-                        <button onClick={() => signIn('spotify')}
-                          className="flex-1 bg-[#1DB954] text-black font-semibold py-2 rounded-lg text-xs hover:opacity-90 transition-opacity">
-                          Setuju &amp; Lanjutkan
-                        </button>
-                        <button onClick={() => setSpotifyWarning(false)}
-                          className="flex-1 glass border border-soraku-border text-soraku-sub py-2 rounded-lg text-xs hover:text-white transition-colors">
-                          Batal
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* PRIMARY – Discord */}
-            <div className="mb-5">
-              <p className="text-center text-xs text-soraku-sub uppercase tracking-widest mb-3">
-                ✨ Direkomendasikan
-              </p>
-              <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
-                onClick={() => signIn('discord')}
-                disabled={!!loading}
-                className="w-full flex items-center justify-center gap-3 bg-[#5865F2] hover:bg-[#4752C4] text-white py-4 rounded-2xl font-bold text-base transition-all shadow-xl shadow-indigo-600/30 disabled:opacity-60 disabled:cursor-not-allowed">
-                {loading === 'discord'
-                  ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  : <DiscordIcon className="w-6 h-6" />
-                }
-                Lanjutkan dengan Discord
-                {!loading && <ArrowRight className="w-4 h-4 ml-auto" />}
-              </motion.button>
-            </div>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3 mb-5">
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="text-soraku-sub text-xs">atau pilih lainnya</span>
-              <div className="flex-1 h-px bg-white/10" />
-            </div>
-
-            {/* SECONDARY – Google + Facebook */}
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              {([
-                { p:'google'   as const, Icon:GoogleIcon,   label:'Google',   hover:'hover:bg-white/5' },
-                { p:'facebook' as const, Icon:FacebookIcon, label:'Facebook',  hover:'hover:bg-blue-900/20' },
-              ] as const).map(({ p, Icon, label, hover }) => (
-                <motion.button key={p} whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
-                  onClick={() => signIn(p)}
-                  disabled={!!loading}
-                  className={`flex items-center justify-center gap-2 glass border border-white/10 ${hover} py-3.5 rounded-xl text-sm font-medium transition-all disabled:opacity-60`}>
-                  {loading === p
-                    ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    : <Icon className="w-5 h-5" />
-                  }
-                  {label}
-                </motion.button>
-              ))}
-            </div>
-
-            {/* OPTIONAL – Spotify */}
-            {spotifyEnabled && !spotifyWarning && (
-              <motion.button whileHover={{ scale:1.01 }} whileTap={{ scale:0.98 }}
-                onClick={handleSpotify}
-                disabled={!!loading}
-                className="w-full flex items-center justify-center gap-2 glass border border-[#1DB954]/20 hover:bg-[#1DB954]/10 py-3.5 rounded-xl text-sm font-medium transition-all disabled:opacity-60 text-[#1DB954]">
-                {loading === 'spotify'
-                  ? <div className="w-4 h-4 border-2 border-[#1DB954]/30 border-t-[#1DB954] rounded-full animate-spin" />
-                  : <SpotifyIcon className="w-5 h-5" />
-                }
-                Lanjutkan dengan Spotify
-                <span className="ml-auto text-xs text-soraku-sub">(Opsional)</span>
-              </motion.button>
-            )}
-
-            <p className="text-center text-xs text-soraku-sub/60 mt-6 leading-relaxed">
-              Dengan login, kamu setuju dengan{' '}
-              <Link href="/Tentang" className="text-purple-400 hover:underline">Ketentuan Layanan</Link>{' '}
-              &amp; Kebijakan Privasi Soraku.
-            </p>
+          {/* ─── Divider ───────────────────────────────────────────── */}
+          <div className="flex items-center gap-3 my-4">
+            <div className="flex-1 h-px bg-soraku-border" />
+            <span className="text-soraku-sub text-xs">atau lanjut dengan</span>
+            <div className="flex-1 h-px bg-soraku-border" />
           </div>
 
-          <div className="text-center mt-5">
-            <Link href="/" className="text-soraku-sub text-sm hover:text-purple-400 transition-colors">
-              ← Kembali ke Beranda
-            </Link>
+          {/* ─── Secondary providers (2-col grid) ─────────────────── */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <button
+              onClick={() => signIn('google')}
+              disabled={!!loading}
+              className="flex items-center justify-center gap-2 glass border border-soraku-border hover:border-white/30 disabled:opacity-60 text-soraku-text py-3 px-4 rounded-xl text-sm font-medium transition-all hover:scale-[1.02]"
+            >
+              <Chrome className="w-4 h-4 text-blue-400" />
+              {loading === 'google' ? '...' : 'Google'}
+            </button>
+            <button
+              onClick={() => signIn('facebook')}
+              disabled={!!loading}
+              className="flex items-center justify-center gap-2 glass border border-soraku-border hover:border-white/30 disabled:opacity-60 text-soraku-text py-3 px-4 rounded-xl text-sm font-medium transition-all hover:scale-[1.02]"
+            >
+              <Facebook className="w-4 h-4 text-blue-500" />
+              {loading === 'facebook' ? '...' : 'Facebook'}
+            </button>
           </div>
-        </motion.div>
+
+          {/* ─── Spotify (optional) ────────────────────────────────── */}
+          <button
+            onClick={() => signIn('spotify')}
+            disabled={!!loading}
+            className="w-full flex items-center justify-center gap-2 glass border border-green-500/30 hover:border-green-500/60 disabled:opacity-60 text-soraku-text py-2.5 px-4 rounded-xl text-sm font-medium transition-all hover:scale-[1.02]"
+          >
+            <Music className="w-4 h-4 text-green-400" />
+            {loading === 'spotify' ? 'Menghubungkan...' : 'Hubungkan Spotify (opsional)'}
+          </button>
+
+          {/* Footer */}
+          <p className="text-center text-soraku-sub text-xs mt-6">
+            Dengan login, kamu menyetujui{' '}
+            <span className="text-soraku-primary">Ketentuan Layanan</span> dan{' '}
+            <span className="text-soraku-primary">Kebijakan Privasi</span> Soraku.
+          </p>
+        </div>
+
+        {/* Decorative elements */}
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-purple-500/10 blur-3xl" />
+        <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-pink-500/10 blur-3xl" />
       </div>
     </div>
   )

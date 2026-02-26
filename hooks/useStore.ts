@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { User, SiteSetting } from '@/types'
+import { User, SiteSetting } from '@/types'
 
 interface AppState {
   currentUser: User | null
@@ -15,7 +15,7 @@ export const useStore = create<AppState>((set, get) => ({
   setCurrentUser: (user) => set({ currentUser: user }),
   setSiteSettings: (settings) => set({ siteSettings: settings }),
   getSetting: (key, fallback = '') => {
-    const found = get().siteSettings.find((s) => s.key === key)
+    const found = get().siteSettings.find(s => s.key === key)
     return found?.value ?? fallback
   },
 }))

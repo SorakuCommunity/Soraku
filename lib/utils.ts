@@ -1,19 +1,9 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import type { UserRole } from '@/types'
+import { UserRole } from '@/types'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
-}
-
-export const ROLE_LEVELS: Record<UserRole, number> = {
-  OWNER: 7,
-  MANAGER: 6,
-  ADMIN: 5,
-  AGENSI: 4,
-  PREMIUM: 3,
-  DONATE: 2,
-  USER: 1,
 }
 
 export function getRoleBadgeColor(role: UserRole): string {
@@ -29,7 +19,7 @@ export function getRoleBadgeColor(role: UserRole): string {
 }
 
 export function hasAdminAccess(role: UserRole): boolean {
-  return ROLE_LEVELS[role] >= ROLE_LEVELS['AGENSI']
+  return ['OWNER', 'MANAGER', 'ADMIN', 'AGENSI'].includes(role)
 }
 
 export function canManageRoles(role: UserRole): boolean {
@@ -37,29 +27,13 @@ export function canManageRoles(role: UserRole): boolean {
 }
 
 export function isOwnerOrManager(role: UserRole): boolean {
-  return ROLE_LEVELS[role] >= ROLE_LEVELS['MANAGER']
+  return ['OWNER', 'MANAGER'].includes(role)
 }
 
-export function canManageAnime(role: UserRole): boolean {
-  return ROLE_LEVELS[role] >= ROLE_LEVELS['AGENSI']
-}
-
-export function isPremiumOrAbove(role: UserRole): boolean {
-  return ROLE_LEVELS[role] >= ROLE_LEVELS['PREMIUM']
-}
-
-/** USER gets max 2 social links, PREMIUM+ gets unlimited */
-export function maxSocialLinks(role: UserRole): number {
-  if (isPremiumOrAbove(role)) return Infinity
-  return 2
-}
-
-export function formatDate(dateStr: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      year: 'numeric', month: 'long', day: 'numeric',
-    })
-  } catch { return dateStr }
+export function formatDate(date: string): string {
+  return new Date(date).toLocaleDateString('id-ID', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  })
 }
 
 export function formatDuration(ms: number): string {
@@ -77,13 +51,4 @@ export function isValidUrl(url: string): boolean {
 
 export function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-}
-
-export function isEventActive(event: { start_date: string; end_date: string }): boolean {
-  const now = new Date()
-  return new Date(event.start_date) <= now && new Date(event.end_date) >= now
-}
-
-export function isEventUpcoming(event: { start_date: string }): boolean {
-  return new Date(event.start_date) > new Date()
 }

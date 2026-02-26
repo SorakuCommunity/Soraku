@@ -1,198 +1,203 @@
 import Image from 'next/image'
-import { Heart, Users, Globe, Sparkles, Star, Calendar, ArrowRight } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import { Heart, Users, Globe, Sparkles, Star, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 
-export const metadata = { title: 'Tentang Soraku' }
+export const metadata: Metadata = { title: 'Tentang Kami — Soraku' }
+export const revalidate = 3600
 
 const TIMELINE = [
-  { year: '2023', q: 'Q1', title: 'Soraku Lahir', desc: 'Sekelompok penggemar anime Indonesia mendirikan Soraku dengan impian sederhana: membuat ruang digital yang terasa seperti rumah bagi sesama penggemar.' },
-  { year: '2023', q: 'Q2', title: 'Discord Diluncurkan', desc: 'Server Discord Soraku resmi dibuka. Dalam minggu pertama, lebih dari 100 anggota bergabung dan komunitas mulai hidup!' },
-  { year: '2023', q: 'Q3', title: 'Event Pertama', desc: 'Soraku mengadakan turnamen kuis anime pertamanya. Antusias luar biasa — lebih dari 50 peserta ikut dan membuktikan semangat komunitas.' },
-  { year: '2023', q: 'Q4', title: 'Galeri & Fanart', desc: 'Galeri online diluncurkan. Ratusan karya fanart mulai bermunculan, memperlihatkan betapa kreatifnya komunitas Soraku.' },
-  { year: '2024', q: 'Q1', title: 'Platform Web Soraku', desc: 'Website Soraku resmi diluncurkan dengan fitur lengkap: blog, galeri, profil kreator, dan integrasi Discord.' },
-  { year: '2024', q: 'Q2', title: '5.000+ Anggota', desc: 'Milestone besar! Komunitas mencapai 5.000 anggota aktif — sebuah bukti nyata bahwa Soraku bukan sekadar impian.' },
-  { year: '2024', q: 'Q3', title: 'Komunitas Goes National', desc: 'Event offline pertama Soraku digelar, menyatukan anggota dari berbagai kota Indonesia untuk pertama kalinya.' },
-  { year: '2024', q: 'Q4', title: '10.000+ Anggota', desc: 'Soraku terus tumbuh. Dengan lebih dari 10.000 anggota, kami makin yakin bahwa anime menyatukan kita semua.' },
-]
-
-const FOUNDERS = [
   {
-    name: 'Kairo', role: 'Founder & CEO',
-    img: 'https://images.unsplash.com/photo-1535016120720-40c646be5580?w=300&q=80',
-    bio: 'Pecinta anime sejati yang percaya bahwa passion bisa jadi platform. Mendirikan Soraku untuk menyatukan komunitas anime Indonesia.',
+    year: '2023',
+    month: 'Awal Tahun',
+    title: 'Lahirnya Ide',
+    desc: 'Soraku bermula dari diskusi kecil antara penggemar anime yang ingin punya ruang digital tersendiri.',
+    accent: 'border-purple-500 text-purple-400',
   },
   {
-    name: 'Tim Soraku', role: 'Co-Founders',
-    img: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=300&q=80',
-    bio: 'Sekelompok penggemar setia yang bergabung di awal perjalanan Soraku dan membantu membangun fondasi komunitas yang kuat.',
+    year: '2023',
+    month: 'Pertengahan',
+    title: 'Discord Pertama',
+    desc: 'Server Discord Soraku resmi dibuka. Anggota pertama mulai berdatangan dari berbagai daerah.',
+    accent: 'border-pink-500 text-pink-400',
+  },
+  {
+    year: '2024',
+    month: 'Awal Tahun',
+    title: 'Platform Web',
+    desc: 'Soraku.vercel.app diluncurkan — dengan Gallery, Blog, dan integrasi Spotify.',
+    accent: 'border-blue-500 text-blue-400',
+  },
+  {
+    year: '2024',
+    month: 'Pertengahan',
+    title: 'Komunitas Berkembang',
+    desc: 'Ribuan anggota aktif. Events offline perdana digelar. VTuber dan kreator lokal bergabung.',
+    accent: 'border-cyan-500 text-cyan-400',
+  },
+  {
+    year: '2025',
+    month: 'Sekarang',
+    title: 'Soraku v1.0.a3',
+    desc: 'Platform diperkuat dengan RBAC, Premium features, Redis, dan upgrade UI menyeluruh.',
+    accent: 'border-yellow-500 text-yellow-400',
   },
 ]
 
-export default function TentangPage() {
+const VALUES = [
+  { icon: Heart, title: 'Passion', desc: 'Didorong kecintaan terhadap anime & manga.', color: 'text-pink-400 bg-pink-400/10 border-pink-400/20' },
+  { icon: Users, title: 'Komunitas', desc: 'Ruang aman dan inklusif bagi semua.', color: 'text-purple-400 bg-purple-400/10 border-purple-400/20' },
+  { icon: Globe, title: 'Budaya', desc: 'Merayakan keindahan budaya digital Jepang.', color: 'text-blue-400 bg-blue-400/10 border-blue-400/20' },
+  { icon: Sparkles, title: 'Kreativitas', desc: 'Mendorong ekspresi kreatif seluruh komunitas.', color: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20' },
+]
+
+export default async function TentangPage() {
+  const supabase = await createClient()
+
+  // Fetch founder settings
+  const { data: settings } = await supabase
+    .from('site_settings')
+    .select('key, value')
+    .in('key', ['founder_name', 'founder_bio', 'founder_avatar', 'site_name', 'tagline'])
+
+  const s = Object.fromEntries((settings ?? []).map(r => [r.key, r.value]))
+
   return (
-    <div className="min-h-screen pt-20 pb-20 overflow-hidden">
-
-      {/* ── Hero Banner ── */}
-      <section className="relative min-h-[60vh] flex items-center overflow-hidden mb-24">
-        <div className="absolute inset-0">
+    <div className="min-h-screen pt-24 pb-16 px-4">
+      <div className="max-w-5xl mx-auto">
+        {/* ─── Hero Banner ──────────────────────────────────────────── */}
+        <div className="relative rounded-3xl overflow-hidden mb-16">
           <Image
-            src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1600&q=80"
-            alt="About Soraku" fill className="object-cover opacity-30"
+            src="https://images.unsplash.com/photo-1535016120720-40c646be5580?w=1200&q=80"
+            alt="Tentang Soraku"
+            width={1200}
+            height={400}
+            className="w-full h-72 object-cover"
+            priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-soraku-dark/40 via-soraku-dark/70 to-soraku-dark" />
-        </div>
-        <div className="relative z-10 max-w-5xl mx-auto px-4 py-20">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-soraku-gradient flex items-center justify-center shadow-lg">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <span className="font-display text-2xl font-bold text-white">Soraku</span>
-          </div>
-          <h1 className="font-display text-6xl md:text-8xl font-bold mb-6 leading-none">
-            Tentang<br /><span className="grad-text">Soraku</span>
-          </h1>
-          <p className="text-xl text-white/70 max-w-2xl leading-relaxed">
-            Dari sebuah impian kecil untuk menyatukan penggemar anime Indonesia,
-            kini Soraku tumbuh menjadi ekosistem komunitas yang sesungguhnya.
-          </p>
-        </div>
-      </section>
-
-      <div className="max-w-5xl mx-auto px-4">
-
-        {/* ── Story ── */}
-        <section className="mb-24">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="absolute inset-0 bg-gradient-to-r from-soraku-dark via-soraku-dark/85 to-transparent flex items-center px-12">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-widest text-purple-400 mb-4">Kisah Kami</div>
-              <h2 className="font-display text-4xl font-bold mb-6">
-                Lebih dari Sekadar<br /><span className="grad-text">Komunitas</span>
-              </h2>
-              <div className="space-y-4 text-soraku-sub text-sm leading-relaxed">
-                <p>
-                  Soraku lahir dari kesederhanaan — sebuah obrolan di Discord antara beberapa penggemar anime yang frustrasi
-                  karena tidak ada tempat yang benar-benar terasa seperti &ldquo;rumah&rdquo; bagi mereka.
-                </p>
-                <p>
-                  Nama &ldquo;Soraku&rdquo; diambil dari harmoni kata Jepang yang mencerminkan semangat kami:
-                  langit yang luas (空) dan kegembiraan (楽) — karena kami percaya ekspresi kreativitas
-                  seharusnya seluas langit dan selalu membawa kebahagiaan.
-                </p>
-                <p>
-                  Hari ini, Soraku bukan hanya platform — ini adalah keluarga. Setiap karya yang diupload,
-                  setiap diskusi yang terjadi, setiap event yang digelar — semuanya dibangun oleh dan untuk komunitas.
-                </p>
-              </div>
+              <h1 className="font-display text-5xl font-bold mb-4">
+                Tentang <span className="grad-text">Soraku</span>
+              </h1>
+              <p className="text-soraku-sub text-lg max-w-lg">{s.tagline ?? 'Platform komunitas untuk penggemar Anime, Manga, dan Budaya Digital Jepang.'}</p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                ['2023', 'Tahun berdiri', 'text-purple-400'],
-                ['10K+', 'Anggota aktif', 'text-pink-400'],
-                ['5K+', 'Karya di galeri', 'text-cyan-400'],
-                ['100+', 'Event digelar', 'text-yellow-400'],
-              ].map(([n, l, c]) => (
-                <div key={l} className="glass rounded-2xl p-6 text-center border border-soraku-border hover:border-purple-500/30 transition-colors">
-                  <div className={`font-display text-3xl font-bold ${c} mb-1`}>{n}</div>
-                  <div className="text-soraku-sub text-xs">{l}</div>
+          </div>
+        </div>
+
+        {/* ─── Story ────────────────────────────────────────────────── */}
+        <div className="grid md:grid-cols-2 gap-12 mb-16 items-center">
+          <div>
+            <h2 className="font-display text-3xl font-bold mb-6">Kisah Kami</h2>
+            <div className="space-y-4 text-soraku-sub leading-relaxed text-sm">
+              <p>
+                Soraku lahir dari impian sederhana: menciptakan ruang digital di mana penggemar anime dan manga
+                dapat berkumpul, berbagi, dan tumbuh bersama.
+              </p>
+              <p>
+                Nama &ldquo;Soraku&rdquo; terinspirasi dari harmoni bahasa Jepang — mencerminkan nilai inti
+                platform ini: kreativitas, komunitas, dan semangat berbagi.
+              </p>
+              <p>
+                Kami percaya setiap penggemar memiliki cerita yang layak didengar dan setiap kreator berhak
+                mendapat tempat untuk berkarya.
+              </p>
+            </div>
+          </div>
+          <div className="glass rounded-2xl p-8 border border-purple-500/20">
+            <div className="grid grid-cols-2 gap-6">
+              {[['2023', 'Tahun Berdiri'], ['10K+', 'Anggota'], ['5K+', 'Karya'], ['∞', 'Semangat']].map(([n, l]) => (
+                <div key={l} className="text-center">
+                  <div className="font-display text-3xl font-bold grad-text">{n}</div>
+                  <div className="text-soraku-sub text-sm mt-1">{l}</div>
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* ── Founders ── */}
-        <section className="mb-24">
-          <div className="text-xs font-semibold uppercase tracking-widest text-pink-400 mb-4">Tim Pendiri</div>
-          <h2 className="font-display text-4xl font-bold mb-10">
-            Orang di Balik <span className="grad-text">Soraku</span>
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-6">
-            {FOUNDERS.map(f => (
-              <div key={f.name} className="glass rounded-2xl overflow-hidden border border-soraku-border hover:border-purple-500/30 transition-colors group">
-                <div className="relative h-48 overflow-hidden">
-                  <Image src={f.img} alt={f.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-60" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-soraku-card to-soraku-card/20" />
+        {/* ─── Founder Section ──────────────────────────────────────── */}
+        {s.founder_name && (
+          <div className="mb-16">
+            <h2 className="font-display text-2xl font-bold mb-8 text-center">
+              Founder & <span className="grad-text">Tim</span>
+            </h2>
+            <div className="glass rounded-3xl p-8 flex flex-col sm:flex-row items-center gap-8 border border-yellow-500/20">
+              {s.founder_avatar ? (
+                <div className="relative w-28 h-28 rounded-2xl overflow-hidden shrink-0">
+                  <Image src={s.founder_avatar} alt={s.founder_name} fill className="object-cover" />
                 </div>
-                <div className="p-6">
-                  <h3 className="font-display text-xl font-bold mb-1">{f.name}</h3>
-                  <div className="text-soraku-primary text-sm font-medium mb-3">{f.role}</div>
-                  <p className="text-soraku-sub text-sm leading-relaxed">{f.bio}</p>
+              ) : (
+                <div className="w-28 h-28 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center shrink-0">
+                  <Star className="w-10 h-10 text-yellow-400" />
                 </div>
+              )}
+              <div>
+                <div className="inline-block text-xs bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full mb-2">
+                  Founder
+                </div>
+                <h3 className="font-display text-2xl font-bold mb-2">{s.founder_name}</h3>
+                {s.founder_bio && (
+                  <p className="text-soraku-sub text-sm leading-relaxed">{s.founder_bio}</p>
+                )}
               </div>
-            ))}
+            </div>
           </div>
-        </section>
+        )}
 
-        {/* ── Timeline ── */}
-        <section className="mb-24">
-          <div className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-4">
-            <Calendar className="inline w-4 h-4 mr-1" />Perjalanan Kami
-          </div>
-          <h2 className="font-display text-4xl font-bold mb-10">
-            Timeline <span className="grad-text">Soraku</span>
+        {/* ─── Timeline ─────────────────────────────────────────────── */}
+        <div className="mb-16">
+          <h2 className="font-display text-2xl font-bold mb-10 text-center">
+            Perjalanan <span className="grad-text">Soraku</span>
           </h2>
           <div className="relative">
             {/* Vertical line */}
-            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-purple-500/50 via-pink-500/30 to-transparent" />
+            <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-purple-500/50 via-soraku-border to-transparent" />
+
             <div className="space-y-8">
               {TIMELINE.map((item, i) => (
-                <div key={i} className={`relative flex items-start gap-6 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                <div key={i} className="flex gap-6 items-start">
                   {/* Dot */}
-                  <div className="absolute left-6 md:left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-soraku-primary border-2 border-soraku-dark shadow-lg shadow-purple-500/50" />
-                  {/* Content */}
-                  <div className={`pl-16 md:pl-0 md:w-[calc(50%-2rem)] ${i % 2 === 0 ? 'md:pr-8 md:text-right' : 'md:pl-8'}`}>
-                    <div className="glass rounded-2xl p-5 border border-soraku-border hover:border-purple-500/30 transition-colors">
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className="text-xs font-bold text-soraku-primary bg-purple-500/10 px-2 py-0.5 rounded-full">{item.year}</span>
-                        <span className="text-xs text-soraku-sub">{item.q}</span>
-                      </div>
-                      <h3 className="font-semibold mb-2">{item.title}</h3>
-                      <p className="text-soraku-sub text-xs leading-relaxed">{item.desc}</p>
+                  <div className={`relative z-10 w-4 h-4 rounded-full border-2 ${item.accent.split(' ')[0]} bg-soraku-dark mt-1 shrink-0 ml-6`} />
+                  {/* Card */}
+                  <div className="glass rounded-2xl p-5 flex-1 hover:border-purple-500/30 transition-colors">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className={`text-xs font-bold ${item.accent.split(' ')[1]}`}>{item.year}</span>
+                      <span className="text-xs text-soraku-sub">{item.month}</span>
                     </div>
+                    <h3 className="font-semibold mb-1">{item.title}</h3>
+                    <p className="text-soraku-sub text-sm">{item.desc}</p>
                   </div>
-                  {/* Spacer for other side */}
-                  <div className="hidden md:block md:w-[calc(50%-2rem)]" />
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* ── Values ── */}
-        <section className="mb-16">
-          <h2 className="font-display text-4xl font-bold mb-10 text-center">
-            Nilai-nilai <span className="grad-text">Kami</span>
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              { Icon: Heart,    color: 'text-pink-400',   bg: 'bg-pink-500/10 border-pink-500/20',   title: 'Passion',    desc: 'Didorong oleh kecintaan tulus terhadap anime & manga.' },
-              { Icon: Users,    color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20', title: 'Komunitas', desc: 'Ruang aman dan inklusif untuk semua penggemar.' },
-              { Icon: Globe,    color: 'text-cyan-400',   bg: 'bg-cyan-500/10 border-cyan-500/20',   title: 'Budaya',     desc: 'Merayakan kekayaan budaya digital Jepang.' },
-              { Icon: Sparkles, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20', title: 'Kreativitas', desc: 'Mendorong setiap orang mengekspresikan diri.' },
-            ].map(({ Icon, color, bg, title, desc }) => (
-              <div key={title} className={`rounded-2xl p-6 border ${bg} text-center hover:scale-105 transition-transform`}>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${bg}`}>
-                  <Icon className={`w-6 h-6 ${color}`} />
+        {/* ─── Values ───────────────────────────────────────────────── */}
+        <div className="mb-16">
+          <h2 className="font-display text-2xl font-bold mb-8 text-center">Nilai Kami</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {VALUES.map(({ icon: Icon, title, desc, color }) => (
+              <div key={title} className="glass rounded-2xl p-6 text-center hover:border-purple-500/40 transition-colors">
+                <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mx-auto mb-4 border`}>
+                  <Icon className="w-6 h-6" />
                 </div>
                 <h3 className="font-semibold mb-2">{title}</h3>
-                <p className="text-soraku-sub text-xs leading-relaxed">{desc}</p>
+                <p className="text-soraku-sub text-sm">{desc}</p>
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
-        {/* CTA */}
-        <div className="glass rounded-3xl p-12 text-center border border-purple-500/20">
-          <Star className="w-8 h-8 text-yellow-400 fill-yellow-400 mx-auto mb-4" />
-          <h2 className="font-display text-3xl font-bold mb-3">
-            Jadilah Bagian dari <span className="grad-text">Soraku</span>
-          </h2>
-          <p className="text-soraku-sub mb-6 max-w-md mx-auto text-sm">
-            Kisah Soraku belum selesai — kamu adalah bab selanjutnya.
-          </p>
-          <Link href="/login"
-            className="inline-flex items-center gap-2 bg-soraku-gradient text-white px-8 py-3.5 rounded-xl font-semibold hover:opacity-90 transition-opacity">
-            Mulai Sekarang <ArrowRight className="w-4 h-4" />
+        {/* ─── CTA ──────────────────────────────────────────────────── */}
+        <div className="text-center">
+          <Link
+            href="/komunitas"
+            className="inline-flex items-center gap-2 bg-soraku-gradient text-white px-8 py-3.5 rounded-full font-semibold hover:opacity-90 transition-opacity"
+          >
+            Bergabung dengan Komunitas <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
