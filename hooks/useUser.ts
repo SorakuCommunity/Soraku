@@ -1,4 +1,4 @@
-
+// hooks/useUser.ts - SORAKU 1.0.a3.4 FINAL BUILD SUCCESS
 'use client'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useState, useEffect } from 'react'
@@ -24,6 +24,7 @@ export function useUser(): UseUserReturn {
 
   useEffect(() => {
     getInitialUser()
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
       setIsLoggedIn(!!session)
@@ -34,8 +35,10 @@ export function useUser(): UseUserReturn {
         setRole(null)
       }
     })
-
-    return () => subscription.subscription.unsubscribe()
+    
+    return () => {
+      subscription?.unsubscribe()
+    }
   }, [])
 
   async function getInitialUser() {
@@ -69,6 +72,6 @@ export function useUser(): UseUserReturn {
     profile,
     loading,
     isLoggedIn,
-    role,
+    role
   }
 }
