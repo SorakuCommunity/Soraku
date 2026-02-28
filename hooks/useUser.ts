@@ -1,44 +1,74 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { User } from '@supabase/supabase-js'
 
-interface UserProfile {
-  id:           string
-  username:     string
-  display_name: string | null
-  avatar_url:   string | null
-  role:         string
-  theme_mode:   string
+'use client'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useState, useEffect } from 'react'
+import type { User } from '@supabase/supabase-js'
+import { UserWithRole } from '@/types'
+
+interface UseUserReturn {
+  user: User | null
+  profile: UserWithRole | null
+  loading: boolean
+  isLoggedIn: boolean
+  role: string | null
 }
 
-export function useUser() {
-  const [user,    setUser]    = useState<User | null>(null)
-  const [profile, setProfile] = useState<UserProfile | null>(null)
+export function useUser(): UseUserReturn {
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<UserWithRole | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [role, setRole] = useState<string | null>(null)
+
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      setUser(user)
-      if (user) {
-        const { data } = await supabase
-          .from('users')
-          .select('id, username, display_name, avatar_url, role, theme_mode')
-          .eq('id', user.id)
-          .single()
-        setProfile(data)
-      }
-      setLoading(false)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    getInitialUser()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
-      if (!session?.user) setProfile(null)
+      setIsLoggedIn(!!session)
+      if (session?.user) {
+        fetchProfile(session.user.id)
+      } else {
+        setProfile(null)
+        setRole(null)
+      }
     })
 
-    return () => subscription.unsubscribe()
+    return () => subscription.subscription.unsubscribe()
   }, [])
 
-  return { user, profile, loading, isLoggedIn: !!user }
+  async function getInitialUser() {
+    const { data: { user } } = await supabase.auth.getUser()
+    setUser(user || null)
+    setIsLoggedIn(!!user)
+    if (user) {
+      await fetchProfile(user.id)
+    }
+    setLoading(false)
+  }
+
+  async function fetchProfile(userId: string) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select(`
+        *,
+        users!profiles_user_id_fkey(role)
+      `)
+      .eq('id', userId)
+      .single()
+
+    if (data && !error) {
+      setProfile(data as UserWithRole)
+      setRole(data.role || null)
+    }
+  }
+
+  return {
+    user,
+    profile,
+    loading,
+    isLoggedIn,
+    role,
+  }
 }
