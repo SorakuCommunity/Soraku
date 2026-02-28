@@ -46,11 +46,27 @@ export async function getGitHubDiscussions(
 }
 
 export async function fetchDiscussionByNumber(
-  owner: string,
-  repo: string,
-  number: number
+  numberOrOwner: number | string,
+  repo?: string,
+  number?: number
 ): Promise<unknown | null> {
-  const cacheKey = `github:discussion:${owner}/${repo}:${number}`
+  // Support both: fetchDiscussionByNumber(num) and fetchDiscussionByNumber(owner, repo, num)
+  let owner: string
+  let repoName: string
+  let discussionNumber: number
+
+  if (typeof numberOrOwner === 'number') {
+    // Called as fetchDiscussionByNumber(number) — use env defaults
+    owner = process.env.GITHUB_OWNER ?? 'SorakuCommunity'
+    repoName = process.env.GITHUB_REPO ?? 'Soraku'
+    discussionNumber = numberOrOwner
+  } else {
+    owner = numberOrOwner
+    repoName = repo!
+    discussionNumber = number!
+  }
+
+  const cacheKey = `github:discussion:${owner}/${repoName}:${discussionNumber}`
   const cached = await cacheGet(cacheKey)
   if (cached) return cached
 
@@ -79,7 +95,7 @@ export async function fetchDiscussionByNumber(
       'Content-Type': 'application/json',
       Authorization: `Bearer ${process.env.GITHUB_TOKEN ?? ''}`,
     },
-    body: JSON.stringify({ query, variables: { owner, repo, number } }),
+    body: JSON.stringify({ query, variables: { owner, repo: repoName, number: discussionNumber } }),
   })
 
   if (!res.ok) return null
