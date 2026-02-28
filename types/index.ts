@@ -1,16 +1,20 @@
-// types/index.ts - SORAKU 1.0.a3.1 ABSOLUTE FINAL FIXED
+// types/index.ts - SORAKU 1.0.a3.1 ABSOLUTE FINAL - ALL TYPES
 export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'PREMIUM' | 'DONATE' | 'USER'
 
-// 1. CORE USER SYSTEM
-export interface UserWithRole {
+// 1. CORE USER SYSTEM - BASE USER TYPE
+export interface User {
   id: string
   email: string | null
   username?: string | null
   full_name?: string | null
-  role: UserRole
-  theme_mode: 'dark' | 'light' | 'auto'
-  social_links?: UserSocialLinks[]
+  role?: UserRole
+  theme_mode?: 'dark' | 'light' | 'auto'
   created_at: string
+}
+
+export interface UserWithRole extends User {
+  role: UserRole        // ✅ Extended dengan role wajib
+  social_links?: UserSocialLinks[]
 }
 
 export interface UserSocialLinks {
@@ -22,8 +26,8 @@ export interface UserSocialLinks {
   max_links: number
 }
 
-// 2. THEME SYSTEM
-export interface SiteSettings {
+// 2. THEME SYSTEM - FIX NAMA SiteSetting
+export interface SiteSetting {  // ✅ FIXED: singular (useStore.ts expect ini)
   primary_color: `#${string}`
   dark_base_color: `#${string}`
   secondary_color?: `#${string}`
@@ -31,6 +35,8 @@ export interface SiteSettings {
   accent_color?: `#${string}`
   theme_mode: 'dark' | 'light' | 'auto'
 }
+
+export interface SiteSettings extends SiteSetting {}  // ✅ Alias plural
 
 // 3. GALLERY SYSTEM
 export interface GalleryItem {
@@ -52,7 +58,7 @@ export interface VtuberData {
   agency_id?: string
 }
 
-// 5. SPOTIFY SYSTEM (FIXED)
+// 5. SPOTIFY SYSTEM
 export interface SpotifyTrack {
   id: string
   name: string
@@ -74,12 +80,12 @@ export interface SpotifyTrack {
   uri: string
 }
 
-// 6. DISCORD SYSTEM (COMPLETE - FIX onlineCount)
+// 6. DISCORD SYSTEM (FULL FIX)
 export interface DiscordStats {
   online: number
-  onlineCount: number           // ✅ FIXED untuk DiscordSection.tsx line 62
-  memberCount: number           // ✅ FIXED untuk DiscordSection.tsx line 46
-  total_members: number         // ✅ Alias untuk useDiscord.ts
+  onlineCount: number
+  memberCount: number
+  total_members: number
   voice_channels: number
   text_channels: number
   boost_count: number
