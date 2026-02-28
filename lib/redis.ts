@@ -48,7 +48,13 @@ export async function checkRateLimit(
 }
 
 // Alias — beberapa file mengimport sebagai rateLimit
-export const rateLimit = checkRateLimit
+// Signature: rateLimit(key, windowSeconds) → returns current count
+export async function rateLimit(key: string, windowSeconds: number): Promise<number> {
+  const r = getRedis()
+  const current = await r.incr(key)
+  if (current === 1) await r.expire(key, windowSeconds)
+  return current
+}
 
 // ─── BullMQ Queues ────────────────────────────────────────────────────────────
 export const webhookQueue = new Queue('webhook', {
