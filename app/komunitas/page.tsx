@@ -1,141 +1,117 @@
-import { fetchDiscussions } from '@/lib/github'
-import { fetchDiscordStats } from '@/lib/discord'
-import { formatDate } from '@/lib/utils'
 import Link from 'next/link'
-import { MessageSquare, ThumbsUp, Clock, Users, Mic, MapPin, Github, ExternalLink } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import { getGitHubDiscussions } from '@/lib/github'
+import { MessageCircle, Radio, Calendar, Mic2, ExternalLink } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const revalidate = 60
-export const metadata: Metadata = { title: 'Komunitas — Soraku' }
-
-const DISCORD_INVITE = 'https://discord.gg/CJJ7KEJMbg'
+export const metadata: Metadata = { title: 'Komunitas – Soraku' }
+export const revalidate = 600 // 10 minutes
 
 export default async function KomunitasPage() {
-  const [discussions, discord] = await Promise.all([
-    fetchDiscussions(),
-    fetchDiscordStats(),
-  ])
+  const supabase = await createClient()
+
+  const { data: events } = await supabase
+    .from('events')
+    .select('id, title, cover_url, description, start_date, type, slug')
+    .in('status', ['active', 'upcoming'])
+    .order('start_date', { ascending: true })
+    .limit(9)
+
+  let discussions: unknown[] = []
+  try {
+    discussions = await getGitHubDiscussions('SorakuCommunity', 'Soraku', 10)
+  } catch {}
+
+  const features = [
+    { icon: <MessageCircle size={20} />, title: 'Diskusi Anime', desc: 'Bahas episode terbaru, rekomendasi, dan teori seru bersama ribuan anggota.' },
+    { icon: <Radio size={20} />,        title: 'Discord Chat',  desc: 'Server Discord aktif 24/7 dengan berbagai channel topik spesifik.' },
+    { icon: <Mic2 size={20} />,         title: 'Voice Channel', desc: 'Nonton bareng, ngobrol santai, dan karaoke online kapan saja.' },
+    { icon: <Calendar size={20} />,     title: 'Event',         desc: 'Event online dan offline reguler — cosplay, quiz, dan banyak lagi.' },
+  ]
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4">
-      <div className="max-w-5xl mx-auto">
-        {/* ─── Header ──────────────────────────────────────────────────── */}
-        <div className="text-center mb-12">
-          <h1 className="font-display text-4xl font-bold mb-4">
-            <span className="grad-text">Komunitas</span> Soraku
-          </h1>
-          <p className="text-soraku-sub">Diskusi, berbagi, dan terhubung dengan sesama penggemar.</p>
-        </div>
+    <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="mb-12 text-center">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: 'var(--text)' }}>Komunitas Soraku</h1>
+        <p className="max-w-xl mx-auto text-sm" style={{ color: 'var(--text-sub)' }}>
+          Bergabunglah bersama ribuan penggemar Anime dan Manga Indonesia.
+        </p>
+      </div>
 
-        {/* ─── Discord Section (top) ────────────────────────────────── */}
-        <div className="grid sm:grid-cols-3 gap-4 mb-12">
-          {/* Discord Chat */}
-          <a
-            href={DISCORD_INVITE}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="glass rounded-2xl p-6 hover:border-indigo-500/50 hover:scale-[1.02] transition-all group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4">
-              <MessageSquare className="w-5 h-5 text-indigo-400" />
+      {/* Feature grid */}
+      <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-16">
+        {features.map(f => (
+          <div key={f.title} className="p-4 sm:p-6 rounded-xl border"
+            style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+              style={{ backgroundColor: 'var(--hover-bg)', color: 'var(--color-primary)' }}>
+              {f.icon}
             </div>
-            <h3 className="font-semibold mb-1 group-hover:text-indigo-400 transition-colors">Chat Discord</h3>
-            <p className="text-soraku-sub text-sm mb-3">Obrolan real-time 24/7 di server Discord Soraku.</p>
-            {discord.memberCount > 0 && (
-              <div className="flex items-center gap-3 text-xs">
-                <span className="flex items-center gap-1 text-soraku-sub">
-                  <Users className="w-3 h-3" /> {discord.memberCount.toLocaleString()} member
-                </span>
-                <span className="flex items-center gap-1 text-green-400">
-                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  {discord.onlineCount.toLocaleString()} online
-                </span>
-              </div>
-            )}
-          </a>
-
-          {/* Voice Channels */}
-          <a
-            href={DISCORD_INVITE}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="glass rounded-2xl p-6 hover:border-purple-500/50 hover:scale-[1.02] transition-all group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4">
-              <Mic className="w-5 h-5 text-purple-400" />
-            </div>
-            <h3 className="font-semibold mb-1 group-hover:text-purple-400 transition-colors">Voice Channel</h3>
-            <p className="text-soraku-sub text-sm mb-3">Nonton bareng, ngobrol, dan ngemil di voice channel.</p>
-            <span className="text-xs text-purple-400 flex items-center gap-1">
-              <ExternalLink className="w-3 h-3" /> Buka Discord
-            </span>
-          </a>
-
-          {/* Offline Meetups */}
-          <div className="glass rounded-2xl p-6">
-            <div className="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-4">
-              <MapPin className="w-5 h-5 text-pink-400" />
-            </div>
-            <h3 className="font-semibold mb-1">Offline Meetup</h3>
-            <p className="text-soraku-sub text-sm mb-3">Kumpul bareng komunitas di acara anime & manga lokal.</p>
-            <Link href="/events" className="text-xs text-pink-400 hover:text-pink-300 flex items-center gap-1 transition-colors">
-              <ExternalLink className="w-3 h-3" /> Lihat Events
-            </Link>
+            <h3 className="font-semibold text-sm mb-1" style={{ color: 'var(--text)' }}>{f.title}</h3>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-sub)' }}>{f.desc}</p>
           </div>
-        </div>
+        ))}
+      </div>
 
-        {/* ─── GitHub Discussions (bottom) ─────────────────────────── */}
-        <div className="mb-6 flex items-center gap-3">
-          <Github className="w-5 h-5 text-soraku-sub" />
-          <h2 className="font-semibold text-lg">Diskusi Komunitas</h2>
-          {discussions.length === 0 && (
-            <span className="text-xs text-soraku-sub bg-soraku-muted/50 px-2 py-0.5 rounded-full">
-              Memerlukan konfigurasi GitHub token
-            </span>
-          )}
-        </div>
+      {/* Discord CTA */}
+      <div className="mb-16 p-6 sm:p-8 rounded-2xl text-center border"
+        style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--glass-border)' }}>
+        <div className="text-3xl mb-3">💬</div>
+        <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--text)' }}>Gabung Discord Kami</h2>
+        <p className="text-sm mb-4" style={{ color: 'var(--text-sub)' }}>Server aktif dengan 1000+ member dari seluruh Indonesia.</p>
+        <a href="https://discord.gg/CJJ7KEJMbg" target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm min-h-[44px] hover:opacity-90 transition-opacity"
+          style={{ backgroundColor: '#5865F2', color: '#fff' }}>
+          Bergabung ke Discord
+        </a>
+      </div>
 
-        {discussions.length === 0 ? (
-          <div className="glass rounded-2xl p-10 text-center">
-            <Github className="w-10 h-10 text-soraku-sub mx-auto mb-4 opacity-40" />
-            <p className="text-soraku-sub text-sm">
-              Belum ada diskusi tersedia. Set <code className="text-purple-400 text-xs bg-purple-500/10 px-1.5 py-0.5 rounded">GITHUB_TOKEN</code>,{' '}
-              <code className="text-purple-400 text-xs bg-purple-500/10 px-1.5 py-0.5 rounded">GITHUB_REPO_OWNER</code>,{' '}
-              dan <code className="text-purple-400 text-xs bg-purple-500/10 px-1.5 py-0.5 rounded">GITHUB_REPO_NAME</code> di environment.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {discussions.map((d) => (
-              <Link
-                key={d.id}
-                href={`/komunitas/${d.number}`}
-                className="glass rounded-2xl p-5 block group hover:border-purple-500/50 transition-all"
-              >
-                <div className="flex gap-4">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={d.author.avatarUrl} alt={d.author.login} className="w-9 h-9 rounded-full shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs text-soraku-sub bg-soraku-muted/50 px-2 py-0.5 rounded-full">
-                        {d.category.emoji} {d.category.name}
-                      </span>
-                    </div>
-                    <h2 className="font-semibold group-hover:text-purple-400 transition-colors line-clamp-1 mb-1 text-sm">{d.title}</h2>
-                    <p className="text-soraku-sub text-xs line-clamp-2 mb-2">{d.body}</p>
-                    <div className="flex items-center gap-4 text-xs text-soraku-sub">
-                      <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{d.comments.totalCount}</span>
-                      <span className="flex items-center gap-1"><ThumbsUp className="w-3 h-3" />{d.upvoteCount}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDate(d.createdAt)}</span>
-                      <span className="text-soraku-sub/70">oleh {d.author.login}</span>
-                    </div>
+      {/* Events */}
+      {events && events.length > 0 && (
+        <div className="mb-16">
+          <h2 className="text-xl font-bold mb-6" style={{ color: 'var(--text)' }}>Event Mendatang</h2>
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {events.map(e => (
+              <div key={e.id} className="rounded-xl border overflow-hidden"
+                style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                {e.cover_url && (
+                  <div className="aspect-video overflow-hidden">
+                    <img src={e.cover_url} alt={e.title} className="w-full h-full object-cover" />
                   </div>
+                )}
+                <div className="p-3">
+                  <h3 className="font-semibold text-xs mb-1 truncate" style={{ color: 'var(--text)' }}>{e.title}</h3>
+                  {e.start_date && (
+                    <p className="text-xs" style={{ color: 'var(--text-sub)' }}>
+                      {new Date(e.start_date).toLocaleDateString('id-ID')}
+                    </p>
+                  )}
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* GitHub Discussions */}
+      {(discussions as {id:string;title:string;url:string;author:{login:string}}[]).length > 0 && (
+        <div>
+          <h2 className="text-xl font-bold mb-6" style={{ color: 'var(--text)' }}>Diskusi GitHub</h2>
+          <div className="space-y-3">
+            {(discussions as {id:string;title:string;url:string;author:{login:string};upvoteCount:number;comments:{totalCount:number}}[]).map(d => (
+              <a key={d.id} href={d.url} target="_blank" rel="noopener noreferrer"
+                className="flex items-center justify-between p-4 rounded-xl border transition-all hover:bg-[var(--hover-bg)]"
+                style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate" style={{ color: 'var(--text)' }}>{d.title}</p>
+                  <p className="text-xs" style={{ color: 'var(--text-sub)' }}>oleh {d.author?.login}</p>
+                </div>
+                <ExternalLink size={14} className="flex-shrink-0 ml-3" style={{ color: 'var(--text-sub)' }} />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

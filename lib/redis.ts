@@ -1,93 +1,57 @@
 /**
- * ============================================================
- *  SORAKU COMMUNITY — PROPRIETARY & CONFIDENTIAL
- * ============================================================
- *  Redis client (ioredis) — Singleton pattern for Next.js
- * ============================================================
+ * lib/redis.ts — Centralized Redis + BullMQ
+ * All cache, rate limiting, and queue logic lives here.
  */
-
-import Redis from 'ioredis'
+import { Redis } from 'ioredis'
+import { Queue } from 'bullmq'
 
 let redis: Redis | null = null
 
-function getRedisClient(): Redis {
-  if (redis) return redis
-
-  const url = process.env.REDIS_URL
-  if (!url) {
-    throw new Error('REDIS_URL environment variable is not set')
+export function getRedis(): Redis {
+  if (!redis) {
+    redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379', {
+      maxRetriesPerRequest: null,
+      lazyConnect: true,
+    })
   }
-
-  redis = new Redis(url, {
-    maxRetriesPerRequest: 3,
-    enableReadyCheck: false,
-    lazyConnect: true,
-  })
-
-  redis.on('error', (err) => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('[Redis] Connection error:', err.message)
-    }
-  })
-
   return redis
 }
 
-export { getRedisClient }
-
-// ─── Generic cache helpers ─────────────────────────────────────────────────
-
+// ─── Cache helpers ────────────────────────────────────────────────────────────
 export async function cacheGet<T>(key: string): Promise<T | null> {
-  try {
-    const client = getRedisClient()
-    const raw = await client.get(key)
-    if (!raw) return null
-    return JSON.parse(raw) as T
-  } catch {
-    return null
-  }
+  const r = getRedis()
+  const val = await r.get(key)
+  if (!val) return null
+  try { return JSON.parse(val) as T } catch { return null }
 }
 
-export async function cacheSet<T>(
-  key: string,
-  value: T,
-  ttlSeconds = 600
-): Promise<void> {
-  try {
-    const client = getRedisClient()
-    await client.setex(key, ttlSeconds, JSON.stringify(value))
-  } catch {
-    // Fail silently — cache miss is acceptable
-  }
+export async function cacheSet(key: string, value: unknown, ttlSeconds: number): Promise<void> {
+  const r = getRedis()
+  await r.set(key, JSON.stringify(value), 'EX', ttlSeconds)
 }
 
 export async function cacheDel(key: string): Promise<void> {
-  try {
-    const client = getRedisClient()
-    await client.del(key)
-  } catch {
-    // Fail silently
-  }
+  await getRedis().del(key)
 }
 
-// ─── Rate limiting ─────────────────────────────────────────────────────────
-
-/**
- * Increment a counter for rate-limiting.
- * Returns current count. Sets TTL on first increment.
- */
-export async function rateLimit(
+// ─── Rate limiting ────────────────────────────────────────────────────────────
+export async function checkRateLimit(
   key: string,
-  windowSeconds = 60
-): Promise<number> {
-  try {
-    const client = getRedisClient()
-    const pipeline = client.pipeline()
-    pipeline.incr(key)
-    pipeline.expire(key, windowSeconds)
-    const results = await pipeline.exec()
-    return (results?.[0]?.[1] as number) ?? 0
-  } catch {
-    return 0
-  }
+  maxRequests: number,
+  windowSeconds: number
+): Promise<{ allowed: boolean; remaining: number }> {
+  const r = getRedis()
+  const current = await r.incr(key)
+  if (current === 1) await r.expire(key, windowSeconds)
+  const allowed = current <= maxRequests
+  return { allowed, remaining: Math.max(0, maxRequests - current) }
 }
+
+// ─── BullMQ Queues ────────────────────────────────────────────────────────────
+export const webhookQueue = new Queue('webhook', {
+  connection: { host: 'localhost', port: 6379 },
+})
+
+export const spotifyQueue = new Queue('spotify-refresh', {
+  connection: { host: 'localhost', port: 6379 },
+})

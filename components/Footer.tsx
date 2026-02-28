@@ -1,44 +1,82 @@
+'use client'
 import Link from 'next/link'
-import { Sparkles, Heart } from 'lucide-react'
+import { Github, Twitter, Instagram, MessageCircle } from 'lucide-react'
+
+const links = {
+  Platform: [
+    { label: 'Beranda',    href: '/' },
+    { label: 'Blog',       href: '/blog' },
+    { label: 'Gallery',    href: '/gallery' },
+    { label: 'Komunitas',  href: '/komunitas' },
+    { label: 'VTuber',     href: '/Vtuber' },
+  ],
+  Sosial: [
+    { label: 'Discord',    href: 'https://discord.gg/CJJ7KEJMbg', external: true },
+    { label: 'Twitter/X',  href: 'https://x.com/appSora',         external: true },
+    { label: 'Instagram',  href: 'https://instagram.com/soraku.moe', external: true },
+    { label: 'GitHub',     href: 'https://github.com/SorakuCommunity', external: true },
+  ],
+}
 
 export function Footer() {
   return (
-    <footer className="border-t border-soraku-border bg-soraku-card/30 mt-20">
+    <footer className="border-t" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-soraku-gradient flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-display font-bold text-xl grad-text">Soraku</span>
-            </Link>
-            <p className="text-soraku-sub text-sm leading-relaxed max-w-xs">
-              Platform komunitas untuk penggemar Anime, Manga, dan Budaya Digital Jepang.
+        <div className="grid grid-cols-3 gap-8 mb-8">
+          {/* Brand */}
+          <div>
+            <span className="font-bold text-lg" style={{ color: 'var(--color-primary)' }}>
+              Soraku
+            </span>
+            <p className="mt-2 text-sm" style={{ color: 'var(--text-sub)' }}>
+              Platform komunitas Anime, Manga, dan Budaya Digital Jepang.
             </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-xs uppercase tracking-wider text-soraku-sub mb-4">Navigasi</h4>
-            <ul className="space-y-2">
-              {[['/', 'Beranda'], ['/komunitas', 'Komunitas'], ['/Vtuber', 'Anime'], ['/gallery', 'Gallery']].map(([h, l]) => (
-                <li key={h}><Link href={h} className="text-soraku-sub hover:text-soraku-primary transition-colors text-sm">{l}</Link></li>
+            <div className="flex gap-3 mt-4">
+              {[
+                { icon: <Github size={16} />, href: 'https://github.com/SorakuCommunity' },
+                { icon: <Twitter size={16} />, href: 'https://x.com/appSora' },
+                { icon: <Instagram size={16} />, href: 'https://instagram.com/soraku.moe' },
+                { icon: <MessageCircle size={16} />, href: 'https://discord.gg/CJJ7KEJMbg' },
+              ].map((s, i) => (
+                <a
+                  key={i} href={s.href} target="_blank" rel="noopener noreferrer"
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ color: 'var(--text-sub)' }}
+                >
+                  {s.icon}
+                </a>
               ))}
-            </ul>
+            </div>
           </div>
-          <div>
-            <h4 className="font-semibold text-xs uppercase tracking-wider text-soraku-sub mb-4">Info</h4>
-            <ul className="space-y-2">
-              {[['/Blog', 'Blog'], ['/Tentang', 'Tentang Kami'], ['/gallery/upload', 'Upload Karya']].map(([h, l]) => (
-                <li key={h}><Link href={h} className="text-soraku-sub hover:text-soraku-primary transition-colors text-sm">{l}</Link></li>
-              ))}
-            </ul>
-          </div>
+
+          {Object.entries(links).map(([title, items]) => (
+            <div key={title}>
+              <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--text)' }}>{title}</h4>
+              <ul className="space-y-2">
+                {items.map((item) => (
+                  <li key={item.label}>
+                    {'external' in item && item.external ? (
+                      <a href={item.href} target="_blank" rel="noopener noreferrer"
+                        className="text-sm hover:opacity-80 transition-opacity"
+                        style={{ color: 'var(--text-sub)' }}>
+                        {item.label}
+                      </a>
+                    ) : (
+                      <Link href={item.href}
+                        className="text-sm hover:opacity-80 transition-opacity"
+                        style={{ color: 'var(--text-sub)' }}>
+                        {item.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div className="border-t border-soraku-border mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-soraku-sub text-xs">
-            © {new Date().getFullYear()} Soraku. Dibuat dengan <Heart className="inline w-3 h-3 text-pink-500" /> untuk komunitas.
-          </p>
-          <p className="text-soraku-sub text-xs">Next.js 15 · Supabase · Vercel</p>
+
+        <div className="pt-8 border-t text-sm text-center" style={{ borderColor: 'var(--border)', color: 'var(--text-sub)' }}>
+          © {new Date().getFullYear()} Soraku Community. All rights reserved. · v1.0.a3.1
         </div>
       </div>
     </footer>

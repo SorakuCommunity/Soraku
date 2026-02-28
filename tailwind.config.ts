@@ -10,24 +10,37 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // ── Soraku Theme Tokens (reference CSS variables) ──────────────
         soraku: {
-          dark: '#0D0D1A',
-          card: '#111827',
-          border: '#1F2937',
-          muted: '#374151',
-          primary: '#7C3AED',
-          secondary: '#EC4899',
-          accent: '#06B6D4',
-          text: '#F9FAFB',
-          sub: '#9CA3AF',
+          // Semantic aliases — do NOT use hardcoded hex in components
+          dark:     'var(--bg)',
+          card:     'var(--bg-card)',
+          border:   'var(--border)',
+          muted:    'var(--bg-muted)',
+          primary:  'var(--color-primary)',
+          secondary:'var(--color-secondary)',
+          accent:   'var(--color-accent)',
+          text:     'var(--text)',
+          sub:      'var(--text-sub)',
         },
+        // ── Direct palette access (for advanced usage) ──────────────────
+        'theme-primary':    'var(--color-primary)',
+        'theme-dark-base':  'var(--color-dark-base)',
+        'theme-secondary':  'var(--color-secondary)',
+        'theme-light-base': 'var(--color-light-base)',
+        'theme-accent':     'var(--color-accent)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans:    ['Inter', 'system-ui', 'sans-serif'],
         display: ['Lexend', 'Inter', 'sans-serif'],
       },
       backgroundImage: {
-        'soraku-gradient': 'linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #06B6D4 100%)',
+        'soraku-gradient': 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
+        'soraku-gradient-full': 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 50%, var(--color-secondary) 100%)',
+      },
+      borderColor: {
+        soraku: 'var(--border)',
+        'soraku-primary': 'var(--color-primary)',
       },
     },
   },

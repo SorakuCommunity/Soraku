@@ -1,103 +1,56 @@
-import { createClient } from '@/lib/supabase/server'
-import Image from 'next/image'
 import Link from 'next/link'
-import { Twitter, Youtube, Twitch, Instagram, Star, Plus } from 'lucide-react'
-import type { VtuberProfile } from '@/types'
+import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = { title: 'Anime & VTuber — Soraku' }
-export const revalidate = 60
-
-const FALLBACK: VtuberProfile[] = [
-  { id: '1', name: 'Sakura Miko', slug: 'sakura-miko', generation: 'Gen 3', avatar_url: 'https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=400&q=80', description: 'Kreator anime pilihan komunitas Soraku.', twitter: null, youtube: null, twitch: null, instagram: null, tiktok: null, created_at: '' },
-  { id: '2', name: 'Nakiri Ayame', slug: 'nakiri-ayame', generation: 'Gen 2', avatar_url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&q=80', description: 'Streamer dengan konten anime berkualitas tinggi.', twitter: null, youtube: null, twitch: null, instagram: null, tiktok: null, created_at: '' },
-  { id: '3', name: 'Shirakami Fubuki', slug: 'shirakami-fubuki', generation: 'Gen 1', avatar_url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&q=80', description: 'Content creator anime dan gaming populer.', twitter: null, youtube: null, twitch: null, instagram: null, tiktok: null, created_at: '' },
-]
+export const metadata: Metadata = { title: 'VTuber – Soraku' }
 
 export default async function VtuberPage() {
   const supabase = await createClient()
-  const { data } = await supabase
+  const { data: vtubers } = await supabase
     .from('vtubers')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  const profiles: VtuberProfile[] = (data?.length ? data : FALLBACK) as VtuberProfile[]
-
-  // Group by generation
-  const generations = [...new Set(profiles.map(p => p.generation ?? 'Lainnya'))].filter(Boolean)
+    .select('id, name, slug, description, agency, avatar_url')
+    .eq('active', true)
+    .order('name')
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-12 flex items-end justify-between">
-          <div>
-            <h1 className="font-display text-4xl font-bold mb-4">
-              Anime & <span className="grad-text">VTuber</span>
-            </h1>
-            <p className="text-soraku-sub">Koleksi kreator dan talent berbakat dari komunitas Soraku.</p>
-          </div>
-          <Link
-            href="/Soraku_Admin"
-            className="inline-flex items-center gap-2 glass border border-soraku-border px-4 py-2 rounded-xl text-sm hover:border-purple-500 transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Tambah VTuber
-          </Link>
-        </div>
-
-        {/* Grid — all or by generation */}
-        {generations.length > 1 ? (
-          generations.map(gen => (
-            <div key={gen} className="mb-12">
-              <h2 className="font-display text-xl font-semibold mb-6 flex items-center gap-2">
-                <Star className="w-4 h-4 text-purple-400" />
-                <span>{gen}</span>
-              </h2>
-              <VtuberGrid profiles={profiles.filter(p => (p.generation ?? 'Lainnya') === gen)} />
-            </div>
-          ))
-        ) : (
-          <VtuberGrid profiles={profiles} />
-        )}
+    <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="mb-10">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: 'var(--text)' }}>VTuber</h1>
+        <p className="text-sm" style={{ color: 'var(--text-sub)' }}>Kenali VTuber dan kreator konten dalam ekosistem Soraku.</p>
       </div>
-    </div>
-  )
-}
 
-function VtuberGrid({ profiles }: { profiles: VtuberProfile[] }) {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {profiles.map((p) => (
-        <Link
-          key={p.id}
-          href={`/Vtuber/${p.slug ?? p.id}`}
-          className="glass rounded-2xl overflow-hidden hover:border-purple-500/50 hover:scale-[1.02] transition-all group"
-        >
-          <div className="relative h-52 overflow-hidden">
-            {p.avatar_url ? (
-              <Image src={p.avatar_url} alt={p.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
-            ) : (
-              <div className="w-full h-full bg-soraku-muted flex items-center justify-center">
-                <Star className="w-12 h-12 text-soraku-sub/30" />
+      {!vtubers?.length ? (
+        <div className="text-center py-24">
+          <p className="text-4xl mb-4">🎭</p>
+          <p style={{ color: 'var(--text-sub)' }}>Belum ada VTuber terdaftar.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {vtubers.map(v => (
+            <Link key={v.id} href={`/Vtuber/${v.slug}`}
+              className="group rounded-2xl border overflow-hidden transition-all hover:-translate-y-1 hover:shadow-lg"
+              style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              {/* Avatar */}
+              <div className="aspect-square overflow-hidden" style={{ backgroundColor: 'var(--bg-muted)' }}>
+                {v.avatar_url ? (
+                  <img src={v.avatar_url} alt={v.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-3xl">🎭</div>
+                )}
               </div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-soraku-card to-transparent" />
-            {p.generation && (
-              <span className="absolute top-3 left-3 text-xs bg-soraku-primary/80 text-white px-2 py-0.5 rounded-full">{p.generation}</span>
-            )}
-          </div>
-          <div className="p-5">
-            <h3 className="font-display font-bold text-lg mb-1 group-hover:text-soraku-primary transition-colors">{p.name}</h3>
-            {p.description && <p className="text-soraku-sub text-sm line-clamp-2 mb-3">{p.description}</p>}
-            <div className="flex items-center gap-2">
-              {p.twitter && <Twitter className="w-4 h-4 text-soraku-sub" />}
-              {p.youtube && <Youtube className="w-4 h-4 text-soraku-sub" />}
-              {p.twitch && <Twitch className="w-4 h-4 text-soraku-sub" />}
-              {p.instagram && <Instagram className="w-4 h-4 text-soraku-sub" />}
-            </div>
-          </div>
-        </Link>
-      ))}
+              <div className="p-3">
+                <h3 className="font-semibold text-xs sm:text-sm truncate" style={{ color: 'var(--text)' }}>{v.name}</h3>
+                {v.agency && (
+                  <p className="text-xs truncate mt-0.5" style={{ color: 'var(--color-primary)' }}>{v.agency}</p>
+                )}
+                {v.description && (
+                  <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--text-sub)' }}>{v.description}</p>
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,15 +1,12 @@
 /**
- * ============================================================
- *  SORAKU COMMUNITY — PROPRIETARY & CONFIDENTIAL
- * ============================================================
- *  Copyright © 2026 Soraku Community. All Rights Reserved.
- * ============================================================
+ * lib/roles.ts — Centralized Role System
+ * All role validation must go through this file.
  */
 
-import type { UserRole } from '@/types'
+export const ROLES = ['OWNER', 'MANAGER', 'ADMIN', 'AGENSI', 'PREMIUM', 'DONATE', 'USER'] as const
+export type Role = (typeof ROLES)[number]
 
-// Hierarchy: OWNER(7) > MANAGER(6) > ADMIN(5) > AGENSI(4) > PREMIUM(3) > DONATE(2) > USER(1)
-export const ROLES: Record<UserRole, number> = {
+const ROLE_RANK: Record<Role, number> = {
   OWNER:   7,
   MANAGER: 6,
   ADMIN:   5,
@@ -19,70 +16,35 @@ export const ROLES: Record<UserRole, number> = {
   USER:    1,
 }
 
-export const ROLE_LABELS: Record<UserRole, string> = {
-  OWNER:   'Owner',
-  MANAGER: 'Manager',
-  ADMIN:   'Admin',
-  AGENSI:  'Agensi',
-  PREMIUM: 'Premium',
-  DONATE:  'Donatur',
-  USER:    'Member',
+export function hasRole(userRole: Role | null | undefined, required: Role): boolean {
+  if (!userRole) return false
+  return ROLE_RANK[userRole] >= ROLE_RANK[required]
 }
 
-export const ROLE_COLORS: Record<UserRole, string> = {
-  OWNER:   'text-yellow-400 bg-yellow-400/10 border-yellow-400/30',
-  MANAGER: 'text-purple-400 bg-purple-400/10 border-purple-400/30',
-  ADMIN:   'text-blue-400 bg-blue-400/10 border-blue-400/30',
-  AGENSI:  'text-cyan-400 bg-cyan-400/10 border-cyan-400/30',
-  PREMIUM: 'text-pink-400 bg-pink-400/10 border-pink-400/30',
-  DONATE:  'text-orange-400 bg-orange-400/10 border-orange-400/30',
-  USER:    'text-gray-400 bg-gray-400/10 border-gray-400/30',
+export function getRoleRank(role: Role | null | undefined): number {
+  if (!role) return 0
+  return ROLE_RANK[role] ?? 0
 }
 
-export function hasRole(userRole: UserRole, requiredRole: UserRole): boolean {
-  return ROLES[userRole] >= ROLES[requiredRole]
+export function isAdmin(role: Role | null | undefined): boolean {
+  return hasRole(role, 'ADMIN')
 }
 
-export function isPremium(role: UserRole): boolean {
-  return hasRole(role, 'PREMIUM')
-}
-
-export function canManageVtuber(role: UserRole): boolean {
+export function isAgensi(role: Role | null | undefined): boolean {
   return hasRole(role, 'AGENSI')
 }
 
-export function canFullCRUDVtuber(role: UserRole): boolean {
-  return hasRole(role, 'MANAGER')
+export function isPremium(role: Role | null | undefined): boolean {
+  return hasRole(role, 'PREMIUM')
 }
 
-export function canManageBlog(role: UserRole): boolean {
-  return hasRole(role, 'ADMIN')
+/**
+ * Server-side role check — calls DB function public.has_role(role_name)
+ */
+export async function checkUserRole(
+  supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: boolean | null }> },
+  role: Role
+): Promise<boolean> {
+  const { data } = await supabase.rpc('has_role', { role_name: role })
+  return data === true
 }
-
-export function canManageEvents(role: UserRole): boolean {
-  return hasRole(role, 'ADMIN')
-}
-
-export function canApproveGallery(role: UserRole): boolean {
-  return hasRole(role, 'ADMIN')
-}
-
-export function canManageRoles(role: UserRole): boolean {
-  return hasRole(role, 'MANAGER')
-}
-
-export function canAccessAdmin(role: UserRole): boolean {
-  return hasRole(role, 'ADMIN')
-}
-
-export function canToggleMaintenance(role: UserRole): boolean {
-  return hasRole(role, 'OWNER')
-}
-
-/** Max social links: USER/DONATE = 2, PREMIUM+ = unlimited */
-export function maxSocialLinks(role: UserRole): number {
-  return isPremium(role) ? 999 : 2
-}
-
-export const ALL_ROLES: UserRole[] = ['OWNER', 'MANAGER', 'ADMIN', 'AGENSI', 'PREMIUM', 'DONATE', 'USER']
-export const ADMIN_ROLES: UserRole[] = ['OWNER', 'MANAGER', 'ADMIN', 'AGENSI']
