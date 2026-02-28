@@ -1,4 +1,4 @@
-// app/Admin/pengurus/page.tsx — SORAKU v1.0.a3.4
+// app/Admin/pengurus/page.tsx — SORAKU v1.0.a3.4 ✅ BUILD FIXED
 // Separate table for staff: OWNER, MANAGER, ADMIN, AGENSI
 export const dynamic = 'force-dynamic'
 import { redirect } from 'next/navigation'
@@ -79,14 +79,29 @@ export default async function AdminPengurusPage() {
                         <tr key={m.id}
                           className="border-b transition-colors hover:bg-white/[0.02]"
                           style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+                          {/* ✅ FIXED AVATAR - ringColor → border-2 */}
                           <td className="px-4 py-3">
-                            <div className="w-8 h-8 rounded-full overflow-hidden ring-1 flex items-center justify-center"
-                              style={{ backgroundColor: color + '22', ringColor: color + '40' }}>
+                            <div 
+                              className="w-8 h-8 rounded-full overflow-hidden border-2 flex items-center justify-center shadow-sm"
+                              style={{ 
+                                backgroundColor: color + '22',
+                                borderColor: color + '40'
+                              }}
+                            >
                               {m.avatar_url ? (
-                                <Image src={m.avatar_url} alt={m.username} width={32} height={32} className="object-cover" />
+                                <Image 
+                                  src={m.avatar_url} 
+                                  alt={m.username || 'Avatar'} 
+                                  width={32} 
+                                  height={32} 
+                                  className="w-full h-full object-cover rounded-full" 
+                                />
                               ) : (
-                                <span className="text-xs font-bold" style={{ color }}>
-                                  {m.username[0]?.toUpperCase()}
+                                <span 
+                                  className="text-xs font-bold flex items-center justify-center w-full h-full"
+                                  style={{ color }}
+                                >
+                                  {m.username?.[0]?.toUpperCase()}
                                 </span>
                               )}
                             </div>
