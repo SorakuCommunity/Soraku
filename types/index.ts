@@ -1,6 +1,7 @@
-// types/index.ts - SORAKU 1.0.a3.1 FULLY CORRECTED
+// types/index.ts - SORAKU 1.0.a3.1 FULL SPEC - ALL FEATURES
 export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'PREMIUM' | 'DONATE' | 'USER'
 
+// 1. CORE USER SYSTEM
 export interface UserWithRole {
   id: string
   email: string | null
@@ -21,6 +22,7 @@ export interface UserSocialLinks {
   max_links: number
 }
 
+// 2. THEME SYSTEM (Admin + User)
 export interface SiteSettings {
   primary_color: `#${string}`
   dark_base_color: `#${string}`
@@ -30,6 +32,7 @@ export interface SiteSettings {
   theme_mode: 'dark' | 'light' | 'auto'
 }
 
+// 3. GALLERY SYSTEM
 export interface GalleryItem {
   id: string
   image_url: string
@@ -40,6 +43,7 @@ export interface GalleryItem {
   created_at: string
 }
 
+// 4. VTUBER SYSTEM
 export interface VtuberData {
   slug: string
   name: string
@@ -48,11 +52,11 @@ export interface VtuberData {
   agency_id?: string
 }
 
-// 🎵 SPOTIFY API REAL SPEC (MusicPlayer.tsx compatible)
+// 5. SPOTIFY INTEGRATION (MusicPlayer.tsx)
 export interface SpotifyTrack {
   id: string
   name: string
-  artists: Array<{     // ✅ FIXED: Array of artists
+  artists: Array<{
     name: string
     id: string
   }>
@@ -68,4 +72,47 @@ export interface SpotifyTrack {
   preview_url?: string
   external_url?: string
   uri: string
+}
+
+// 6. DISCORD INTEGRATION (useDiscord.ts) ✅ NEW
+export interface DiscordStats {
+  online: number
+  total_members: number
+  voice_channels: number
+  text_channels: number
+  boost_count: number
+  last_updated: string
+}
+
+// 7. GITHUB INTEGRATION 
+export interface GitHubRepo {
+  name: string
+  description: string
+  stars: number
+  forks: number
+  language: string
+  html_url: string
+}
+
+// 8. BLOG POST TYPE
+export interface BlogPost {
+  id: string
+  slug: string
+  title: string
+  excerpt: string
+  content: string
+  author_id: string
+  published: boolean
+  published_at?: string
+  spotify_track_id?: string
+}
+
+// 9. EVENT TYPE
+export interface EventData {
+  id: string
+  title: string
+  description: string
+  date: string
+  location: string
+  status: 'ongoing' | 'upcoming' | 'finished'
 }
