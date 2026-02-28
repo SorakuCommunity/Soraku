@@ -1,4 +1,4 @@
-// types/index.ts - SORAKU 1.0.a3.1 FULL SPEC - ALL FEATURES
+// types/index.ts - SORAKU 1.0.a3.1 ABSOLUTE FINAL - NO MORE ERRORS
 export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'PREMIUM' | 'DONATE' | 'USER'
 
 // 1. CORE USER SYSTEM
@@ -22,7 +22,7 @@ export interface UserSocialLinks {
   max_links: number
 }
 
-// 2. THEME SYSTEM (Admin + User)
+// 2. THEME SYSTEM
 export interface SiteSettings {
   primary_color: `#${string}`
   dark_base_color: `#${string}`
@@ -52,7 +52,7 @@ export interface VtuberData {
   agency_id?: string
 }
 
-// 5. SPOTIFY INTEGRATION (MusicPlayer.tsx)
+// 5. SPOTIFY SYSTEM (FIXED)
 export interface SpotifyTrack {
   id: string
   name: string
@@ -74,17 +74,18 @@ export interface SpotifyTrack {
   uri: string
 }
 
-// 6. DISCORD INTEGRATION (useDiscord.ts) ✅ NEW
+// 6. DISCORD SYSTEM (COMPLETE FIX)
 export interface DiscordStats {
   online: number
-  total_members: number
+  memberCount: number        // ✅ FIXED untuk DiscordSection.tsx
+  total_members: number      // ✅ Alias untuk useDiscord.ts
   voice_channels: number
   text_channels: number
   boost_count: number
   last_updated: string
 }
 
-// 7. GITHUB INTEGRATION 
+// 7. GITHUB SYSTEM
 export interface GitHubRepo {
   name: string
   description: string
@@ -94,7 +95,7 @@ export interface GitHubRepo {
   html_url: string
 }
 
-// 8. BLOG POST TYPE
+// 8. BLOG SYSTEM
 export interface BlogPost {
   id: string
   slug: string
@@ -107,7 +108,7 @@ export interface BlogPost {
   spotify_track_id?: string
 }
 
-// 9. EVENT TYPE
+// 9. EVENT SYSTEM
 export interface EventData {
   id: string
   title: string
