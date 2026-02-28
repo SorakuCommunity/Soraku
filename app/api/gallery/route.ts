@@ -7,7 +7,7 @@
  * ============================================================
  */
 
-// app/api/gallery/route.ts - FIXED NO JSDOM (Vercel Serverless Safe)
+// app/api/gallery/route.ts - Soraku 1.0.a3.1 FINAL BUILD SUCCESS
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
@@ -16,7 +16,6 @@ import DOMPurify from 'dompurify'
 
 const ADMIN_ROLES: UserRole[] = ['OWNER', 'MANAGER', 'ADMIN']
 
-// Simple sanitization tanpa JSDOM (Vercel Edge compatible)
 const sanitizeCaption = (caption: string): string => {
   return DOMPurify.sanitize(caption, { 
     ALLOWED_TAGS: ['b', 'i', 'em', 'strong'], 
@@ -37,8 +36,8 @@ const uploadSchema = z.object({
 })
 
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
   const { searchParams } = new URL(request.url)
+  const supabase = await createClient() // ✅ FIXED: await client
   
   const { search, approved, page = 1, limit = 9 } = getSchema.parse({
     search: searchParams.get('search'),
@@ -48,21 +47,28 @@ export async function GET(request: NextRequest) {
   })
 
   try {
-    const query = supabase
+    let query = supabase
       .from('gallery')
       .select('*', { count: 'exact' })
-      .eq('approved', approved === 'true')
+      .eq('approved', true) // Default: approved only
+      .order('created_at', { ascending: false })
       .range((page - 1) * limit, page * limit - 1)
 
-    if (search) query.ilike('caption', `%${search}%`)
-    if (approved === 'false') query.eq('approved', false)
+    // Filter logic
+    if (approved === 'false') query = query.eq('approved', false)
+    if (search) query = query.ilike('caption', `%${search}%`)
 
     const { data, error, count } = await query
     if (error) throw error
 
     return NextResponse.json({
       data: data as GalleryItem[],
-      pagination: { page, limit, total: count || 0, totalPages: Math.ceil((count || 0) / limit) }
+      pagination: { 
+        page, 
+        limit, 
+        total: count || 0, 
+        totalPages: Math.ceil((count || 0) / limit) 
+      }
     })
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch gallery' }, { status: 500 })
@@ -70,18 +76,26 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient() // ✅ FIXED: await client
+  
   try {
     const { caption, image_url } = uploadSchema.parse(await request.json())
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     const cleanCaption = sanitizeCaption(caption)
 
     const { data, error } = await supabase
       .from('gallery')
-      .insert({ caption: cleanCaption, image_url, user_id: user.id, approved: false })
+      .insert({ 
+        caption: cleanCaption, 
+        image_url, 
+        user_id: user.id, 
+        approved: false 
+      })
       .select()
       .single()
 
