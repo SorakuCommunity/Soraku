@@ -383,3 +383,31 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 CREATE INDEX IF NOT EXISTS idx_vtuber_socials_vtuber ON vtuber_socials(vtuber_id);
 CREATE INDEX IF NOT EXISTS idx_user_roles_user ON user_roles(user_id);
+
+-- ============================================================
+--  v1.0.a3.4 ADDITIONS (idempotent)
+-- ============================================================
+
+-- gallery.likes
+DO $$ BEGIN
+  ALTER TABLE gallery ADD COLUMN likes INTEGER DEFAULT 0;
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+UPDATE gallery SET likes = 0 WHERE likes IS NULL;
+
+-- events.cover_image
+DO $$ BEGIN
+  ALTER TABLE events ADD COLUMN cover_image TEXT;
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+
+-- blog_posts.published_at
+DO $$ BEGIN
+  ALTER TABLE blog_posts ADD COLUMN published_at TIMESTAMPTZ;
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+UPDATE blog_posts SET published_at = created_at WHERE published = true AND published_at IS NULL;
+
+-- Performance indexes
+CREATE INDEX IF NOT EXISTS idx_gallery_likes      ON gallery(likes DESC);
+CREATE INDEX IF NOT EXISTS idx_gallery_created    ON gallery(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_blog_published_at  ON blog_posts(published_at DESC) WHERE published = true;
+CREATE INDEX IF NOT EXISTS idx_events_status_date ON events(status, date ASC);
+CREATE INDEX IF NOT EXISTS idx_user_socials_user  ON user_socials(user_id);

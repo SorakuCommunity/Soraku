@@ -1,85 +1,206 @@
-// components/Footer.tsx — SORAKU v1.0.a3.2 — Responsive fix
+// components/Footer.tsx — SORAKU v1.0.a3.4
+// Glass footer: Logo + desc | Quick Links | Social Icons
 'use client'
-import Link from 'next/link'
-import { Github, Twitter, Instagram, MessageCircle } from 'lucide-react'
 
-const links = {
-  Platform: [
-    { label: 'Beranda',   href: '/' },
-    { label: 'Blog',      href: '/blog' },
-    { label: 'Gallery',   href: '/gallery' },
-    { label: 'Komunitas', href: '/komunitas' },
-    { label: 'VTuber',    href: '/Vtuber' },
-  ],
-  Sosial: [
-    { label: 'Discord',   href: 'https://discord.gg/CJJ7KEJMbg', external: true },
-    { label: 'Twitter/X', href: 'https://x.com/appSora',          external: true },
-    { label: 'Instagram', href: 'https://instagram.com/soraku.moe', external: true },
-    { label: 'GitHub',    href: 'https://github.com/SorakuCommunity', external: true },
-  ],
-}
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+
+const quickLinks = [
+  { label: 'Beranda',   href: '/' },
+  { label: 'Blog',      href: '/blog' },
+  { label: 'Events',    href: '/events' },
+  { label: 'Komunitas', href: '/komunitas' },
+  { label: 'VTuber',    href: '/Vtuber' },
+  { label: 'Gallery',   href: '/gallery' },
+]
+
+const socials = [
+  {
+    label: 'Discord',
+    href: 'https://discord.gg/CJJ7KEJMbg',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.113 18.1.132 18.11a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
+      </svg>
+    ),
+    color: '#5865F2',
+  },
+  {
+    label: 'Instagram',
+    href: 'https://instagram.com/soraku.moe',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
+      </svg>
+    ),
+    color: '#E1306C',
+  },
+  {
+    label: 'TikTok',
+    href: 'https://tiktok.com/@soraku.moe',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.3 6.3 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.77a4.85 4.85 0 0 1-1.01-.08z" />
+      </svg>
+    ),
+    color: '#000000',
+  },
+  {
+    label: 'Twitter/X',
+    href: 'https://x.com/appSora',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      </svg>
+    ),
+    color: '#1DA1F2',
+  },
+  {
+    label: 'Website',
+    href: 'https://soraku.vercel.app',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+    ),
+    color: 'var(--color-primary)',
+  },
+]
 
 export function Footer() {
   return (
-    <footer className="border-t" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Grid: 1 col mobile → 3 col desktop */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
-          {/* Brand */}
-          <div className="text-center sm:text-left">
-            <span className="font-bold text-lg" style={{ color: 'var(--color-primary)' }}>
-              Soraku
-            </span>
-            <p className="mt-2 text-sm" style={{ color: 'var(--text-sub)' }}>
-              Platform komunitas Anime, Manga, dan Budaya Digital Jepang.
-            </p>
-            {/* Social icons — centered on mobile */}
-            <div className="flex gap-3 mt-4 justify-center sm:justify-start">
-              {[
-                { icon: <Github size={16} />,       href: 'https://github.com/SorakuCommunity' },
-                { icon: <Twitter size={16} />,      href: 'https://x.com/appSora' },
-                { icon: <Instagram size={16} />,    href: 'https://instagram.com/soraku.moe' },
-                { icon: <MessageCircle size={16} />,href: 'https://discord.gg/CJJ7KEJMbg' },
-              ].map((s, i) => (
-                <a
-                  key={i} href={s.href} target="_blank" rel="noopener noreferrer"
-                  className="p-2 rounded-lg transition-colors"
-                  style={{ color: 'var(--text-sub)' }}
-                >
-                  {s.icon}
-                </a>
-              ))}
-            </div>
-          </div>
+    <footer>
+      {/* Glass top panel */}
+      <div
+        className="border-t backdrop-blur-xl"
+        style={{
+          backgroundColor: 'rgba(255,255,255,0.03)',
+          borderColor: 'rgba(255,255,255,0.08)',
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
 
-          {Object.entries(links).map(([title, items]) => (
-            <div key={title} className="text-center sm:text-left">
-              <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--text)' }}>{title}</h4>
+            {/* Left: Logo + description */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span
+                  className="font-bold text-2xl tracking-tight"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent, #E8C2A8))',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  Soraku
+                </span>
+                <span className="text-lg">🎌</span>
+              </div>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-sub)' }}>
+                Platform komunitas Anime, Manga, dan Budaya Digital Jepang. Tempat berkumpulnya para kreator dan pecinta budaya Jepang Indonesia.
+              </p>
+              {/* Social icons */}
+              <div className="flex gap-2 flex-wrap">
+                {socials.map(s => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={s.label}
+                    className="w-9 h-9 rounded-xl flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                    style={{
+                      backgroundColor: 'rgba(255,255,255,0.05)',
+                      borderColor: 'rgba(255,255,255,0.10)',
+                      color: s.color,
+                    }}
+                  >
+                    {s.icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Middle: Quick Links */}
+            <div>
+              <h4 className="font-semibold text-sm mb-4" style={{ color: 'var(--text)' }}>
+                Navigasi
+              </h4>
               <ul className="space-y-2">
-                {items.map((item) => (
-                  <li key={item.label}>
-                    {'external' in item && item.external ? (
-                      <a href={item.href} target="_blank" rel="noopener noreferrer"
-                        className="text-sm hover:opacity-80 transition-opacity"
-                        style={{ color: 'var(--text-sub)' }}>
-                        {item.label}
-                      </a>
-                    ) : (
-                      <Link href={item.href}
-                        className="text-sm hover:opacity-80 transition-opacity"
-                        style={{ color: 'var(--text-sub)' }}>
-                        {item.label}
-                      </Link>
-                    )}
+                {quickLinks.map(link => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm transition-colors hover:text-[var(--color-primary)] flex items-center gap-1.5 group"
+                      style={{ color: 'var(--text-sub)' }}
+                    >
+                      <span
+                        className="w-1 h-1 rounded-full inline-block transition-all group-hover:w-2"
+                        style={{ backgroundColor: 'var(--color-primary)' }}
+                      />
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
             </div>
-          ))}
-        </div>
 
-        <div className="pt-8 border-t text-sm text-center" style={{ borderColor: 'var(--border)', color: 'var(--text-sub)' }}>
-          © {new Date().getFullYear()} Soraku Community. All rights reserved. · v1.0.a3.3
+            {/* Right: Social + Discord CTA */}
+            <div>
+              <h4 className="font-semibold text-sm mb-4" style={{ color: 'var(--text)' }}>
+                Komunitas
+              </h4>
+              <a
+                href="https://discord.gg/CJJ7KEJMbg"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 rounded-xl border mb-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg group"
+                style={{
+                  backgroundColor: 'rgba(88,101,242,0.10)',
+                  borderColor: 'rgba(88,101,242,0.25)',
+                }}
+              >
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: '#5865F220' }}>
+                  <svg viewBox="0 0 24 24" fill="#5865F2" className="w-5 h-5">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.113 18.1.132 18.11a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Join Discord</div>
+                  <div className="text-xs" style={{ color: 'var(--text-sub)' }}>Server aktif 24/7</div>
+                </div>
+              </a>
+
+              <p className="text-xs" style={{ color: 'var(--text-sub)' }}>
+                Ada pertanyaan atau ingin berkolaborasi?{' '}
+                <a href="mailto:echo.soraku@gmail.com" className="underline underline-offset-2 hover:text-[var(--color-primary)] transition-colors">
+                  Hubungi kami
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom copyright bar */}
+      <div
+        className="border-t"
+        style={{
+          backgroundColor: 'rgba(0,0,0,0.2)',
+          borderColor: 'rgba(255,255,255,0.05)',
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-4 py-4 text-center">
+          <p className="text-xs" style={{ color: 'var(--text-sub)' }}>
+            © {new Date().getFullYear()} Soraku Community · All rights reserved ·{' '}
+            <Link href="/Tentang" className="hover:text-[var(--color-primary)] transition-colors">Tentang</Link>
+            {' '}·{' '}
+            <a href="https://github.com/SorakuCommunity" target="_blank" rel="noopener noreferrer"
+              className="hover:text-[var(--color-primary)] transition-colors">GitHub</a>
+          </p>
         </div>
       </div>
     </footer>

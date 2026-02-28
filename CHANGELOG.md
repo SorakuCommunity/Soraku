@@ -1,3 +1,42 @@
+## [1.0.a3.4] — 2026-03-01
+
+### Added
+- `DiscordHeroCard` component (shared Dashboard + Komunitas)
+  - Discord server icon, name, live online/total member count
+  - Animated green pulse status indicator + animated glow border
+  - Horizontal scrollable online member strip with glow dots
+  - Auto-hides entirely if no Discord data returned
+  - Full skeleton loading state
+- Dashboard `app/page.tsx` redesigned
+  - DiscordHeroCard as hero section
+  - Content Connection Area: Latest Blog Posts (2-col grid, conditional)
+  - Content Connection Area: Latest Events (2-col grid, conditional)
+  - Staggered Framer Motion fade-in on content cards
+- Komunitas `app/komunitas/page.tsx` redesigned
+  - DiscordHeroCard at top
+  - Filter Tabs: Terbaru / Populer / Trending with AnimatePresence
+  - Glass gallery grid (2–4 col responsive) with hover overlay
+  - GitHub Discussions section (upvote + comment count)
+- `SocialLinksEditor` component
+  - Platforms: Discord, Instagram, TikTok, Twitter/X, YouTube, Website
+  - USER role: max 2 links with soft warning text
+  - PREMIUM/DONATE/AGENSI/MANAGER/ADMIN/OWNER: unlimited
+  - Per-row save with loading spinner + glass toast animation
+- `app/api/profile/socials` POST route (server-side role limit enforcement)
+- Footer redesigned — glass panel, logo, quick links, Discord CTA, copyright bar
+- `app/edit/profile/page.tsx` — glassmorphism redesign + SocialLinksEditor integrated
+- `supabase/migration_v1.0.a3.4.sql` — idempotent migration with all schema checks
+- `next.config.mjs` — optimizePackageImports, security headers, asset caching
+
+### Fixed
+- `app/api/discord/stats` now returns full `online_members[]` array for hero card
+- Profile edit styling migrated to glassmorphism
+
+### Changed
+- Version: 1.0.a3.3 → 1.0.a3.4
+
+---
+
 # Changelog — Soraku Platform
 
 Format: [Semantic Versioning](https://semver.org)
