@@ -128,3 +128,16 @@ export interface EventData {
   location: string
   status: 'ongoing' | 'upcoming' | 'finished'
 }
+
+// 11. COOKIE TYPE - SUPABASE SSR + MIDDLEWARE
+export interface Cookie {
+  name: string
+  value: string
+  options?: {
+    httpOnly?: boolean
+    secure?: boolean
+    sameSite?: 'lax' | 'strict' | 'none'
+    maxAge?: number
+    path?: string
+  }
+}
