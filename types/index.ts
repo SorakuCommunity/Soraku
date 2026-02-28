@@ -1,7 +1,7 @@
-// types/index.ts - SORAKU 1.0.a3.1 ABSOLUTE FINAL - ALL TYPES
+// types/index.ts - SORAKU 1.0.a3.1 USESTORE ARRAY FIX
 export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'PREMIUM' | 'DONATE' | 'USER'
 
-// 1. CORE USER SYSTEM - BASE USER TYPE
+// 1. CORE USER SYSTEM
 export interface User {
   id: string
   email: string | null
@@ -13,7 +13,7 @@ export interface User {
 }
 
 export interface UserWithRole extends User {
-  role: UserRole        // ✅ Extended dengan role wajib
+  role: UserRole
   social_links?: UserSocialLinks[]
 }
 
@@ -26,8 +26,14 @@ export interface UserSocialLinks {
   max_links: number
 }
 
-// 2. THEME SYSTEM - FIX NAMA SiteSetting
-export interface SiteSetting {  // ✅ FIXED: singular (useStore.ts expect ini)
+// 2. SITE SETTINGS - KEY-VALUE ARRAY (useStore.ts REQUIRED)
+export interface SiteSetting {
+  key: string           // ✅ "primary_color", "dark_base_color", etc
+  value: string         // ✅ "#4FA3D1", "#1C1E22", etc
+}
+
+// 3. DB THEME OBJECT (untuk admin panel)
+export interface SiteSettingsObject {
   primary_color: `#${string}`
   dark_base_color: `#${string}`
   secondary_color?: `#${string}`
@@ -36,9 +42,7 @@ export interface SiteSetting {  // ✅ FIXED: singular (useStore.ts expect ini)
   theme_mode: 'dark' | 'light' | 'auto'
 }
 
-export interface SiteSettings extends SiteSetting {}  // ✅ Alias plural
-
-// 3. GALLERY SYSTEM
+// 4. GALLERY SYSTEM
 export interface GalleryItem {
   id: string
   image_url: string
@@ -49,7 +53,7 @@ export interface GalleryItem {
   created_at: string
 }
 
-// 4. VTUBER SYSTEM
+// 5. VTUBER SYSTEM
 export interface VtuberData {
   slug: string
   name: string
@@ -58,7 +62,7 @@ export interface VtuberData {
   agency_id?: string
 }
 
-// 5. SPOTIFY SYSTEM
+// 6. SPOTIFY SYSTEM
 export interface SpotifyTrack {
   id: string
   name: string
@@ -80,7 +84,7 @@ export interface SpotifyTrack {
   uri: string
 }
 
-// 6. DISCORD SYSTEM (FULL FIX)
+// 7. DISCORD SYSTEM
 export interface DiscordStats {
   online: number
   onlineCount: number
@@ -92,7 +96,7 @@ export interface DiscordStats {
   last_updated: string
 }
 
-// 7. GITHUB SYSTEM
+// 8. GITHUB SYSTEM
 export interface GitHubRepo {
   name: string
   description: string
@@ -102,7 +106,7 @@ export interface GitHubRepo {
   html_url: string
 }
 
-// 8. BLOG SYSTEM
+// 9. BLOG SYSTEM
 export interface BlogPost {
   id: string
   slug: string
@@ -115,7 +119,7 @@ export interface BlogPost {
   spotify_track_id?: string
 }
 
-// 9. EVENT SYSTEM
+// 10. EVENT SYSTEM
 export interface EventData {
   id: string
   title: string
