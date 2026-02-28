@@ -1,17 +1,12 @@
 /**
- * lib/supabase.ts — Re-export untuk kompatibilitas import @/lib/supabase
- * Beberapa file mengimport dari '@/lib/supabase' (bukan '@/lib/supabase/server')
+ * lib/supabase.ts — Barrel export untuk @/lib/supabase
  */
 
 import { createClient as createSupabaseJs } from '@supabase/supabase-js'
 
 export { createClient, createAdminClient } from './supabase/server'
 
-/**
- * createServerSupabaseClient — SYNC version (tanpa await, tanpa cookies)
- * Dipakai di webhook/API routes yang tidak butuh session user.
- * Menggunakan service role key agar bisa write ke DB.
- */
+// Sync client — untuk webhook/API routes tanpa cookies
 export function createServerSupabaseClient() {
   return createSupabaseJs(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,3 +14,8 @@ export function createServerSupabaseClient() {
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
 }
+
+// Aliases
+export const createSupabaseServer    = createServerSupabaseClient
+export const createServiceClient     = createServerSupabaseClient
+export const createAdminSupabase     = createServerSupabaseClient

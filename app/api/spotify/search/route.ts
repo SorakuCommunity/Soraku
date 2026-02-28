@@ -1,18 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { searchSpotifyTracks } from "@/lib/spotify";
+import { NextRequest, NextResponse } from 'next/server'
+import { searchSpotifyTracks } from '@/lib/spotify'
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const q     = searchParams.get('q')     ?? ''
+  const limit = parseInt(searchParams.get('limit') ?? '10')
+
+  if (!q.trim()) return NextResponse.json({ tracks: [] })
+
   try {
-    const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q');
-    if (!query) {
-      return NextResponse.json({ error: 'Query parameter is required' }, { status: 400 });
-    }
-
-    const tracks = await searchSpotifyTracks(query);
-    return NextResponse.json(tracks);
-  } catch (error) {
-    console.error('Spotify search error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const tracks = await searchSpotifyTracks(q, Math.min(limit, 20))
+    return NextResponse.json({ tracks })
+  } catch {
+    return NextResponse.json({ tracks: [] }, { status: 500 })
   }
 }

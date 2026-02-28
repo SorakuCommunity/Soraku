@@ -1,16 +1,11 @@
 /**
- * lib/github.ts — GitHub Discussions API with Redis cache (10 min TTL)
+ * lib/github.ts — GitHub Discussions API with Redis cache
  */
 import { cacheGet, cacheSet } from './redis'
 
-const GITHUB_API = 'https://api.github.com'
-const CACHE_TTL = 600 // 10 minutes
+const CACHE_TTL = 600
 
-export async function getGitHubDiscussions(
-  owner: string,
-  repo: string,
-  limit = 10
-): Promise<unknown[]> {
+export async function getGitHubDiscussions(owner: string, repo: string, limit = 10): Promise<unknown[]> {
   const cacheKey = `github:discussions:${owner}/${repo}`
   const cached = await cacheGet<unknown[]>(cacheKey)
   if (cached) return cached
@@ -28,41 +23,43 @@ export async function getGitHubDiscussions(
       }
     }
   `
-
-  const res = await fetch('https://api.github.com/graphql', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN ?? ''}`,
-    },
-    body: JSON.stringify({ query, variables: { owner, repo, first: limit } }),
-  })
-
-  if (!res.ok) return []
-  const data = await res.json()
-  const nodes = data?.data?.repository?.discussions?.nodes ?? []
-  await cacheSet(cacheKey, nodes, CACHE_TTL)
-  return nodes
+  try {
+    const res = await fetch('https://api.github.com/graphql', {
+      method:  'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN ?? ''}`,
+      },
+      body: JSON.stringify({ query, variables: { owner, repo, first: limit } }),
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+    const nodes = data?.data?.repository?.discussions?.nodes ?? []
+    await cacheSet(cacheKey, nodes, CACHE_TTL)
+    return nodes
+  } catch { return [] }
 }
+
+// Alias
+export const fetchDiscussions = getGitHubDiscussions
 
 export async function fetchDiscussionByNumber(
   numberOrOwner: number | string,
   repo?: string,
   number?: number
 ): Promise<unknown | null> {
-  // Support both: fetchDiscussionByNumber(num) and fetchDiscussionByNumber(owner, repo, num)
+  // Support: fetchDiscussionByNumber(num) OR fetchDiscussionByNumber(owner, repo, num)
   let owner: string
   let repoName: string
   let discussionNumber: number
 
   if (typeof numberOrOwner === 'number') {
-    // Called as fetchDiscussionByNumber(number) — use env defaults
-    owner = process.env.GITHUB_OWNER ?? 'SorakuCommunity'
-    repoName = process.env.GITHUB_REPO ?? 'Soraku'
+    owner            = process.env.GITHUB_OWNER ?? 'SorakuCommunity'
+    repoName         = process.env.GITHUB_REPO  ?? 'Soraku'
     discussionNumber = numberOrOwner
   } else {
-    owner = numberOrOwner
-    repoName = repo!
+    owner            = numberOrOwner
+    repoName         = repo!
     discussionNumber = number!
   }
 
@@ -79,28 +76,28 @@ export async function fetchDiscussionByNumber(
           category { name emoji }
           upvoteCount
           comments(first: 20) {
-            nodes {
-              id bodyHTML createdAt
-              author { login avatarUrl }
-            }
+            nodes { id bodyHTML createdAt author { login avatarUrl } }
           }
         }
       }
     }
   `
-
-  const res = await fetch('https://api.github.com/graphql', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN ?? ''}`,
-    },
-    body: JSON.stringify({ query, variables: { owner, repo: repoName, number: discussionNumber } }),
-  })
-
-  if (!res.ok) return null
-  const data = await res.json()
-  const discussion = data?.data?.repository?.discussion ?? null
-  if (discussion) await cacheSet(cacheKey, discussion, CACHE_TTL)
-  return discussion
+  try {
+    const res = await fetch('https://api.github.com/graphql', {
+      method:  'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN ?? ''}`,
+      },
+      body: JSON.stringify({ query, variables: { owner, repo: repoName, number: discussionNumber } }),
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    const discussion = data?.data?.repository?.discussion ?? null
+    if (discussion) await cacheSet(cacheKey, discussion, CACHE_TTL)
+    return discussion
+  } catch { return null }
 }
+
+// Alias
+export const getDiscussionByNumber = fetchDiscussionByNumber

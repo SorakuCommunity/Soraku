@@ -4,7 +4,7 @@
 import { cacheGet, cacheSet } from './redis'
 
 const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token'
-const SPOTIFY_API_BASE = 'https://api.spotify.com/v1'
+const SPOTIFY_API_BASE  = 'https://api.spotify.com/v1'
 
 async function getAccessToken(): Promise<string> {
   const cached = await cacheGet<string>('spotify:token')
@@ -15,14 +15,10 @@ async function getAccessToken(): Promise<string> {
   ).toString('base64')
 
   const res = await fetch(SPOTIFY_TOKEN_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${creds}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'grant_type=client_credentials',
+    method:  'POST',
+    headers: { Authorization: `Basic ${creds}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body:    'grant_type=client_credentials',
   })
-
   if (!res.ok) throw new Error('Failed to fetch Spotify token')
   const data = await res.json()
   await cacheSet('spotify:token', data.access_token, data.expires_in - 60)
@@ -34,34 +30,75 @@ export async function getTrack(trackId: string) {
   const cached = await cacheGet(cacheKey)
   if (cached) return cached
 
-  const token = await getAccessToken()
-  const res = await fetch(`${SPOTIFY_API_BASE}/tracks/${trackId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!res.ok) return null
-
-  const data = await res.json()
-  await cacheSet(cacheKey, data, 3600)
-  return data
+  try {
+    const token = await getAccessToken()
+    const res = await fetch(`${SPOTIFY_API_BASE}/tracks/${trackId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    await cacheSet(cacheKey, data, 3600)
+    return data
+  } catch { return null }
 }
 
-// Alias — beberapa file mengimport sebagai getSpotifyTrack
-export const getSpotifyTrack = getTrack
+// Aliases
+export const getSpotifyTrack  = getTrack
+export const fetchTrack       = getTrack
+export const fetchSpotifyTrack = getTrack
 
 export async function searchSpotifyTracks(query: string, limit = 10) {
-  const cacheKey = `spotify:search:${query}:${limit}`
+  const cacheKey = `spotify:search:${encodeURIComponent(query)}:${limit}`
   const cached = await cacheGet(cacheKey)
   if (cached) return cached
 
-  const token = await getAccessToken()
-  const params = new URLSearchParams({ q: query, type: 'track', limit: String(limit) })
-  const res = await fetch(`${SPOTIFY_API_BASE}/search?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!res.ok) return []
+  try {
+    const token = await getAccessToken()
+    const params = new URLSearchParams({ q: query, type: 'track', limit: String(limit) })
+    const res = await fetch(`${SPOTIFY_API_BASE}/search?${params}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+    const tracks = data?.tracks?.items ?? []
+    await cacheSet(cacheKey, tracks, 300)
+    return tracks
+  } catch { return [] }
+}
 
-  const data = await res.json()
-  const tracks = data?.tracks?.items ?? []
-  await cacheSet(cacheKey, tracks, 300) // 5 menit
-  return tracks
+// Alias
+export const searchTracks = searchSpotifyTracks
+
+export async function getAlbum(albumId: string) {
+  const cacheKey = `spotify:album:${albumId}`
+  const cached = await cacheGet(cacheKey)
+  if (cached) return cached
+
+  try {
+    const token = await getAccessToken()
+    const res = await fetch(`${SPOTIFY_API_BASE}/albums/${albumId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    await cacheSet(cacheKey, data, 3600)
+    return data
+  } catch { return null }
+}
+
+export async function getArtist(artistId: string) {
+  const cacheKey = `spotify:artist:${artistId}`
+  const cached = await cacheGet(cacheKey)
+  if (cached) return cached
+
+  try {
+    const token = await getAccessToken()
+    const res = await fetch(`${SPOTIFY_API_BASE}/artists/${artistId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    await cacheSet(cacheKey, data, 3600)
+    return data
+  } catch { return null }
 }

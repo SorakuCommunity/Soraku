@@ -20,15 +20,8 @@ export async function getMaintenanceStatus(): Promise<MaintenanceStatus> {
   return { enabled: false, message: 'Sedang dalam pemeliharaan.', startedAt: null }
 }
 
-export async function setMaintenanceMode(
-  enabled: boolean,
-  message = 'Sedang dalam pemeliharaan.'
-): Promise<void> {
-  const status: MaintenanceStatus = {
-    enabled,
-    message,
-    startedAt: enabled ? new Date().toISOString() : null,
-  }
+export async function setMaintenanceMode(enabled: boolean, message = 'Sedang dalam pemeliharaan.'): Promise<void> {
+  const status: MaintenanceStatus = { enabled, message, startedAt: enabled ? new Date().toISOString() : null }
   await cacheSet(MAINTENANCE_KEY, status, 86400)
 }
 
@@ -36,8 +29,12 @@ export async function disableMaintenance(): Promise<void> {
   await cacheDel(MAINTENANCE_KEY)
 }
 
-// Alias — beberapa file mengimport sebagai isMaintenanceMode
+// Aliases
 export async function isMaintenanceMode(): Promise<boolean> {
-  const status = await getMaintenanceStatus()
-  return status.enabled
+  const s = await getMaintenanceStatus()
+  return s.enabled
 }
+
+export const checkMaintenance    = isMaintenanceMode
+export const getMaintenanceMode  = isMaintenanceMode
+export const enableMaintenance   = (msg?: string) => setMaintenanceMode(true, msg)

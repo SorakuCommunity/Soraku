@@ -1,18 +1,16 @@
 /**
  * lib/discord.ts — Discord API integration
- * Guild stats, webhook sender, member info
  */
 
 import { cacheGet, cacheSet } from './redis'
 
 const DISCORD_API = 'https://discord.com/api/v10'
-const CACHE_TTL   = 300 // 5 minutes
+const CACHE_TTL   = 300
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 export interface DiscordGuildStats {
-  id:                  string
-  name:                string
-  icon:                string | null
+  id:                         string
+  name:                       string
+  icon:                       string | null
   approximate_member_count:   number
   approximate_presence_count: number
 }
@@ -46,34 +44,28 @@ export async function getDiscordStats(): Promise<DiscordGuildStats | null> {
   if (cached) return cached
 
   try {
-    const res = await fetch(
-      `${DISCORD_API}/guilds/${guildId}?with_counts=true`,
-      {
-        headers: {
-          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN ?? ''}`,
-        },
-        next: { revalidate: CACHE_TTL },
-      }
-    )
-
+    const res = await fetch(`${DISCORD_API}/guilds/${guildId}?with_counts=true`, {
+      headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN ?? ''}` },
+    })
     if (!res.ok) return null
     const data = await res.json() as DiscordGuildStats
     await cacheSet(cacheKey, data, CACHE_TTL)
     return data
-  } catch {
-    return null
-  }
+  } catch { return null }
 }
 
-// Alias — beberapa file mengimport sebagai fetchDiscordStats
-export const fetchDiscordStats = getDiscordStats
+// Aliases
+export const fetchDiscordStats      = getDiscordStats
+export const getDiscordGuildStats   = getDiscordStats
+export const fetchDiscordGuildStats = getDiscordStats
+
+// ─── Send Webhook ─────────────────────────────────────────────────────────────
 export async function sendDiscordWebhook(
   payload: DiscordWebhookPayload,
   webhookUrl?: string
 ): Promise<boolean> {
   const url = webhookUrl ?? process.env.DISCORD_WEBHOOK_URL
   if (!url) return false
-
   try {
     const res = await fetch(url, {
       method:  'POST',
@@ -81,13 +73,14 @@ export async function sendDiscordWebhook(
       body:    JSON.stringify(payload),
     })
     return res.ok
-  } catch {
-    return false
-  }
+  } catch { return false }
 }
 
-// ─── Notify: New User Registered ─────────────────────────────────────────────
-export async function notifyNewUser(username: string, role: string): Promise<void> {
+// Alias
+export const sendWebhook = sendDiscordWebhook
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+export async function notifyNewUser(username: string, role: string) {
   await sendDiscordWebhook({
     username: 'Soraku Bot',
     embeds: [{
@@ -100,16 +93,11 @@ export async function notifyNewUser(username: string, role: string): Promise<voi
   })
 }
 
-// ─── Notify: New Gallery Upload ───────────────────────────────────────────────
-export async function notifyGalleryUpload(
-  username: string,
-  title: string,
-  imageUrl?: string
-): Promise<void> {
+export async function notifyGalleryUpload(username: string, title: string, imageUrl?: string) {
   await sendDiscordWebhook({
     username: 'Soraku Bot',
     embeds: [{
-      title:       '🖼️ Gallery Baru Menunggu Persetujuan',
+      title:       '🖼️ Gallery Baru',
       description: `**${username}** mengunggah: *${title}*`,
       color:       0xE8C2A8,
       timestamp:   new Date().toISOString(),
@@ -118,12 +106,7 @@ export async function notifyGalleryUpload(
   })
 }
 
-// ─── Notify: New Blog Post ────────────────────────────────────────────────────
-export async function notifyNewPost(
-  title: string,
-  slug: string,
-  author: string
-): Promise<void> {
+export async function notifyNewPost(title: string, slug: string, author: string) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://soraku.vercel.app'
   await sendDiscordWebhook({
     username: 'Soraku Bot',

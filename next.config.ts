@@ -5,13 +5,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'cdn.discordapp.com' },
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
-      { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'https', hostname: 'i.scdn.co' },
-      { protocol: 'https', hostname: 'cdnb.artstation.com' },
+      { protocol: 'https', hostname: '*.supabase.co' },
+      { protocol: 'https', hostname: '*.supabase.in' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
     ],
   },
   experimental: {
-    serverActions: { allowedOrigins: ['localhost:3000', 'soraku.vercel.app'] },
+    serverComponentsExternalPackages: ['ioredis', 'bullmq'],
   },
 }
 

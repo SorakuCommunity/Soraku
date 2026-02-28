@@ -1,6 +1,5 @@
 /**
  * lib/redis.ts — Centralized Redis + BullMQ
- * All cache, rate limiting, and queue logic lives here.
  */
 import { Redis } from 'ioredis'
 import { Queue } from 'bullmq'
@@ -19,19 +18,27 @@ export function getRedis(): Redis {
 
 // ─── Cache helpers ────────────────────────────────────────────────────────────
 export async function cacheGet<T>(key: string): Promise<T | null> {
-  const r = getRedis()
-  const val = await r.get(key)
-  if (!val) return null
-  try { return JSON.parse(val) as T } catch { return null }
+  try {
+    const r = getRedis()
+    const val = await r.get(key)
+    if (!val) return null
+    return JSON.parse(val) as T
+  } catch { return null }
 }
 
 export async function cacheSet(key: string, value: unknown, ttlSeconds: number): Promise<void> {
-  const r = getRedis()
-  await r.set(key, JSON.stringify(value), 'EX', ttlSeconds)
+  try {
+    const r = getRedis()
+    await r.set(key, JSON.stringify(value), 'EX', ttlSeconds)
+  } catch {}
 }
 
 export async function cacheDel(key: string): Promise<void> {
-  await getRedis().del(key)
+  try { await getRedis().del(key) } catch {}
+}
+
+export async function cacheExists(key: string): Promise<boolean> {
+  try { return (await getRedis().exists(key)) === 1 } catch { return false }
 }
 
 // ─── Rate limiting ────────────────────────────────────────────────────────────
@@ -40,27 +47,29 @@ export async function checkRateLimit(
   maxRequests: number,
   windowSeconds: number
 ): Promise<{ allowed: boolean; remaining: number }> {
-  const r = getRedis()
-  const current = await r.incr(key)
-  if (current === 1) await r.expire(key, windowSeconds)
-  const allowed = current <= maxRequests
-  return { allowed, remaining: Math.max(0, maxRequests - current) }
+  try {
+    const r = getRedis()
+    const current = await r.incr(key)
+    if (current === 1) await r.expire(key, windowSeconds)
+    return { allowed: current <= maxRequests, remaining: Math.max(0, maxRequests - current) }
+  } catch { return { allowed: true, remaining: 0 } }
 }
 
-// Alias — beberapa file mengimport sebagai rateLimit
-// Signature: rateLimit(key, windowSeconds) → returns current count
+// rateLimit(key, windowSeconds) → count  (2-arg version used by repo)
 export async function rateLimit(key: string, windowSeconds: number): Promise<number> {
-  const r = getRedis()
-  const current = await r.incr(key)
-  if (current === 1) await r.expire(key, windowSeconds)
-  return current
+  try {
+    const r = getRedis()
+    const current = await r.incr(key)
+    if (current === 1) await r.expire(key, windowSeconds)
+    return current
+  } catch { return 0 }
 }
 
 // ─── BullMQ Queues ────────────────────────────────────────────────────────────
-export const webhookQueue = new Queue('webhook', {
-  connection: { host: 'localhost', port: 6379 },
-})
+const queueConn = process.env.REDIS_URL
+  ? { connection: new Redis(process.env.REDIS_URL, { maxRetriesPerRequest: null }) }
+  : { connection: { host: 'localhost', port: 6379 } }
 
-export const spotifyQueue = new Queue('spotify-refresh', {
-  connection: { host: 'localhost', port: 6379 },
-})
+export const webhookQueue      = new Queue('webhook',         queueConn as never)
+export const spotifyQueue      = new Queue('spotify-refresh', queueConn as never)
+export const notificationQueue = new Queue('notifications',   queueConn as never)
