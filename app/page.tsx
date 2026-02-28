@@ -1,202 +1,184 @@
+// app/page.tsx - SORAKU 1.0.a3.1 LANDING PAGE REFINEMENT
+'use client'
 import Link from 'next/link'
-import { ArrowRight, Users, BookOpen, Image, Music } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import Image from 'next/image'
+import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Gallery, Users, Music, MessageCircle, Calendar, Image as ImageIcon } from 'lucide-react'
 
-export default async function HomePage() {
-  const supabase = await createClient()
+const fadeUp = {
+  initial: { opacity: 0, y: 24 },
+  viewport: { once: true },
+  whileInView: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+}
 
-  // Fetch active events
-  const { data: events } = await supabase
-    .from('events')
-    .select('id, title, cover_url, start_date, slug')
-    .eq('status', 'active')
-    .order('start_date', { ascending: true })
-    .limit(6)
-
-  // Fetch recent blog posts
-  const { data: posts } = await supabase
-    .from('blog_posts')
-    .select('id, title, slug, excerpt, cover_image, created_at')
-    .eq('published', true)
-    .order('created_at', { ascending: false })
-    .limit(3)
-
-  // Fetch gallery highlights
-  const { data: gallery } = await supabase
-    .from('gallery')
-    .select('id, title, image_url')
-    .eq('approved', true)
-    .order('created_at', { ascending: false })
-    .limit(6)
-
+export default function Home() {
   return (
-    <div className="overflow-x-hidden">
-      {/* ── Hero ──────────────────────────────────────────────── */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse at 60% 50%, rgba(79,163,209,0.12) 0%, transparent 70%), var(--bg)'
-        }} />
-        <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-6 border"
-            style={{ backgroundColor: 'var(--badge-bg)', color: 'var(--badge-text)', borderColor: 'var(--glass-border)' }}>
-            ✦ Platform Komunitas Anime & Manga Indonesia
-          </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight" style={{ color: 'var(--text)' }}>
-            Selamat Datang di{' '}
-            <span style={{ color: 'var(--color-primary)' }}>Soraku</span>
-          </h1>
-          <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: 'var(--text-sub)' }}>
-            Temukan komunitas Anime, Manga, Games, dan Budaya Digital Jepang yang hangat dan aktif.
-          </p>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/komunitas"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90 min-h-[44px]"
-              style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>
-              Bergabung Sekarang <ArrowRight size={16} />
-            </Link>
-            <Link href="/blog"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm border transition-all hover:bg-[var(--hover-bg)] min-h-[44px]"
-              style={{ color: 'var(--text-sub)', borderColor: 'var(--border)' }}>
-              Lihat Blog
-            </Link>
-          </div>
+    <main className="min-h-screen bg-background text-foreground">
+      {/* HERO - Clean Hierarchy */}
+      <section className="relative py-20 md:py-32 overflow-hidden bg-gradient-to-br from-background via-primary/3 to-secondary/5">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <motion.div 
+            {...fadeUp}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <div className="inline-flex items-center gap-2 bg-primary/10 px-5 py-2 rounded-full mb-8 w-fit mx-auto">
+              <div className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse" />
+              <span className="text-sm font-medium text-primary tracking-tight">2.4K Online</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl lg:text-[8rem] font-black bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent mb-6 leading-[0.9] tracking-tight">
+              Soraku
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
+              Anime, VTuber, Music. Join the community.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" asChild className="h-14 px-10 text-lg font-semibold shadow-xl hover:shadow-2xl">
+                <Link href="/discord">Join Discord</Link>
+              </Button>
+              <Button variant="outline" size="lg" asChild className="h-14 px-10 text-lg border-secondary/50">
+                <Link href="/gallery">View Gallery</Link>
+              </Button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ── About Preview ─────────────────────────────────────── */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: 'var(--text)' }}>Tentang Soraku</h2>
-            <p className="max-w-2xl mx-auto" style={{ color: 'var(--text-sub)' }}>
-              Soraku adalah ruang digital untuk para pecinta Anime, Manga, Game Jepang, dan Vtuber.
+      {/* EVENTS - Grid 3 Mobile */}
+      <section className="py-24">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <motion.div className="text-center mb-20" {...fadeUp}>
+            <h2 className="text-3xl md:text-4xl font-black mb-4 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+              Live Events
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+              Watch parties, karaoke, collabs
             </p>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
+          </motion.div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
-              { icon: <Users size={24} />,    title: 'Komunitas',  desc: 'Diskusi dan event bersama member aktif.' },
-              { icon: <BookOpen size={24} />, title: 'Blog',       desc: 'Artikel, review, dan berita terkini.' },
-              { icon: <Image size={24} />,    title: 'Gallery',    desc: 'Koleksi fanart dan karya original.' },
-              { icon: <Music size={24} />,    title: 'VTuber',     desc: 'Profil VTuber dan konten kreator.' },
-            ].map((item) => (
-              <div key={item.title} className="p-4 sm:p-6 rounded-xl border text-center transition-all hover:-translate-y-0.5"
-                style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
-                  style={{ backgroundColor: 'var(--hover-bg)', color: 'var(--color-primary)' }}>
-                  {item.icon}
-                </div>
-                <h3 className="font-semibold text-sm mb-1" style={{ color: 'var(--text)' }}>{item.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-sub)' }}>{item.desc}</p>
-              </div>
+              { title: "Anime Night", date: "Mar 15 • 19:00", icon: Calendar },
+              { title: "VTuber Karaoke", date: "Mar 22 • 20:00", icon: Music },
+              { title: "Manga Discussion", date: "Mar 29 • 18:00", icon: ImageIcon }
+            ].map((event, i) => (
+              <motion.div 
+                key={event.title} 
+                {...fadeUp}
+                transition={{ delay: i * 0.1 }}
+                className="group"
+              >
+                <Card className="h-full border-0 bg-card/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-secondary/30">
+                  <CardHeader className="pb-4">
+                    <event.icon className="w-12 h-12 text-primary/80 mb-4 group-hover:scale-110 transition-transform" />
+                    <CardTitle className="text-xl font-semibold group-hover:text-primary">
+                      {event.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-sm text-muted-foreground mb-6">{event.date}</p>
+                    <Button variant="ghost" size="sm" className="w-full justify-start h-10 px-4 hover:bg-primary/5 group-hover:translate-x-2 transition-all">
+                      View Details →
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Active Events ─────────────────────────────────────── */}
-      {events && events.length > 0 && (
-        <section className="py-16 px-4" style={{ backgroundColor: 'var(--bg-muted)' }}>
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--text)' }}>Event Aktif</h2>
-              <Link href="/komunitas" className="text-sm hover:underline" style={{ color: 'var(--color-primary)' }}>
-                Lihat semua →
-              </Link>
-            </div>
-            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-              {events.map((event) => (
-                <Link key={event.id} href={`/komunitas/${event.slug ?? event.id}`}
-                  className="group rounded-xl overflow-hidden border transition-all hover:-translate-y-0.5"
-                  style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                  <div className="aspect-square overflow-hidden" style={{ backgroundColor: 'var(--bg-muted)' }}>
-                    {event.cover_url ? (
-                      <img src={event.cover_url} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ color: 'var(--color-primary)' }}>
-                        <Users size={24} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-2">
-                    <p className="text-xs font-medium truncate" style={{ color: 'var(--text)' }}>{event.title}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── Blog Preview ──────────────────────────────────────── */}
-      {posts && posts.length > 0 && (
-        <section className="py-16 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--text)' }}>Blog Terbaru</h2>
-              <Link href="/blog" className="text-sm hover:underline" style={{ color: 'var(--color-primary)' }}>Lihat semua →</Link>
-            </div>
-            <div className="grid grid-cols-3 sm:grid-cols-3 gap-4">
-              {posts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`}
-                  className="group rounded-xl overflow-hidden border transition-all hover:-translate-y-0.5"
-                  style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                  {post.cover_image && (
-                    <div className="aspect-video overflow-hidden">
-                      <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                    </div>
-                  )}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-sm mb-1 line-clamp-2" style={{ color: 'var(--text)' }}>{post.title}</h3>
-                    {post.excerpt && <p className="text-xs line-clamp-2" style={{ color: 'var(--text-sub)' }}>{post.excerpt}</p>}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── Gallery Highlight ─────────────────────────────────── */}
-      {gallery && gallery.length > 0 && (
-        <section className="py-16 px-4" style={{ backgroundColor: 'var(--bg-muted)' }}>
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--text)' }}>Gallery Terbaru</h2>
-              <Link href="/gallery" className="text-sm hover:underline" style={{ color: 'var(--color-primary)' }}>Lihat semua →</Link>
-            </div>
-            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {gallery.map((item) => (
-                <Link key={item.id} href="/gallery"
-                  className="group aspect-square rounded-xl overflow-hidden border"
-                  style={{ borderColor: 'var(--border)' }}>
-                  <img src={item.image_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── Discord CTA ───────────────────────────────────────── */}
-      <section className="py-20 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="p-8 sm:p-12 rounded-2xl border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--glass-border)' }}>
-            <div className="text-4xl mb-4">💬</div>
-            <h2 className="text-xl sm:text-2xl font-bold mb-3" style={{ color: 'var(--text)' }}>
-              Yuk Ngobrol di Discord
+      {/* GALLERY HIGHLIGHT - Grid 3 Mobile */}
+      <section className="py-24 bg-gradient-to-b from-secondary/5 to-background">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <motion.div className="text-center mb-20" {...fadeUp}>
+            <h2 className="text-3xl md:text-4xl font-black mb-4 bg-gradient-to-r from-foreground to-accent bg-clip-text text-transparent">
+              Gallery Highlights
             </h2>
-            <p className="mb-6 text-sm" style={{ color: 'var(--text-sub)' }}>
-              Server Discord kami aktif setiap hari — diskusi anime, nonton bareng, game bareng, dan event seru lainnya.
-            </p>
-            <a href="https://discord.gg/CJJ7KEJMbg" target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90 min-h-[44px]"
-              style={{ backgroundColor: '#5865F2', color: '#fff' }}>
-              Bergabung ke Discord
-            </a>
+          </motion.div>
+          
+          <div className="grid grid-cols-3 gap-4 mb-16">
+            {['/demo/gallery-1.jpg', '/demo/gallery-2.jpg', '/demo/gallery-3.jpg'].map((src, i) => (
+              <motion.div 
+                key={i} 
+                className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg cursor-pointer"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Image 
+                  src={src} 
+                  alt="" 
+                  fill 
+                  sizes="(max-width: 768px) 33vw, 20vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
+                  <span className="text-white font-bold text-sm bg-accent/20 px-3 py-1 rounded-full">
+                    +{(i+1) * 100} likes
+                  </span>
+                </div>
+              </motion.div>
+            ))}
           </div>
+          
+          <motion.div {...fadeUp} className="text-center">
+            <Button size="lg" className="h-14 px-12 text-lg font-semibold shadow-xl">
+              <Gallery className="w-5 h-5 mr-2" />
+              Browse Gallery
+            </Button>
+          </motion.div>
         </div>
       </section>
-    </div>
+
+      {/* STATS + DISCORD CTA */}
+      <section className="py-24">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div {...fadeUp} className="lg:text-left text-center">
+              <h3 className="text-4xl md:text-5xl font-black mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Join 10K+ Members
+              </h3>
+              <p className="text-xl text-muted-foreground mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                Discord voice, anime nights, VTuber streams
+              </p>
+            </motion.div>
+            
+            <motion.div 
+              {...fadeUp}
+              transition={{ delay: 0.2 }}
+              className="grid grid-cols-3 gap-8 p-10 bg-card/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-secondary/20"
+            >
+              <div className="text-center">
+                <p className="text-3xl lg:text-4xl font-black text-primary mb-2">2,456</p>
+                <p className="text-sm text-muted-foreground font-medium">Online Now</p>
+              </div>
+              <div className="text-center">
+                <p className="text-3xl lg:text-4xl font-black text-foreground mb-2">10K+</p>
+                <p className="text-sm text-muted-foreground font-medium">Members</p>
+              </div>
+              <div className="text-center">
+                <p className="text-3xl lg:text-4xl font-black text-foreground mb-2">500+</p>
+                <p className="text-sm text-muted-foreground font-medium">Events</p>
+              </div>
+            </motion.div>
+          </div>
+          
+          <motion.div 
+            {...fadeUp}
+            transition={{ delay: 0.4 }}
+            className="text-center mt-20"
+          >
+            <Button size="lg" className="h-16 px-16 text-xl font-bold shadow-2xl bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-primary/90">
+              <MessageCircle className="w-6 h-6 mr-3" />
+              Join Discord Server
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+    </main>
   )
 }
