@@ -17,6 +17,9 @@ export const editProfileSchema = z.object({
   socials:    z.record(z.string().url()).optional(),
 })
 
+// Alias — beberapa file mengimport sebagai profileSchema
+export const profileSchema = editProfileSchema
+
 // ─── Gallery Upload Schema ─────────────────────────────────────────────────────
 export const galleryUploadSchema = z.object({
   title:     z.string().min(2).max(200),

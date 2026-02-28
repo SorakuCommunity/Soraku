@@ -35,3 +35,9 @@ export async function setMaintenanceMode(
 export async function disableMaintenance(): Promise<void> {
   await cacheDel(MAINTENANCE_KEY)
 }
+
+// Alias — beberapa file mengimport sebagai isMaintenanceMode
+export async function isMaintenanceMode(): Promise<boolean> {
+  const status = await getMaintenanceStatus()
+  return status.enabled
+}

@@ -4,3 +4,6 @@
  */
 
 export { createClient, createAdminClient } from './supabase/server'
+
+// Alias — beberapa file mengimport sebagai createServerSupabaseClient
+export { createClient as createServerSupabaseClient } from './supabase/server'

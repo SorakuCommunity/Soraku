@@ -65,7 +65,8 @@ export async function getDiscordStats(): Promise<DiscordGuildStats | null> {
   }
 }
 
-// ─── Send Webhook ─────────────────────────────────────────────────────────────
+// Alias — beberapa file mengimport sebagai fetchDiscordStats
+export const fetchDiscordStats = getDiscordStats
 export async function sendDiscordWebhook(
   payload: DiscordWebhookPayload,
   webhookUrl?: string
