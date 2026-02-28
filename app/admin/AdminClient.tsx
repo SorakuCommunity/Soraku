@@ -171,14 +171,17 @@ function ThemeTab() {
 }
 
 // ─── Simple list tabs (Blog, Gallery, VTuber) ─────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function ContentTab({ table, cols }: { table: string; cols: string[] }) {
-  const [rows, setRows]       = useState<Record<string, unknown>[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [rows, setRows]       = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const sb = createClient()
     sb.from(table).select(cols.join(', ')).order('created_at', { ascending: false }).limit(50)
-      .then(({ data }) => { setRows(data ?? []); setLoading(false) })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then(({ data }) => { setRows((data as any[]) ?? []); setLoading(false) })
   }, [table])
 
   if (loading) return <div className="text-center py-12" style={{ color: 'var(--text-sub)' }}>Memuat...</div>
