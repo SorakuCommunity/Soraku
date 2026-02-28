@@ -79,7 +79,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t text-sm text-center" style={{ borderColor: 'var(--border)', color: 'var(--text-sub)' }}>
-          © {new Date().getFullYear()} Soraku Community. All rights reserved. · v1.0.a3.2
+          © {new Date().getFullYear()} Soraku Community. All rights reserved. · v1.0.a3.3
         </div>
       </div>
     </footer>

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { Heart, Users, Globe, Sparkles, Star, ArrowRight } from 'lucide-react'

@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "es6"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -12,26 +16,51 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@/types": ["./types/index"],
-      "@/types/*": ["./types/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/lib/supabase/*": ["./lib/supabase/*"],
-      "@/lib/theme/*": ["./lib/theme/*"],
-      "@/lib/redis/*": ["./lib/redis/*"],
-      "@/components/*": ["./components/*"],
-      "@/components/ui/*": ["./components/ui/*"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@/types": [
+        "./types/index"
+      ],
+      "@/types/*": [
+        "./types/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/lib/supabase/*": [
+        "./lib/supabase/*"
+      ],
+      "@/lib/theme/*": [
+        "./lib/theme/*"
+      ],
+      "@/lib/redis/*": [
+        "./lib/redis/*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/components/ui/*": [
+        "./components/ui/*"
+      ]
+    },
+    "target": "ES2017"
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts", 
+    "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
     "types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

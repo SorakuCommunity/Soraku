@@ -1,59 +1,201 @@
-# Soraku v1.0.a3 — Setup Guide
+# Soraku v1.0.a3.3 — Setup Guide
 
 ## Prerequisites
 - Node.js 20+
-- Supabase project
-- Redis instance (optional but recommended)
+- npm 10+
+- Supabase project (free tier works)
+- Redis instance (optional, recommended for caching)
 
-## Quick Start
+---
 
-### 1. Install dependencies
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/SorakuCommunity/Soraku.git
+cd Soraku
+```
+
+---
+
+## 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
-### 2. Configure environment
+---
+
+## 3. Configure Environment Variables
+
 ```bash
 cp .env.example .env.local
-# Edit .env.local with your credentials
 ```
 
-### 3. Setup database
-Run the single schema file in Supabase SQL Editor:
+Edit `.env.local` with your credentials:
+
+```env
+# ── Supabase (required) ───────────────────────────────────────
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# ── Redis (optional, recommended) ────────────────────────────
+REDIS_URL=redis://localhost:6379
+
+# ── Discord (optional) ────────────────────────────────────────
+DISCORD_BOT_TOKEN=your-bot-token
+DISCORD_SERVER_ID=your-server-id
+
+# ── GitHub (optional) ─────────────────────────────────────────
+GITHUB_TOKEN=your-github-token
+
+# ── Spotify (optional) ────────────────────────────────────────
+SPOTIFY_CLIENT_ID=your-client-id
+SPOTIFY_CLIENT_SECRET=your-client-secret
+SPOTIFY_REFRESH_TOKEN=your-refresh-token
+```
+
+---
+
+## 4. Enable Google OAuth Provider
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials
+2. Create **OAuth 2.0 Client ID** (type: Web application)
+3. Add Authorized redirect URIs:
+   - `https://your-project.supabase.co/auth/v1/callback`
+4. Copy **Client ID** and **Client Secret**
+5. In Supabase Dashboard → **Authentication → Providers → Google**:
+   - Enable Google
+   - Paste Client ID and Client Secret
+   - Save
+
+---
+
+## 5. Enable Discord OAuth Provider
+
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. Create a new Application → OAuth2 → General
+3. Add Redirect URL: `https://your-project.supabase.co/auth/v1/callback`
+4. Copy **Client ID** and **Client Secret**
+5. In Supabase Dashboard → **Authentication → Providers → Discord**:
+   - Enable Discord
+   - Paste Client ID and Client Secret
+   - Save
+
+---
+
+## 6. Configure Redirect URLs in Supabase
+
+In Supabase Dashboard → **Authentication → URL Configuration**:
+
+- **Site URL**: `https://your-domain.com`
+- **Additional Redirect URLs**:
+  ```
+  https://your-domain.com/auth/callback
+  http://localhost:3000/auth/callback
+  ```
+
+> ⚠️ Both production and localhost must be listed for local dev to work.
+
+---
+
+## 7. Apply Database Schema
+
+In Supabase Dashboard → **SQL Editor**, paste the contents of:
+
 ```
 lib/schema.sql
 ```
-This is the **only** database file you need. It contains:
-- All tables (users, gallery, blog_posts, events, vtubers, site_settings, etc.)
+
+This single file contains:
+- All tables: `users`, `gallery`, `blog_posts`, `events`, `vtubers`, `webhook_settings`, `spotify_tokens`, `user_socials`, `site_settings`
 - RLS policies (production-grade)
-- Helper functions (`has_role`, `check_social_limit`)
-- Triggers (auto-slug, updated_at, premium enforcement)
-- Default site_settings data
+- Helper functions: `has_role()`, `handle_new_user()`
+- Triggers: auto-slug, updated_at, premium social limit enforcement
+- Indexes: title, likes, created_at for gallery sorting
 
-### 4. Configure Supabase Auth
-In Supabase Dashboard → Authentication → Providers, enable:
-- **Discord** (recommended) — add Client ID + Secret
-- **Google** — add Client ID + Secret
-- **GitHub** — add Client ID + Secret
-- **Spotify** (optional)
+> Schema is **idempotent** — safe to re-run.
 
-Set redirect URL: `https://your-domain.com/auth/callback`
+---
 
-### 5. Create Storage Bucket
-In Supabase Dashboard → Storage:
-1. Create bucket named `gallery` (set to Public)
-2. Run storage policies from the bottom of `lib/schema.sql`
+## 8. Create Storage Bucket
 
-### 6. Run development server
+In Supabase Dashboard → **Storage**:
+
+1. Create bucket named `gallery`
+2. Set to **Public**
+3. Add storage policies as needed (from schema.sql comments)
+
+---
+
+## 9. Run Development Server
+
 ```bash
 npm run dev
 ```
 
-### 7. Deploy to Vercel
+Visit: [http://localhost:3000](http://localhost:3000)
+
+Test checklist:
+- [ ] App loads without crash
+- [ ] Login with email works
+- [ ] Login with username works
+- [ ] Google OAuth works
+- [ ] Discord OAuth works
+- [ ] Logout clears session completely
+- [ ] Public profile `/u/username` loads
+- [ ] Gallery grid = 3 cols on mobile
+
+---
+
+## 10. Build for Production
+
 ```bash
-# Push to GitHub, connect repo to Vercel
-# Set env vars in Vercel dashboard
+# Clear build cache first
+rm -rf .next
+
+npm run build
 ```
+
+Fix any TypeScript or ESLint errors before deploying.
+
+---
+
+## 11. Deploy to Vercel
+
+```bash
+# Option A: Git push (recommended)
+git push origin main
+# Connect repo in Vercel dashboard → Import Project
+
+# Option B: Vercel CLI
+npm i -g vercel
+vercel --prod
+```
+
+In Vercel Dashboard → **Settings → Environment Variables**, add all variables from `.env.local`.
+
+---
+
+## Production Checklist
+
+| Item | Status |
+|------|--------|
+| `NEXT_PUBLIC_SUPABASE_URL` set | ☐ |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` set | ☐ |
+| `SUPABASE_SERVICE_ROLE_KEY` set | ☐ |
+| Google OAuth provider enabled | ☐ |
+| Discord OAuth provider enabled | ☐ |
+| Redirect URLs configured in Supabase | ☐ |
+| `lib/schema.sql` applied | ☐ |
+| RLS enabled on all tables | ☐ |
+| Storage bucket `gallery` created | ☐ |
+| Clean build passes (`npm run build`) | ☐ |
+| No console errors in preview | ☐ |
+| Logout fully clears session | ☐ |
+| Mobile grid = 3 columns verified | ☐ |
+
+---
 
 ## Role Hierarchy
 
@@ -67,21 +209,17 @@ npm run dev
 | DONATE  | 2     | Donatur badge |
 | USER    | 1     | Member, max 2 social links |
 
-## Premium Enforcement
-- Social link limit (max 2) is enforced at DB layer via trigger `check_social_limit()`
-- Cannot be bypassed from client-side
+---
 
-## Environment Variables
+## Security Notes
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Service role (server-only) |
-| `REDIS_URL` | Recommended | Redis for caching + rate limiting |
-| `DISCORD_BOT_TOKEN` | Optional | Discord stats |
-| `DISCORD_SERVER_ID` | Optional | Discord server ID |
-| `GITHUB_TOKEN` | Optional | GitHub Discussions |
-| `SPOTIFY_CLIENT_ID` | Optional | Spotify lofi player |
-| `SPOTIFY_CLIENT_SECRET` | Optional | Spotify API |
-| `SPOTIFY_REFRESH_TOKEN` | Optional | Spotify token refresh |
+- **Role editing** is blocked in UI — users cannot self-escalate
+- **RLS** enforces all data access at the database layer
+- **Social link limit** (max 2 for USER) is enforced by DB trigger — cannot be bypassed client-side
+- **OAuth user creation** is idempotent — duplicate records are prevented via `ON CONFLICT DO NOTHING`
+- All inputs validated with **Zod** before processing
+- All user content sanitized with **DOMPurify** before rendering
+
+---
+
+> Questions? Open an issue at [github.com/SorakuCommunity/Soraku](https://github.com/SorakuCommunity/Soraku)

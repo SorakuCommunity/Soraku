@@ -52,6 +52,13 @@ export const adminThemeSchema = z.object({
 })
 
 export const loginSchema = z.object({
+  // accepts email OR username
+  identifier: z.string().min(2, 'Email atau username harus diisi'),
+  password:   z.string().min(8, 'Password minimal 8 karakter'),
+})
+
+// Legacy compat — some imports use { email, password }
+export const loginEmailSchema = z.object({
   email:    z.string().email(),
   password: z.string().min(8),
 })

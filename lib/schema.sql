@@ -253,3 +253,133 @@ CREATE INDEX IF NOT EXISTS idx_vtubers_active       ON vtubers(active);
 CREATE INDEX IF NOT EXISTS idx_gallery_approved     ON gallery(approved, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_events_status        ON events(status, start_date ASC);
 CREATE INDEX IF NOT EXISTS idx_users_username       ON users(username);
+
+-- ─── Additional indexes for gallery sorting (v1.0.a3.3) ─────────────────────
+CREATE INDEX IF NOT EXISTS idx_gallery_title       ON gallery(title);
+CREATE INDEX IF NOT EXISTS idx_gallery_likes       ON gallery(likes DESC);
+CREATE INDEX IF NOT EXISTS idx_gallery_created     ON gallery(created_at DESC);
+
+-- ─── likes column on gallery (idempotent) ───────────────────────────────────
+ALTER TABLE gallery ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0;
+
+-- ─── webhook_settings ────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS webhook_settings (
+  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name       TEXT NOT NULL,
+  url        TEXT NOT NULL,
+  events     TEXT[] DEFAULT '{}',
+  active     BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE webhook_settings ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  CREATE POLICY "Admin manage webhook_settings" ON webhook_settings
+    FOR ALL USING (public.has_role('ADMIN'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- ─── spotify_tokens ──────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS spotify_tokens (
+  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  access_token  TEXT NOT NULL,
+  refresh_token TEXT,
+  expires_at    TIMESTAMPTZ,
+  updated_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE spotify_tokens ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  CREATE POLICY "Admin manage spotify_tokens" ON spotify_tokens
+    FOR ALL USING (public.has_role('ADMIN'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- ─── user_socials ─────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS user_socials (
+  id       UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  platform TEXT NOT NULL,
+  url      TEXT NOT NULL,
+  UNIQUE(user_id, platform)
+);
+
+ALTER TABLE user_socials ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  CREATE POLICY "Public read user_socials" ON user_socials
+    FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "Owner manage own socials" ON user_socials
+    FOR ALL USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Premium social limit trigger (max 2 for USER role) ─────────────────────────
+CREATE OR REPLACE FUNCTION enforce_social_limit()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  user_role_val user_role;
+  social_count  INTEGER;
+BEGIN
+  SELECT role INTO user_role_val FROM users WHERE id = NEW.user_id;
+  SELECT COUNT(*) INTO social_count FROM user_socials WHERE user_id = NEW.user_id;
+
+  IF user_role_val = 'USER' AND social_count >= 2 THEN
+    RAISE EXCEPTION 'USER role is limited to 2 social links. Upgrade to Premium for unlimited.';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_social_limit ON user_socials;
+CREATE TRIGGER trg_social_limit
+  BEFORE INSERT ON user_socials
+  FOR EACH ROW EXECUTE FUNCTION enforce_social_limit();
+
+-- ─── user_roles (supplemental role audit table) ───────────────────────────────
+CREATE TABLE IF NOT EXISTS user_roles (
+  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role       user_role NOT NULL DEFAULT 'USER',
+  granted_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  granted_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  CREATE POLICY "Admin read user_roles" ON user_roles
+    FOR SELECT USING (public.has_role('ADMIN'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "Admin manage user_roles" ON user_roles
+    FOR ALL USING (public.has_role('ADMIN'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- ─── vtuber_socials ───────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS vtuber_socials (
+  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  vtuber_id  UUID NOT NULL REFERENCES vtubers(id) ON DELETE CASCADE,
+  platform   TEXT NOT NULL CHECK (platform IN ('youtube','twitter','tiktok','twitch','instagram','facebook','website','other')),
+  url        TEXT NOT NULL CHECK (length(url) <= 500),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE vtuber_socials ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  CREATE POLICY "Public read vtuber_socials" ON vtuber_socials
+    FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "Agensi manage vtuber_socials" ON vtuber_socials
+    FOR ALL USING (public.has_role('AGENSI'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+CREATE INDEX IF NOT EXISTS idx_vtuber_socials_vtuber ON vtuber_socials(vtuber_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_user ON user_roles(user_id);

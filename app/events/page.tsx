@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
@@ -77,7 +79,7 @@ export default function EventsPage() {
       {/* Events */}
       <section className="px-4 pb-20">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {MOCK_EVENTS.map((event) => {
               const status = STATUS_STYLES[event.status as keyof typeof STATUS_STYLES];
               return (

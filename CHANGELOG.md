@@ -4,6 +4,34 @@ Format: [Semantic Versioning](https://semver.org)
 
 ---
 
+## [1.0.a3.3] — 2026-02-28 (MASTER STABILITY RELEASE)
+
+### Added
+- Anime-style split-screen login UI (Left: animated illustration, Right: glass form)
+- Anime-style split-screen register UI (reversed layout)
+- Google OAuth integration (login + register, replaces GitHub OAuth)
+- Username login support: resolves email via users table lookup
+- `webhook_settings`, `spotify_tokens`, `user_socials` tables with RLS
+- `user_roles` table with RLS (role audit trail, admin-managed)
+- `vtuber_socials` table with RLS (platform social links per VTuber)
+- Gallery sorting indexes: title, likes, created_at
+- `likes` column on gallery (idempotent)
+- `/auth/callback` as canonical OAuth callback (Google + Discord)
+- Premium social limit trigger (USER → max 2 links, PREMIUM = unlimited)
+- Schema fully consolidated in `/lib/schema.sql` (all 11 tables + RLS + triggers + indexes)
+
+### Fixed
+- OAuth redirects point to `/auth/callback` (canonical)
+- `loginSchema` accepts identifier (email OR username)
+- Public profile: role display-only, never editable from UI
+- RLS blocks role self-escalation
+
+### Changed
+- Version: 1.0.a3.2 2192 1.0.a3.3
+- setup.md: Google + Discord provider setup documented
+
+---
+
 ## [1.0.a3.2] — 2026-02-28
 
 ### Fixed
