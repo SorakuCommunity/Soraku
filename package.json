@@ -1,0 +1,101 @@
+{
+  "name": "soraku",
+  "version": "1.0.a3.2",
+  "description": "Soraku - Platform Kreatif Komunitas Anime & Manga Indonesia. Fullstack Next.js 15 App Router + Supabase Auth + Spotify API.",
+  "author": {
+    "name": "Soraku Community",
+    "email": "echo.soraku@gmail.com",
+    "url": "https://soraku.vercel.app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SorakuCommunity/Soraku.git"
+  },
+  "homepage": "https://soraku.vercel.app",
+  "bugs": {
+    "url": "https://github.com/SorakuCommunity/Soraku/issues"
+  },
+  "keywords": [
+    "nextjs-15",
+    "supabase",
+    "spotify-api",
+    "anime",
+    "manga",
+    "gallery",
+    "typescript",
+    "tailwindcss",
+    "framer-motion",
+    "Soraku",
+    "KomunitasAnime"
+  ],
+  "license": "SEE LICENSE IN LICENSE",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit",
+    "preview": "npm run build && npm start",
+    "clean": "rm -rf node_modules package-lock.json .next && npm install"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "@supabase/ssr": "^0.5.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "bullmq": "^5.34.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^11.3.0",
+    "ioredis": "^5.4.2",
+    "isomorphic-dompurify": "^2.26.0",
+    "lucide-react": "^0.575.0",
+    "next": "15.5.12",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-dropzone": "^14.2.3",
+    "react-hook-form": "^7.53.0",
+    "sonner": "^1.5.0",
+    "tailwind-merge": "^2.5.2",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/dompurify": "^3.0.5",
+    "@types/ioredis": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/uuid": "^10.0.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "15.5.12",
+    "eslint-config-prettier": "^9.1.0",
+    "postcss": "^8.4.47",
+    "prettier": "^3.3.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.6.0"
+  },
+  "packageManager": "npm@10.9.2",
+  "funding": {
+    "type": "github-sponsors",
+    "url": "https://github.com/sponsors/SorakuCommunity"
+  },
+  "contributors": [
+    "Riu <echo.adinfauzan@gmail.com>",
+    "Soraku Studio Team"
+  ],
+  "socialMedia": {
+    "homepage": "https://soraku.vercel.app",
+    "twitter": "https://x.com/appSora",
+    "discord": "https://discord.gg/CJJ7KEJMbg",
+    "instagram": "https://instagram.com/soraku.moe"
+  },
+  "overrides": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
