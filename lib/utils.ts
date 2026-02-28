@@ -68,3 +68,11 @@ export function formatFileSize(bytes: number): string {
 // Alias untuk kompatibilitas
 export const classNames = cn
 export const clsxMerge  = cn
+
+// ─── Duration formatter (ms → m:ss) ──────────────────────────────────────────
+export function formatDuration(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+}

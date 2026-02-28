@@ -1,150 +1,174 @@
-export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'PREMIUM' | 'DONATE' | 'USER'
-export type GalleryStatus = 'pending' | 'approved' | 'rejected'
-export type BlogStatus = 'draft' | 'published'
+/**
+ * types/index.ts — Global TypeScript types for Soraku
+ */
 
-export interface User {
-  id: string
-  email: string | null
-  display_name: string | null
-  username: string | null
-  avatar_url: string | null
-  bio: string | null
-  role: UserRole
-  official_website: string | null
-  generation_page: string | null
-  talent_profile: string | null
-  lore_archive: string | null
-  schedule_page: string | null
-  twitter: string | null
-  instagram: string | null
-  tiktok: string | null
-  youtube: string | null
-  twitch: string | null
-  facebook: string | null
-  discord_invite: string | null
-  threads: string | null
-  reddit: string | null
-  spotify: string | null
-  saweria: string | null
-  trakteer: string | null
-  sociabuzz: string | null
-  kofi: string | null
-  patreon: string | null
-  streamlabs: string | null
-  paypal: string | null
-  fanart_gallery: string | null
-  fan_submission: string | null
-  merchandise: string | null
-  created_at: string
-}
-
-export interface GalleryItem {
-  id: string
-  user_id: string
-  image_url: string
-  caption: string | null
-  description: string | null
-  hashtags: string[]
-  status: GalleryStatus
-  created_at: string
-  users?: { display_name: string | null; username: string | null; avatar_url: string | null }
-}
-
-export interface BlogPost {
-  id: string
-  title: string
-  slug: string
-  thumbnail: string | null
-  content: string
-  tags: string[]
-  status: BlogStatus
-  author_id: string
-  deleted_at: string | null
-  created_at: string
-  updated_at: string
-  users?: { display_name: string | null; avatar_url: string | null }
-}
-
-export interface Event {
-  id: string
-  title: string
-  description: string | null
-  banner_url: string | null
-  start_date: string
-  end_date: string
-  created_by: string | null
-  created_at: string
-}
-
-export interface VtuberProfile {
-  id: string
-  name: string
-  slug: string | null
-  generation: string | null
-  avatar_url: string | null
-  description: string | null
-  twitter: string | null
-  youtube: string | null
-  twitch: string | null
-  instagram: string | null
-  tiktok: string | null
-  created_at: string
-}
-
-export interface WebhookSetting {
-  id: string
-  name: string
-  url: string
-  events: string[]
-  enabled: boolean
-  created_at: string
-}
-
-export interface VtuberSocial {
-  id: string
-  vtuber_id: string
-  platform: string
-  url: string
-  created_at: string
-}
-
-export interface SiteSetting {
-  key: string
-  value: string
-}
-
-export interface GithubDiscussion {
-  id: string
-  number: number
-  title: string
-  body: string
-  url: string
-  upvoteCount: number
-  createdAt: string
-  author: { login: string; avatarUrl: string }
-  category: { name: string; emoji: string }
-  comments: { totalCount: number; nodes: GithubComment[] }
-}
-
-export interface GithubComment {
-  id: string
-  body: string
-  upvoteCount: number
-  createdAt: string
-  author: { login: string; avatarUrl: string }
-}
-
+// ─── Spotify ──────────────────────────────────────────────────────────────────
 export interface SpotifyTrack {
-  id: string
-  name: string
-  artists: { name: string }[]
-  album: { name: string; images: { url: string }[] }
-  preview_url: string | null
+  id:           string
+  name:         string
+  duration_ms:  number
+  preview_url:  string | null
   external_urls: { spotify: string }
-  duration_ms: number
+  album: {
+    id:     string
+    name:   string
+    images: { url: string; width: number; height: number }[]
+  }
+  artists: { id: string; name: string }[]
 }
 
+export interface SpotifyAlbum {
+  id:           string
+  name:         string
+  album_type:   string
+  release_date: string
+  total_tracks: number
+  images:       { url: string; width: number; height: number }[]
+  artists:      { id: string; name: string }[]
+  tracks: {
+    items: SpotifyTrack[]
+  }
+}
+
+export interface SpotifyArtist {
+  id:         string
+  name:       string
+  followers:  { total: number }
+  popularity: number
+  images:     { url: string; width: number; height: number }[]
+  genres:     string[]
+  external_urls: { spotify: string }
+}
+
+// ─── User / Auth ──────────────────────────────────────────────────────────────
+export type Role = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'PREMIUM' | 'DONATE' | 'USER'
+export type ThemeMode = 'dark' | 'light' | 'auto'
+
+export interface UserProfile {
+  id:           string
+  username:     string
+  display_name: string | null
+  bio:          string | null
+  avatar_url:   string | null
+  cover_url:    string | null
+  role:         Role
+  theme_mode:   ThemeMode
+  website:      string | null
+  location:     string | null
+  created_at:   string
+  updated_at:   string | null
+  socials?:     Record<string, string>
+}
+
+// ─── Blog ─────────────────────────────────────────────────────────────────────
+export interface BlogPost {
+  id:          string
+  title:       string
+  slug:        string
+  content:     string
+  excerpt:     string | null
+  cover_image: string | null
+  spotify_id:  string | null
+  published:   boolean
+  created_at:  string
+  updated_at:  string | null
+  author_id:   string
+  author?:     Pick<UserProfile, 'username' | 'display_name' | 'avatar_url'>
+}
+
+// ─── Gallery ──────────────────────────────────────────────────────────────────
+export interface GalleryItem {
+  id:          string
+  title:       string
+  image_url:   string
+  description: string | null
+  tags:        string[] | null
+  approved:    boolean
+  created_at:  string
+  user_id:     string
+  author?:     Pick<UserProfile, 'username' | 'display_name' | 'avatar_url'>
+}
+
+// ─── VTuber ───────────────────────────────────────────────────────────────────
+export interface VTuber {
+  id:          string
+  name:        string
+  slug:        string
+  description: string | null
+  agency:      string | null
+  avatar_url:  string | null
+  cover_url:   string | null
+  socials:     Record<string, string> | null
+  active:      boolean
+  created_at:  string
+}
+
+// ─── Event ────────────────────────────────────────────────────────────────────
+export interface SorakuEvent {
+  id:          string
+  title:       string
+  slug:        string
+  description: string | null
+  cover_url:   string | null
+  start_date:  string | null
+  end_date:    string | null
+  type:        'online' | 'offline' | 'hybrid'
+  status:      'draft' | 'active' | 'upcoming' | 'ended'
+  created_at:  string
+}
+
+// ─── Site Settings ────────────────────────────────────────────────────────────
+export interface SiteSetting {
+  key:        string
+  value:      string
+  updated_at: string | null
+}
+
+// ─── GitHub ───────────────────────────────────────────────────────────────────
+export interface GitHubDiscussion {
+  id:            string
+  number:        number
+  title:         string
+  url:           string
+  createdAt:     string
+  bodyHTML?:     string
+  author:        { login: string; avatarUrl: string }
+  category:      { name: string; emoji: string }
+  upvoteCount:   number
+  comments:      { totalCount?: number; nodes?: GitHubComment[] }
+}
+
+export interface GitHubComment {
+  id:        string
+  bodyHTML:  string
+  createdAt: string
+  author:    { login: string; avatarUrl: string }
+}
+
+// ─── Discord ──────────────────────────────────────────────────────────────────
 export interface DiscordStats {
-  memberCount: number
-  onlineCount: number
+  id:                         string
+  name:                       string
+  icon:                       string | null
+  approximate_member_count:   number
+  approximate_presence_count: number
+}
+
+// ─── API Response ─────────────────────────────────────────────────────────────
+export interface ApiResponse<T = unknown> {
+  data?:    T
+  error?:   string
+  success?: boolean
+  count?:   number
+  page?:    number
+}
+
+// ─── Theme ────────────────────────────────────────────────────────────────────
+export interface ThemePalette {
+  primary_color:    string
+  dark_base_color:  string
+  secondary_color:  string
+  light_base_color: string
+  accent_color:     string
+  theme_mode:       ThemeMode
 }
