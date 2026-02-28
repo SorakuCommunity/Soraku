@@ -6,6 +6,29 @@
 export const ROLES = ['OWNER', 'MANAGER', 'ADMIN', 'AGENSI', 'PREMIUM', 'DONATE', 'USER'] as const
 export type Role = (typeof ROLES)[number]
 
+// Alias — beberapa file mengimport sebagai ALL_ROLES
+export const ALL_ROLES = ROLES
+
+export const ROLE_LABELS: Record<Role, string> = {
+  OWNER:   'Owner',
+  MANAGER: 'Manager',
+  ADMIN:   'Admin',
+  AGENSI:  'Agensi',
+  PREMIUM: 'Premium',
+  DONATE:  'Donatur',
+  USER:    'User',
+}
+
+export const ROLE_COLORS: Record<Role, string> = {
+  OWNER:   '#E8C2A8',
+  MANAGER: '#4FA3D1',
+  ADMIN:   '#6E8FA6',
+  AGENSI:  '#7C9E87',
+  PREMIUM: '#C9A84C',
+  DONATE:  '#9B7FD4',
+  USER:    '#6E8FA6',
+}
+
 const ROLE_RANK: Record<Role, number> = {
   OWNER:   7,
   MANAGER: 6,

@@ -47,6 +47,9 @@ export async function checkRateLimit(
   return { allowed, remaining: Math.max(0, maxRequests - current) }
 }
 
+// Alias — beberapa file mengimport sebagai rateLimit
+export const rateLimit = checkRateLimit
+
 // ─── BullMQ Queues ────────────────────────────────────────────────────────────
 export const webhookQueue = new Queue('webhook', {
   connection: { host: 'localhost', port: 6379 },

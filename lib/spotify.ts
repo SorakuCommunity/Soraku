@@ -44,3 +44,24 @@ export async function getTrack(trackId: string) {
   await cacheSet(cacheKey, data, 3600)
   return data
 }
+
+// Alias — beberapa file mengimport sebagai getSpotifyTrack
+export const getSpotifyTrack = getTrack
+
+export async function searchSpotifyTracks(query: string, limit = 10) {
+  const cacheKey = `spotify:search:${query}:${limit}`
+  const cached = await cacheGet(cacheKey)
+  if (cached) return cached
+
+  const token = await getAccessToken()
+  const params = new URLSearchParams({ q: query, type: 'track', limit: String(limit) })
+  const res = await fetch(`${SPOTIFY_API_BASE}/search?${params}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) return []
+
+  const data = await res.json()
+  const tracks = data?.tracks?.items ?? []
+  await cacheSet(cacheKey, tracks, 300) // 5 menit
+  return tracks
+}
