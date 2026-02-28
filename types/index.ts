@@ -1,4 +1,4 @@
-// types/index.ts - SORAKU 1.0.a3.1 ABSOLUTE FINAL - NO MORE ERRORS
+// types/index.ts - SORAKU 1.0.a3.1 ABSOLUTE FINAL FIXED
 export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'PREMIUM' | 'DONATE' | 'USER'
 
 // 1. CORE USER SYSTEM
@@ -74,11 +74,12 @@ export interface SpotifyTrack {
   uri: string
 }
 
-// 6. DISCORD SYSTEM (COMPLETE FIX)
+// 6. DISCORD SYSTEM (COMPLETE - FIX onlineCount)
 export interface DiscordStats {
   online: number
-  memberCount: number        // ✅ FIXED untuk DiscordSection.tsx
-  total_members: number      // ✅ Alias untuk useDiscord.ts
+  onlineCount: number           // ✅ FIXED untuk DiscordSection.tsx line 62
+  memberCount: number           // ✅ FIXED untuk DiscordSection.tsx line 46
+  total_members: number         // ✅ Alias untuk useDiscord.ts
   voice_channels: number
   text_channels: number
   boost_count: number
