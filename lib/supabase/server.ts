@@ -1,8 +1,8 @@
-// lib/supabase/server.ts - LINE 10-15 FIX
+// lib/supabase/server.ts - SORAKU 1.0.a3.1 ADMIN CLIENT
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-// ✅ ADD TYPE DEFINITION
+// Cookie type untuk strict mode
 interface Cookie {
   name: string
   value: string
@@ -15,6 +15,7 @@ interface Cookie {
   }
 }
 
+// Regular client untuk public/user routes
 export async function createClient() {
   const cookieStore = await cookies()
   
@@ -24,15 +25,36 @@ export async function createClient() {
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet: Cookie[]) => {  // ✅ FIXED: explicit type
+        setAll: (cookiesToSet: Cookie[]) => {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
             )
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // Server Component session refresh
+          }
+        },
+      },
+    }
+  )
+}
+
+export async function createAdminClient() {
+  const cookieStore = await cookies()
+  
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!, // ✅ Service role key (bypass RLS)
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+        setAll: (cookiesToSet: Cookie[]) => {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // Server Component session refresh
           }
         },
       },
