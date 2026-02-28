@@ -20,6 +20,9 @@ export const editProfileSchema = z.object({
 // Alias — beberapa file mengimport sebagai profileSchema
 export const profileSchema = editProfileSchema
 
+// Type export
+export type ProfileFormData = z.infer<typeof editProfileSchema>
+
 // ─── Gallery Upload Schema ─────────────────────────────────────────────────────
 export const galleryUploadSchema = z.object({
   title:     z.string().min(2).max(200),
