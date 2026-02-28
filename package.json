@@ -93,5 +93,9 @@
     "twitter": "https://x.com/appSora",
     "discord": "https://discord.gg/CJJ7KEJMbg",
     "instagram": "https://instagram.com/soraku.moe"
+  },
+  "overrides": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }
