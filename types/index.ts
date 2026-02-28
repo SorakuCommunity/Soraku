@@ -1,4 +1,4 @@
-// types/index.ts - SORAKU 1.0.a3.1 COMPLETE + SPOTIFY FIXED
+// types/index.ts - SORAKU 1.0.a3.1 FULLY CORRECTED
 export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'PREMIUM' | 'DONATE' | 'USER'
 
 export interface UserWithRole {
@@ -48,10 +48,14 @@ export interface VtuberData {
   agency_id?: string
 }
 
+// 🎵 SPOTIFY API REAL SPEC (MusicPlayer.tsx compatible)
 export interface SpotifyTrack {
   id: string
   name: string
-  artist: string
+  artists: Array<{     // ✅ FIXED: Array of artists
+    name: string
+    id: string
+  }>
   album: {
     name: string
     images: Array<{
