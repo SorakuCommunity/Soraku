@@ -1,81 +1,64 @@
-// app/api/discord/stats/route.ts — SORAKU v1.0.a3.4
-// Extended to return online_members[] for DiscordHeroCard component
+// app/api/discord/stats/route.ts — SORAKU v1.0.a3.5
+// Returns guild stats + online member list from Discord Widget API
+
 import { NextResponse } from 'next/server'
+import { fetchDiscordStats } from '@/lib/discord'
 
-const DISCORD_API = 'https://discord.com/api/v10'
-const INVITE_URL  = 'https://discord.gg/CJJ7KEJMbg'
+interface WidgetMember {
+  id: string
+  username: string
+  status: string
+  avatar_url: string
+}
 
-async function fetchGuildStats() {
-  const guildId  = process.env.DISCORD_GUILD_ID
-  const botToken = process.env.DISCORD_BOT_TOKEN
-  if (!guildId || !botToken) return null
-
-  // 1. Guild with counts
-  const guildRes = await fetch(`${DISCORD_API}/guilds/${guildId}?with_counts=true`, {
-    headers: { Authorization: `Bot ${botToken}` },
-    next:    { revalidate: 300 },
-  })
-  if (!guildRes.ok) return null
-  const guild = await guildRes.json()
-
-  // 2. Online members via guild preview
-  let onlineMembers: { id: string; username: string; avatar_url: string | null }[] = []
-  try {
-    const previewRes = await fetch(`${DISCORD_API}/guilds/${guildId}/members?limit=100`, {
-      headers: { Authorization: `Bot ${botToken}` },
-      next:    { revalidate: 300 },
-    })
-    if (previewRes.ok) {
-      const members = await previewRes.json()
-      // Filter members with user data; avatar from member or user
-      onlineMembers = (members as Record<string, unknown>[])
-        .filter((m) => m.user)
-        .slice(0, 20)
-        .map((m) => {
-          const user = m.user as { id: string; username: string; avatar: string | null }
-          const memberAvatar = (m.avatar as string | null)
-          const avatarHash   = memberAvatar ?? user.avatar
-          return {
-            id:         user.id,
-            username:   user.username,
-            avatar_url: avatarHash
-              ? `https://cdn.discordapp.com/guilds/${guildId}/users/${user.id}/avatars/${avatarHash}.png?size=64`
-              : (user.avatar
-                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
-                : null),
-          }
-        })
-    }
-  } catch {
-    // members endpoint may not be available without privileged intents
-    onlineMembers = []
-  }
-
-  return {
-    guild_id:       guild.id,
-    guild_name:     guild.name,
-    guild_icon:     guild.icon ?? null,
-    online_count:   guild.approximate_presence_count ?? 0,
-    member_count:   guild.approximate_member_count ?? 0,
-    invite_url:     INVITE_URL,
-    online_members: onlineMembers,
-  }
+interface WidgetResponse {
+  id: string
+  name: string
+  members?: WidgetMember[]
 }
 
 export async function GET() {
-  try {
-    const data = await fetchGuildStats()
-    if (!data) {
-      return NextResponse.json(
-        { error: 'Discord data tidak tersedia' },
-        { status: 503, headers: { 'Cache-Control': 's-maxage=60' } }
-      )
-    }
-    return NextResponse.json(data, {
-      headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate=60' },
-    })
-  } catch (err) {
-    console.error('[discord/stats]', err)
-    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+  const stats = await fetchDiscordStats()
+  if (!stats) {
+    return NextResponse.json(
+      { error: 'Tidak dapat mengambil data Discord' },
+      { status: 503 }
+    )
   }
+
+  // Fetch online members from public widget endpoint (no auth required)
+  let onlineMembers: WidgetMember[] = []
+  const guildId = process.env.DISCORD_GUILD_ID
+  if (guildId) {
+    try {
+      const widgetRes = await fetch(
+        `https://discord.com/api/guilds/${guildId}/widget.json`,
+        { next: { revalidate: 60 } }
+      )
+      if (widgetRes.ok) {
+        const widget = (await widgetRes.json()) as WidgetResponse
+        onlineMembers = (widget.members ?? []).slice(0, 20).map((m) => ({
+          id:         m.id,
+          username:   m.username,
+          status:     m.status,
+          avatar_url: m.avatar_url,
+        }))
+      }
+    } catch {
+      // widget may be disabled — graceful degradation
+    }
+  }
+
+  return NextResponse.json(
+    {
+      stats: {
+        ...stats,
+        icon_url: stats.icon
+          ? `https://cdn.discordapp.com/icons/${stats.id}/${stats.icon}.png?size=256`
+          : null,
+        online_members: onlineMembers,
+      },
+    },
+    { headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' } }
+  )
 }

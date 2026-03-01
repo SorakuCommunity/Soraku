@@ -1,87 +1,44 @@
-## [1.0.a3.5] — 2026-03-01
-
-### 🆕 Added
-- `/Admin` route with full role-guard middleware (`ADMIN`, `AGENSI`, `MANAGER`, `OWNER`)
-- `/Soraku_Admin/*` → `/Admin/*` redirect for backward compatibility
-- **Admin Dashboard** — 4 stat cards (Users, Blog Published, Gallery Pending, VTubers)
-- **Admin Users** — scrollable table, avatar, role dropdown (live PATCH), pagination (10/page), search
-- **Admin Pengurus** — separate grouped tables per role: OWNER / MANAGER / ADMIN / AGENSI
-- **Admin Gallery** — approve/reject uploads with hover overlay; Pending / Disetujui tabs
-- **Admin Blogs** — create/edit/publish/delete with modal form + slug auto-gen
-- **Admin VTuber** — CRUD grid + modal with 10 social platforms (YouTube, TikTok, Twitch, Trakteer, Ko-fi etc.)
-- **Admin Pengaturan** — theme color pickers with live swatch, Discord webhook, Spotify credentials
-- **Gallery** — filter tabs (Terbaru / Populer / Trending), like button per card, Upload button for auth users
-- **Gallery Upload** — real Supabase Storage upload (8MB limit) + URL fallback, drag-and-drop zone
-- **SocialLinksEditor** — role-gated platform icons: USER=2, DONATE=8, PREMIUM=10 platforms
-- **Horizontal icon row** with lock overlay + tooltip for inaccessible platforms
-- **Profile cover URL** — locked to PREMIUM+ with visual lock icon and upgrade prompt
-- **KomunitaS** — 6-feature glass grid (3×2), animated hover accent line
-- Migration SQL v1.0.a3.5 — Supabase Storage bucket, vtubers table, vtuber_socials, site_settings RLS, gallery RLS
-- `.env.example` updated with all required keys
-
-### 🔧 Changed
-- `AdminShell` sidebar — routes updated to `/Admin/*`, active indicator with left border, breadcrumb in header
-- `useUser` hook — now exposes `role` and `username` directly as convenience aliases
-- Admin pages converted to proper server+client split pattern (no more `useUser` in admin)
-- Gallery trending score = likes×0.7 + recency×0.3
-
-### 🐛 Fixed
-- Admin Gallery / Pengaturan: removed incorrect `useUser` usage in server-rendered admin pages
-- Cover URL field now properly prevents saves for non-PREMIUM users
-- Gallery upload now writes to Supabase (previously was URL-only)
-
-### 📦 Files Added
-- `app/Admin/page.tsx` (dashboard)
-- `app/Admin/users/page.tsx` + `AdminUsersClient.tsx`
-- `app/Admin/gallery/page.tsx` + `AdminGalleryClient.tsx`
-- `app/Admin/blogs/page.tsx` + `AdminBlogsClient.tsx`
-- `app/Admin/vtuber/page.tsx` + `AdminVtuberClient.tsx`
-- `app/Admin/pengaturan/page.tsx` + `AdminPengaturanClient.tsx`
-- `app/Admin/pengurus/page.tsx`
-- `supabase/migration_v1.0.a3.5.sql`
-- `.env.example` (updated)
-## [1.0.a3.4] — 2026-03-01
-
-### Added
-- `DiscordHeroCard` component (shared Dashboard + Komunitas)
-  - Discord server icon, name, live online/total member count
-  - Animated green pulse status indicator + animated glow border
-  - Horizontal scrollable online member strip with glow dots
-  - Auto-hides entirely if no Discord data returned
-  - Full skeleton loading state
-- Dashboard `app/page.tsx` redesigned
-  - DiscordHeroCard as hero section
-  - Content Connection Area: Latest Blog Posts (2-col grid, conditional)
-  - Content Connection Area: Latest Events (2-col grid, conditional)
-  - Staggered Framer Motion fade-in on content cards
-- Komunitas `app/komunitas/page.tsx` redesigned
-  - DiscordHeroCard at top
-  - Filter Tabs: Terbaru / Populer / Trending with AnimatePresence
-  - Glass gallery grid (2–4 col responsive) with hover overlay
-  - GitHub Discussions section (upvote + comment count)
-- `SocialLinksEditor` component
-  - Platforms: Discord, Instagram, TikTok, Twitter/X, YouTube, Website
-  - USER role: max 2 links with soft warning text
-  - PREMIUM/DONATE/AGENSI/MANAGER/ADMIN/OWNER: unlimited
-  - Per-row save with loading spinner + glass toast animation
-- `app/api/profile/socials` POST route (server-side role limit enforcement)
-- Footer redesigned — glass panel, logo, quick links, Discord CTA, copyright bar
-- `app/edit/profile/page.tsx` — glassmorphism redesign + SocialLinksEditor integrated
-- `supabase/migration_v1.0.a3.4.sql` — idempotent migration with all schema checks
-- `next.config.mjs` — optimizePackageImports, security headers, asset caching
-
-### Fixed
-- `app/api/discord/stats` now returns full `online_members[]` array for hero card
-- Profile edit styling migrated to glassmorphism
-
-### Changed
-- Version: 1.0.a3.3 → 1.0.a3.4
-
----
-
 # Changelog — Soraku Platform
 
 Format: [Semantic Versioning](https://semver.org)
+
+---
+
+## [1.0.a3.5-bf1] — 2026-03-01 — Build-Fix Patch
+
+### Fixed
+- `lib/supabase/server.ts` — Build-safe JWT placeholder fallbacks; @supabase/ssr no longer throws during static prerender with missing env vars
+- `lib/supabase/client.ts` — Same env guard for browser client
+- `middleware.ts` — Env guard + wrapped in try/catch; graceful degradation when Supabase unreachable
+- `app/dashboard/page.tsx` — Removed direct `motion` import from server component; extracted to `components/dashboard/DashboardAnimations.tsx` client wrappers
+- `app/api/gallery/route.ts` — Fixed `caption` → `title` column alignment with actual gallery table schema; removed dompurify dep
+- `types/index.ts` — GalleryItem aligned with DB schema (`title`, `tags`, `likes`); DiscordStats + EventData + BlogPost extended
+- `lib/schema.sql` — Added `approved_by` column to gallery table (idempotent ALTER)
+- Build: 0 errors, 25/25 pages generated ✓
+
+---
+
+## [1.0.a3.5] — 2026-03-01 ✅ BUILD SUCCESS
+
+### Added
+- `app/dashboard/page.tsx` — New Dashboard page: Discord Hero Card, Latest Blog (6), Latest Events, Komunitas CTA
+- `components/community/DiscordHeroCard.tsx` — Reusable glass Discord card with widget member list auto-scroll
+- `app/komunitas/page.tsx` — Full rewrite: Discord Hero Card + 6 Glass Feature Cards (3×2, Framer Motion stagger) + CTA
+- `app/gallery/page.tsx` — Glass upload card with Supabase Storage direct upload + Newest/Popular/Trending tabs + like counter
+- `app/u/[username]/ProfileClient.tsx` — Role-based social media editor: USER=2, DONATE=8, PREMIUM=10 (Trakteer+Ko-fi), cover edit PREMIUM only
+- `components/Footer.tsx` — Glass panel footer: Logo + Quick Links + 6 Social icons with hover colors
+- Navbar: Dashboard link added
+- `lib/schema.sql` — Storage bucket RLS policies for `uploads` bucket
+
+### Changed
+- Discord stats API now returns `icon_url` + `online_members` from widget endpoint
+- Gallery upload uses Supabase Storage (`uploads/gallery/`) instead of URL-only input
+- Footer copyright updated to v1.0.a3.5
+
+### Fixed
+- Gallery `likes` column referenced correctly across all view + like flows
+- Social editor respects role hierarchy from `lib/roles.ts` (`hasRole`)
+- Cover edit gated to `PREMIUM` role minimum
 
 ---
 

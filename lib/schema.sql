@@ -186,6 +186,7 @@ CREATE TABLE IF NOT EXISTS gallery (
   image_url   TEXT NOT NULL,
   tags        TEXT[] DEFAULT '{}',
   approved    BOOLEAN DEFAULT FALSE,
+  approved_by UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -384,30 +385,27 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 CREATE INDEX IF NOT EXISTS idx_vtuber_socials_vtuber ON vtuber_socials(vtuber_id);
 CREATE INDEX IF NOT EXISTS idx_user_roles_user ON user_roles(user_id);
 
--- ============================================================
---  v1.0.a3.4 ADDITIONS (idempotent)
--- ============================================================
+-- ─── Storage bucket for image uploads (v1.0.a3.5) ────────────────────────────
+-- NOTE: Run this via Supabase dashboard Storage → New bucket, OR via:
+-- INSERT INTO storage.buckets (id, name, public) VALUES ('uploads', 'uploads', true)
+-- ON CONFLICT (id) DO NOTHING;
 
--- gallery.likes
+-- RLS for storage.objects (gallery folder)
 DO $$ BEGIN
-  ALTER TABLE gallery ADD COLUMN likes INTEGER DEFAULT 0;
-EXCEPTION WHEN duplicate_column THEN NULL; END $$;
-UPDATE gallery SET likes = 0 WHERE likes IS NULL;
+  CREATE POLICY "Authenticated upload to gallery folder" ON storage.objects
+    FOR INSERT TO authenticated
+    WITH CHECK (bucket_id = 'uploads' AND (storage.foldername(name))[1] = 'gallery');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- events.cover_image
 DO $$ BEGIN
-  ALTER TABLE events ADD COLUMN cover_image TEXT;
-EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+  CREATE POLICY "Public read uploads" ON storage.objects
+    FOR SELECT USING (bucket_id = 'uploads');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- blog_posts.published_at
 DO $$ BEGIN
-  ALTER TABLE blog_posts ADD COLUMN published_at TIMESTAMPTZ;
-EXCEPTION WHEN duplicate_column THEN NULL; END $$;
-UPDATE blog_posts SET published_at = created_at WHERE published = true AND published_at IS NULL;
+  CREATE POLICY "Owner delete own upload" ON storage.objects
+    FOR DELETE USING (auth.uid()::text = (storage.foldername(name))[2]);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- Performance indexes
-CREATE INDEX IF NOT EXISTS idx_gallery_likes      ON gallery(likes DESC);
-CREATE INDEX IF NOT EXISTS idx_gallery_created    ON gallery(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_blog_published_at  ON blog_posts(published_at DESC) WHERE published = true;
-CREATE INDEX IF NOT EXISTS idx_events_status_date ON events(status, date ASC);
-CREATE INDEX IF NOT EXISTS idx_user_socials_user  ON user_socials(user_id);
+-- approved_by column (idempotent, v1.0.a3.5)
+ALTER TABLE gallery ADD COLUMN IF NOT EXISTS approved_by UUID REFERENCES users(id) ON DELETE SET NULL;

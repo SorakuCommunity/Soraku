@@ -1,7 +1,7 @@
 {
   "name": "soraku",
-  "version": "1.0.0-a3.5",
-  "description": "Soraku Community v1.0.a3.5 — Admin Panel, Gallery Upload, Role-gated Social Links",
+  "version": "1.0.a3.5",
+  "description": "Soraku - Platform Kreatif Komunitas Anime & Manga Indonesia. Fullstack Next.js 15 App Router + Supabase Auth + Spotify API.",
   "author": {
     "name": "Soraku Community",
     "email": "echo.soraku@gmail.com",

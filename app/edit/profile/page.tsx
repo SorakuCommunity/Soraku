@@ -1,6 +1,4 @@
 'use client'
-// app/edit/profile/page.tsx — SORAKU v1.0.a3.4
-// Full profile edit page with Social Links Editor integration
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -8,44 +6,25 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { profileSchema, type ProfileFormData } from '@/lib/schemas'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { Save, User, Link as LinkIcon, ArrowLeft, Share2 } from 'lucide-react'
+import { Save, User, Link as LinkIcon, Palette, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { SocialLinksEditor } from '@/components/profile/SocialLinksEditor'
-import type { UserRole } from '@/types'
 
-const inputClass = 'w-full px-3 py-2.5 rounded-xl border text-sm outline-none transition-all focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)20] min-h-[44px] backdrop-blur-sm'
+const inputClass = 'w-full px-3 py-2.5 rounded-lg border text-sm outline-none transition-all focus:border-[var(--color-primary)] min-h-[44px]'
 
-const glassCardClass = 'p-5 rounded-2xl border backdrop-blur-xl'
-const glassCardStyle = {
-  backgroundColor: 'rgba(255,255,255,0.04)',
-  borderColor:     'rgba(255,255,255,0.10)',
-}
-
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-sub)' }}>{label}</label>
-      {children}
-      {error && <p className="text-xs mt-1 text-red-400">{error}</p>}
-    </div>
-  )
-}
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 18 },
-  show:   { opacity: 1, y: 0 },
-}
+const Field = ({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) => (
+  <div>
+    <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-sub)' }}>{label}</label>
+    {children}
+    {error && <p className="text-xs mt-1 text-red-400">{error}</p>}
+  </div>
+)
 
 export default function EditProfilePage() {
   const router   = useRouter()
   const supabase = createClient()
-  const [loading,   setLoading]   = useState(true)
-  const [saving,    setSaving]    = useState(false)
-  const [userId,    setUserId]    = useState<string>('')
-  const [userRole,  setUserRole]  = useState<UserRole>('USER')
-  const [socials,   setSocials]   = useState<Record<string, string>>({})
-  const [username,  setUsername]  = useState('')
+  const [loading, setLoading]   = useState(true)
+  const [saving,  setSaving]    = useState(false)
+  const [username, setUsername] = useState('')
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -56,17 +35,14 @@ export default function EditProfilePage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
 
-      setUserId(user.id)
-
       const { data } = await supabase
         .from('users')
-        .select('username, display_name, bio, avatar_url, cover_url, theme_mode, website, location, role')
+        .select('username, display_name, bio, avatar_url, cover_url, theme_mode, website, location')
         .eq('id', user.id)
         .single()
 
       if (data) {
         setUsername(data.username ?? '')
-        setUserRole((data.role ?? 'USER') as UserRole)
         setValue('display_name', data.display_name ?? '')
         setValue('username',     data.username ?? '')
         setValue('bio',          data.bio ?? '')
@@ -74,25 +50,14 @@ export default function EditProfilePage() {
         setValue('cover_url',    data.cover_url ?? '')
         setValue('website',      data.website ?? '')
         setValue('location',     data.location ?? '')
+        if (data.theme_mode) setValue('theme_mode', data.theme_mode)
       }
-
-      // Load existing socials
-      const { data: socialsData } = await supabase
-        .from('user_socials')
-        .select('platform, url')
-        .eq('user_id', user.id)
-
-      const map: Record<string, string> = {}
-      for (const s of socialsData ?? []) map[s.platform] = s.url
-      setSocials(map)
-
       setLoading(false)
     }
     load()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const onSubmit = async (data: ProfileFormData) => {
+  const onSubmit = async (values: ProfileFormData) => {
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/login'); return }
@@ -100,177 +65,117 @@ export default function EditProfilePage() {
     const { error } = await supabase
       .from('users')
       .update({
-        display_name: data.display_name || null,
-        username:     data.username,
-        bio:          data.bio || null,
-        avatar_url:   data.avatar_url || null,
-        cover_url:    data.cover_url || null,
-        website:      data.website || null,
-        location:     data.location || null,
+        display_name: values.display_name,
+        username:     values.username,
+        bio:          values.bio,
+        avatar_url:   values.avatar_url || null,
+        cover_url:    values.cover_url  || null,
+        theme_mode:   values.theme_mode,
+        website:      values.website    || null,
+        location:     values.location   || null,
         updated_at:   new Date().toISOString(),
       })
       .eq('id', user.id)
 
-    if (error) {
-      toast.error('Gagal menyimpan. ' + error.message)
-    } else {
-      toast.success('Profil disimpan!')
-      router.push(`/u/${data.username ?? username}`)
-    }
     setSaving(false)
+    if (error) { toast.error('Gagal menyimpan: ' + error.message); return }
+
+    // Update theme if changed
+    if (values.theme_mode) {
+      await fetch('/api/profile/theme', {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ theme_mode: values.theme_mode }),
+      })
+    }
+
+    toast.success('Profil berhasil disimpan!')
+    router.push(`/u/${values.username ?? username}`)
+    router.refresh()
   }
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
-        <div className="w-8 h-8 border-2 rounded-full animate-spin"
-          style={{ borderColor: 'var(--color-primary) transparent transparent transparent' }} />
+        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--color-primary)' }} />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
-      <div className="max-w-2xl mx-auto px-4 py-10">
-
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <Link href={`/u/${username}`}
-            className="w-9 h-9 rounded-xl border flex items-center justify-center transition-all hover:scale-105"
-            style={{ borderColor: 'rgba(255,255,255,0.12)', backgroundColor: 'rgba(255,255,255,0.04)', color: 'var(--text-sub)' }}>
-            <ArrowLeft size={16} />
+    <div className="min-h-screen py-10 px-4" style={{ backgroundColor: 'var(--bg)' }}>
+      <div className="max-w-xl mx-auto">
+        <div className="flex items-center gap-3 mb-6">
+          <Link href={`/u/${username}`} className="p-2 rounded-lg hover:bg-[var(--hover-bg)] transition-all"
+            style={{ color: 'var(--text-sub)' }}>
+            <ArrowLeft size={18} />
           </Link>
-          <div>
-            <h1 className="font-bold text-lg" style={{ color: 'var(--text)' }}>Edit Profil</h1>
-            <p className="text-xs" style={{ color: 'var(--text-sub)' }}>@{username}</p>
-          </div>
+          <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Edit Profil</h1>
         </div>
 
-        <motion.div
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
-          initial="hidden"
-          animate="show"
-          className="space-y-6"
-        >
-          {/* ── Section 1: Basic Info ── */}
-          <motion.section variants={sectionVariants} className={glassCardClass} style={glassCardStyle}>
-            <h2 className="flex items-center gap-2 font-semibold mb-5 text-sm" style={{ color: 'var(--text)' }}>
-              <User size={15} style={{ color: 'var(--color-primary)' }} />
-              Informasi Dasar
-            </h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Informasi Dasar */}
+          <section className="p-5 rounded-xl border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+            <h2 className="flex items-center gap-2 font-semibold mb-5"><User className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />Informasi Dasar</h2>
             <div className="space-y-4">
-              <Field label="Display Name" error={errors.display_name?.message}>
-                <input {...register('display_name')} placeholder="Nama tampilan kamu"
-                  className={inputClass} style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }} />
+              <Field label="Nama Tampilan *" error={errors.display_name?.message}>
+                <input {...register('display_name')} placeholder="Nama publik"
+                  className={inputClass} style={{ backgroundColor: 'var(--bg-muted)', borderColor: 'var(--border)', color: 'var(--text)' }} />
               </Field>
-              <Field label="Username" error={errors.username?.message}>
+              <Field label="Username *" error={errors.username?.message}>
                 <input {...register('username')} placeholder="username_kamu"
-                  className={inputClass} style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }} />
+                  className={inputClass} style={{ backgroundColor: 'var(--bg-muted)', borderColor: 'var(--border)', color: 'var(--text)' }} />
               </Field>
               <Field label="Bio" error={errors.bio?.message}>
                 <textarea {...register('bio')} placeholder="Ceritakan sedikit tentang dirimu..." rows={3}
-                  className={inputClass + ' resize-none'} style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)', minHeight: 'auto' }} />
+                  className={inputClass + ' resize-none'} style={{ backgroundColor: 'var(--bg-muted)', borderColor: 'var(--border)', color: 'var(--text)', minHeight: 'auto' }} />
               </Field>
               <Field label="Lokasi" error={errors.location?.message}>
                 <input {...register('location')} placeholder="Jakarta, Indonesia"
-                  className={inputClass} style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }} />
+                  className={inputClass} style={{ backgroundColor: 'var(--bg-muted)', borderColor: 'var(--border)', color: 'var(--text)' }} />
               </Field>
             </div>
-          </motion.section>
+          </section>
 
-          {/* ── Section 2: Avatar & Cover ── */}
-          <motion.section variants={sectionVariants} className={glassCardClass} style={glassCardStyle}>
-            <h2 className="flex items-center gap-2 font-semibold mb-5 text-sm" style={{ color: 'var(--text)' }}>
-              <LinkIcon size={15} style={{ color: 'var(--color-primary)' }} />
-              Avatar & Cover
-            </h2>
+          {/* Avatar & Cover */}
+          <section className="p-5 rounded-xl border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+            <h2 className="flex items-center gap-2 font-semibold mb-5"><LinkIcon className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />Avatar & Cover</h2>
             <div className="space-y-4">
               <Field label="URL Avatar" error={errors.avatar_url?.message}>
                 <input {...register('avatar_url')} placeholder="https://..." type="url"
-                  className={inputClass} style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }} />
+                  className={inputClass} style={{ backgroundColor: 'var(--bg-muted)', borderColor: 'var(--border)', color: 'var(--text)' }} />
               </Field>
-              {/* Cover URL — PREMIUM+ only */}
-              {(() => {
-                const isPremium = ['PREMIUM','AGENSI','ADMIN','MANAGER','OWNER'].includes(userRole)
-                return (
-                  <div>
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-sub)' }}>
-                      URL Cover
-                      <span className="ml-1.5 text-xs px-1.5 py-0.5 rounded-full font-semibold"
-                        style={{ backgroundColor: isPremium ? '#C9A84C22' : '#ef444422', color: isPremium ? '#C9A84C' : '#ef4444' }}>
-                        {isPremium ? 'PREMIUM ✓' : 'PREMIUM'}
-                      </span>
-                    </label>
-                    <div className="relative">
-                      <input {...register('cover_url')} placeholder={isPremium ? 'https://...' : 'Upgrade ke PREMIUM untuk mengubah cover'} type="url"
-                        disabled={!isPremium}
-                        className={inputClass}
-                        style={{
-                          backgroundColor: isPremium ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
-                          borderColor:     isPremium ? 'rgba(255,255,255,0.12)' : 'rgba(239,68,68,0.20)',
-                          color:           'var(--text)',
-                          cursor:          isPremium ? 'text' : 'not-allowed',
-                          opacity:         isPremium ? 1 : 0.55,
-                        }} />
-                      {!isPremium && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                    {!isPremium && (
-                      <p className="text-xs mt-1" style={{ color: '#ef4444' }}>
-                        Cover kustom hanya untuk anggota <a href="/pricing" className="underline hover:opacity-80">Premium</a>.
-                      </p>
-                    )}
-                    {errors.cover_url && <p className="text-xs mt-1 text-red-400">{errors.cover_url.message}</p>}
-                  </div>
-                )
-              })()}
+              <Field label="URL Cover (Premium)" error={errors.cover_url?.message}>
+                <input {...register('cover_url')} placeholder="https://..." type="url"
+                  className={inputClass} style={{ backgroundColor: 'var(--bg-muted)', borderColor: 'var(--border)', color: 'var(--text)' }} />
+              </Field>
               <Field label="Website" error={errors.website?.message}>
-                <input {...register('website')} placeholder="https://yoursite.com" type="url"
-                  className={inputClass} style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }} />
+                <input {...register('website')} placeholder="https://..." type="url"
+                  className={inputClass} style={{ backgroundColor: 'var(--bg-muted)', borderColor: 'var(--border)', color: 'var(--text)' }} />
               </Field>
             </div>
-          </motion.section>
+          </section>
 
-          {/* ── Section 3: Social Links Editor ── */}
-          <motion.section variants={sectionVariants}>
-            <div className="flex items-center gap-2 mb-3 px-1">
-              <Share2 size={14} style={{ color: 'var(--color-primary)' }} />
-              <h2 className="font-semibold text-sm" style={{ color: 'var(--text)' }}>Social Links</h2>
-            </div>
-            {userId && (
-              <SocialLinksEditor
-                userId={userId}
-                role={userRole}
-                initialLinks={socials}
-              />
-            )}
-          </motion.section>
+          {/* Tema */}
+          <section className="p-5 rounded-xl border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+            <h2 className="flex items-center gap-2 font-semibold mb-5"><Palette className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />Tema</h2>
+            <Field label="Mode Tampilan" error={errors.theme_mode?.message}>
+              <select {...register('theme_mode')}
+                className={inputClass} style={{ backgroundColor: 'var(--bg-muted)', borderColor: 'var(--border)', color: 'var(--text)' }}>
+                <option value="dark">🌙 Dark</option>
+                <option value="light">☀️ Light</option>
+                <option value="auto">🔄 Auto (ikuti sistem)</option>
+              </select>
+            </Field>
+          </section>
 
-          {/* ── Save button ── */}
-          <motion.div variants={sectionVariants}>
-            <button
-              onClick={handleSubmit(onSubmit)}
-              disabled={saving}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary, #6E8FA6))',
-                boxShadow: '0 4px 24px var(--color-primary)40',
-              }}
-            >
-              {saving ? (
-                <div className="w-4 h-4 border-2 rounded-full animate-spin border-white border-t-transparent" />
-              ) : (
-                <Save size={15} />
-              )}
-              {saving ? 'Menyimpan...' : 'Simpan Profil'}
-            </button>
-          </motion.div>
-        </motion.div>
+          <button type="submit" disabled={saving}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-60 min-h-[44px]"
+            style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}>
+            <Save size={16} />
+            {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
+          </button>
+        </form>
       </div>
     </div>
   )

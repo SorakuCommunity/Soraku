@@ -1,17 +1,14 @@
 'use client'
-// hooks/useUser.ts — SORAKU v1.0.a3.5
-// Exposes role + username directly for convenience
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
-import type { UserRole } from '@/types'
 
 interface UserProfile {
   id:           string
   username:     string
   display_name: string | null
   avatar_url:   string | null
-  role:         UserRole
+  role:         string
   theme_mode:   string
 }
 
@@ -22,7 +19,6 @@ export function useUser() {
 
   useEffect(() => {
     const supabase = createClient()
-
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       setUser(user)
       if (user) {
@@ -31,7 +27,7 @@ export function useUser() {
           .select('id, username, display_name, avatar_url, role, theme_mode')
           .eq('id', user.id)
           .single()
-        setProfile(data as UserProfile | null)
+        setProfile(data)
       }
       setLoading(false)
     })
@@ -44,13 +40,5 @@ export function useUser() {
     return () => subscription.unsubscribe()
   }, [])
 
-  return {
-    user,
-    profile,
-    loading,
-    isLoggedIn: !!user,
-    // convenience aliases
-    role:     profile?.role     ?? null,
-    username: profile?.username ?? null,
-  }
+  return { user, profile, loading, isLoggedIn: !!user }
 }
