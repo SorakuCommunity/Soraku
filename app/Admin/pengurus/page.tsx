@@ -1,5 +1,3 @@
-// app/Admin/pengurus/page.tsx — SORAKU v1.0.a3.4
-// Separate table for staff: OWNER, MANAGER, ADMIN, AGENSI
 export const dynamic = 'force-dynamic'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -40,8 +38,8 @@ export default async function AdminPengurusPage() {
     <AdminShell userRole={profile.role as Role} username={profile.username ?? 'Admin'}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Pengurus</h1>
-          <p className="text-sm mt-0.5" style={{ color: 'var(--text-sub)' }}>
+          <h1 className="text-xl font-bold text-foreground">Pengurus</h1>
+          <p className="text-sm mt-0.5 text-muted-foreground">
             Daftar staff dan pengurus komunitas Soraku.
           </p>
         </div>
@@ -53,22 +51,28 @@ export default async function AdminPengurusPage() {
           return (
             <div key={role}>
               <div className="flex items-center gap-2 mb-3">
-                <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: color }} />
+                <span 
+                  className="w-2.5 h-2.5 rounded-full inline-block" 
+                  style={{ backgroundColor: color }} 
+                />
                 <h2 className="font-semibold text-sm" style={{ color }}>
                   {label} <span style={{ color: 'var(--text-sub)', fontWeight: 400 }}>({members.length})</span>
                 </h2>
               </div>
 
               {members.length === 0 ? (
-                <p className="text-xs italic px-1" style={{ color: 'var(--text-sub)' }}>Tidak ada {label}</p>
+                <p className="text-xs italic px-1 text-muted-foreground">Tidak ada {label}</p>
               ) : (
-                <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'rgba(255,255,255,0.10)' }}>
+                <div className="rounded-2xl border overflow-hidden border-border">
                   <table className="w-full text-sm">
                     <thead>
                       <tr style={{ backgroundColor: color + '10', borderBottom: `1px solid ${color}30` }}>
                         {['Avatar', 'Username', 'Email', 'Bergabung'].map(h => (
-                          <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider"
-                            style={{ color }}>
+                          <th 
+                            key={h} 
+                            className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider"
+                            style={{ color }}
+                          >
                             {h}
                           </th>
                         ))}
@@ -76,29 +80,45 @@ export default async function AdminPengurusPage() {
                     </thead>
                     <tbody>
                       {members.map((m, i) => (
-                        <tr key={m.id}
-                          className="border-b transition-colors hover:bg-white/[0.02]"
-                          style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+                        <tr 
+                          key={m.id}
+                          className="border-b transition-colors hover:bg-muted/50 border-border"
+                        >
+                          {/* ✅ FIXED: ringColor → borderColor */}
                           <td className="px-4 py-3">
-                            <div className="w-8 h-8 rounded-full overflow-hidden ring-1 flex items-center justify-center"
-                              style={{ backgroundColor: color + '22', ringColor: color + '40' }}>
+                            <div 
+                              className="w-8 h-8 rounded-full overflow-hidden border-2 flex items-center justify-center shadow-sm relative"
+                              style={{ 
+                                backgroundColor: `${color}22`,
+                                borderColor: `${color}40`
+                              }}
+                            >
                               {m.avatar_url ? (
-                                <Image src={m.avatar_url} alt={m.username} width={32} height={32} className="object-cover" />
+                                <Image 
+                                  src={m.avatar_url} 
+                                  alt={m.username || 'Avatar'} 
+                                  width={32} 
+                                  height={32} 
+                                  className="w-full h-full object-cover rounded-full" 
+                                />
                               ) : (
-                                <span className="text-xs font-bold" style={{ color }}>
-                                  {m.username[0]?.toUpperCase()}
+                                <span 
+                                  className="text-xs font-bold flex items-center justify-center w-full h-full"
+                                  style={{ color }}
+                                >
+                                  {m.username?.[0]?.toUpperCase()}
                                 </span>
                               )}
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="font-medium" style={{ color: 'var(--text)' }}>@{m.username}</span>
+                            <span className="font-medium text-foreground">@{m.username}</span>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-xs" style={{ color: 'var(--text-sub)' }}>{m.email ?? '—'}</span>
+                            <span className="text-xs text-muted-foreground">{m.email ?? '—'}</span>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-xs" style={{ color: 'var(--text-sub)' }}>
+                            <span className="text-xs text-muted-foreground">
                               {format(new Date(m.created_at), 'd MMM yyyy', { locale: idLocale })}
                             </span>
                           </td>

@@ -1,17 +1,19 @@
-// middleware.ts — SORAKU v1.0.a3.5 — Build-safe + session forwarding
+// middleware.ts — SORAKU v1.0.a3.5
+// Route guard: /Admin (OWNER|MANAGER|ADMIN|AGENSI only), auth-required pages
+// NOTE: /Soraku_Admin route has been removed. Only /Admin exists.
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL  ?? 'https://placeholder.supabase.co'
-const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJhbm9uIn0.placeholder'
+const ADMIN_ROLES = ['OWNER', 'MANAGER', 'ADMIN', 'AGENSI'] as const
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request })
 
-  try {
-    const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON, {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
       cookies: {
         getAll() { return request.cookies.getAll() },
         setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
@@ -22,36 +24,37 @@ export async function middleware(request: NextRequest) {
           )
         },
       },
-    })
-
-    const { data: { user } } = await supabase.auth.getUser()
-    const pathname = request.nextUrl.pathname
-
-    if (
-      (pathname.startsWith('/profile') ||
-       pathname.startsWith('/admin') ||
-       pathname.startsWith('/Soraku_Admin')) &&
-      !user
-    ) {
-      return NextResponse.redirect(new URL('/login', request.url))
     }
+  )
 
-    if (user) {
-      response.headers.set('x-user-id', user.id ?? '')
-      response.headers.set(
-        'x-user-role',
-        (user.user_metadata as Record<string, string>)?.role ?? ''
-      )
-    }
-  } catch {
-    // Graceful degradation — allow request through
+  const { data: { user } } = await supabase.auth.getUser()
+  const pathname = request.nextUrl.pathname
+
+  // Auth-required routes
+  const requiresAuth =
+    pathname.startsWith('/profile') ||
+    pathname.startsWith('/edit') ||
+    pathname.startsWith('/gallery/upload') ||
+    pathname.startsWith('/Admin')
+
+  if (requiresAuth && !user) {
+    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(pathname)}`, request.url))
   }
 
+  // Admin role guard — OWNER, MANAGER, ADMIN, AGENSI only
+  if (pathname.startsWith('/Admin') && user) {
+    const { data: profile } = await supabase
+      .from('users').select('role').eq('id', user.id).single()
+    const role = profile?.role as string | undefined
+    if (!role || !(ADMIN_ROLES as readonly string[]).includes(role)) {
+      return NextResponse.redirect(new URL('/?error=unauthorized', request.url))
+    }
+  }
+
+  if (user) response.headers.set('x-user-id', user.id)
   return response
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }

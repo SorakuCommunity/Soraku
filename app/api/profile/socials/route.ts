@@ -1,14 +1,37 @@
-// app/api/profile/socials/route.ts — SORAKU v1.0.a3.4
-// Save a single social link — enforces USER=2 limit, PREMIUM=unlimited
+// app/api/profile/socials/route.ts — SORAKU v1.0.a3.5
+// Tier-based platform access:
+//   USER    → instagram, twitter (2 platforms max)
+//   DONATE  → +tiktok, youtube, discord, website, facebook, twitch (8 platforms)
+//   PREMIUM / AGENSI / ADMIN / MANAGER / OWNER → +trakteer, kofi (10 platforms)
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
-const PREMIUM_ROLES = ['PREMIUM', 'DONATE', 'AGENSI', 'MANAGER', 'ADMIN', 'OWNER'] as const
+const ALL_PLATFORMS = [
+  'instagram', 'twitter',
+  'tiktok', 'youtube', 'discord', 'website', 'facebook', 'twitch',
+  'trakteer', 'kofi',
+] as const
+
+type Platform = typeof ALL_PLATFORMS[number]
+
+const USER_PLATFORMS:    Platform[] = ['instagram', 'twitter']
+const DONATE_PLATFORMS:  Platform[] = ['instagram', 'twitter', 'tiktok', 'youtube', 'discord', 'website', 'facebook', 'twitch']
+const PREMIUM_PLATFORMS: Platform[] = [...DONATE_PLATFORMS, 'trakteer', 'kofi']
+
+const ROLE_TIER: Record<string, Platform[]> = {
+  USER:    USER_PLATFORMS,
+  DONATE:  DONATE_PLATFORMS,
+  PREMIUM: PREMIUM_PLATFORMS,
+  AGENSI:  PREMIUM_PLATFORMS,
+  ADMIN:   PREMIUM_PLATFORMS,
+  MANAGER: PREMIUM_PLATFORMS,
+  OWNER:   PREMIUM_PLATFORMS,
+}
 
 const schema = z.object({
-  platform: z.enum(['discord', 'instagram', 'tiktok', 'twitter', 'youtube', 'website']),
-  url: z.string().max(500),
+  platform: z.enum(ALL_PLATFORMS),
+  url:      z.string().max(500),
 })
 
 export async function POST(req: NextRequest) {
@@ -16,59 +39,56 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json()
+  const body   = await req.json()
   const parsed = schema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: 'Invalid' }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: 'Platform tidak valid' }, { status: 400 })
 
   const { platform, url } = parsed.data
 
-  // Get role
   const { data: profile } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+    .from('users').select('role').eq('id', user.id).single()
+  const role    = (profile?.role ?? 'USER') as string
+  const allowed = ROLE_TIER[role] ?? USER_PLATFORMS
 
-  const role = profile?.role ?? 'USER'
-  const isPremium = (PREMIUM_ROLES as readonly string[]).includes(role)
+  // Check tier access
+  if (!(allowed as string[]).includes(platform)) {
+    const tierName = role === 'USER' ? 'Donatur' : 'Premium'
+    return NextResponse.json(
+      { error: `Platform "${platform}" memerlukan upgrade ke ${tierName}.` },
+      { status: 403 }
+    )
+  }
 
-  // If clearing (empty url), allow always
+  // Clearing — always allowed
   if (!url.trim()) {
-    await supabase
-      .from('user_socials')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('platform', platform)
+    await supabase.from('user_socials').delete()
+      .eq('user_id', user.id).eq('platform', platform)
     return NextResponse.json({ ok: true })
   }
 
-  // Check limit for USER
-  if (!isPremium) {
-    const { count } = await supabase
-      .from('user_socials')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-
-    // Check if this platform already exists (update is fine)
+  // USER max 2 platforms
+  if (role === 'USER') {
     const { data: existing } = await supabase
-      .from('user_socials')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('platform', platform)
-      .single()
+      .from('user_socials').select('id')
+      .eq('user_id', user.id).eq('platform', platform).single()
 
-    if (!existing && (count ?? 0) >= 2) {
-      return NextResponse.json({ error: 'Limit reached. Upgrade to PREMIUM.' }, { status: 403 })
+    if (!existing) {
+      const { count } = await supabase
+        .from('user_socials').select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      if ((count ?? 0) >= 2) {
+        return NextResponse.json(
+          { error: 'Limit 2 platform untuk User. Upgrade ke Donatur untuk lebih banyak.' },
+          { status: 403 }
+        )
+      }
     }
   }
 
-  // Upsert
-  const { error } = await supabase
-    .from('user_socials')
-    .upsert(
-      { user_id: user.id, platform, url: url.trim() },
-      { onConflict: 'user_id,platform' }
-    )
+  const { error } = await supabase.from('user_socials').upsert(
+    { user_id: user.id, platform, url: url.trim() },
+    { onConflict: 'user_id,platform' }
+  )
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })

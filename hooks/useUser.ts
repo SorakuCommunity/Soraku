@@ -1,14 +1,16 @@
 'use client'
+// hooks/useUser.ts — SORAKU v1.0.a3.5
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
+import type { UserRole } from '@/types'
 
 interface UserProfile {
   id:           string
   username:     string
   display_name: string | null
   avatar_url:   string | null
-  role:         string
+  role:         UserRole
   theme_mode:   string
 }
 
@@ -19,6 +21,7 @@ export function useUser() {
 
   useEffect(() => {
     const supabase = createClient()
+
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       setUser(user)
       if (user) {
@@ -27,7 +30,7 @@ export function useUser() {
           .select('id, username, display_name, avatar_url, role, theme_mode')
           .eq('id', user.id)
           .single()
-        setProfile(data)
+        setProfile(data as UserProfile | null)
       }
       setLoading(false)
     })
@@ -40,5 +43,12 @@ export function useUser() {
     return () => subscription.unsubscribe()
   }, [])
 
-  return { user, profile, loading, isLoggedIn: !!user }
+  return {
+    user,
+    profile,
+    loading,
+    isLoggedIn: !!user,
+    role:       profile?.role     ?? null,  // shortcut
+    username:   profile?.username ?? null,  // shortcut
+  }
 }

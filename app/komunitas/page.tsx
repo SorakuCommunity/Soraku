@@ -4,7 +4,7 @@
 
 import { motion } from 'framer-motion'
 import { MessageCircle, Radio, Calendar, Mic2, Star, Shield } from 'lucide-react'
-import { DiscordHeroCard } from '@/components/community/DiscordHeroCard'
+import { DiscordHeroCard } from '@/components/discord/DiscordHeroCard'
 
 const features = [
   {

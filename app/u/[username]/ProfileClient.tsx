@@ -49,8 +49,18 @@ const PLATFORMS: Platform[] = [
 ]
 
 const ROLE_LABELS_ID: Record<string, string> = {
-  USER: 'User', DONATE: 'Donatur', PREMIUM: 'Premium',
+  USER: 'Member', DONATE: 'Donatur', PREMIUM: 'Premium',
   AGENSI: 'Agensi', ADMIN: 'Admin', MANAGER: 'Manager', OWNER: 'Owner',
+}
+
+const ROLE_BADGE_STYLE: Record<string, { bg: string; text: string }> = {
+  OWNER:   { bg: '#C9A84C22', text: '#C9A84C' },
+  MANAGER: { bg: '#9B59B622', text: '#9B59B6' },
+  ADMIN:   { bg: '#E74C3C22', text: '#E74C3C' },
+  AGENSI:  { bg: '#1ABC9C22', text: '#1ABC9C' },
+  PREMIUM: { bg: '#F39C1222', text: '#F39C12' },
+  DONATE:  { bg: '#3498DB22', text: '#3498DB' },
+  USER:    { bg: 'rgba(255,255,255,0.08)', text: 'rgba(255,255,255,0.45)' },
 }
 
 // ── SaveToast ─────────────────────────────────────────────────────────────────
@@ -253,7 +263,10 @@ export function ProfileClient({ profile, isOwner }: { profile: Profile; isOwner:
             </h1>
             {profile.role && (
               <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
-                style={{ backgroundColor: 'var(--badge-bg, rgba(79,163,209,0.15))', color: 'var(--color-primary)' }}>
+                style={{
+                  backgroundColor: ROLE_BADGE_STYLE[profile.role ?? 'USER']?.bg ?? ROLE_BADGE_STYLE.USER.bg,
+                  color:           ROLE_BADGE_STYLE[profile.role ?? 'USER']?.text ?? ROLE_BADGE_STYLE.USER.text,
+                }}>
                 {ROLE_LABELS_ID[profile.role] ?? profile.role}
               </span>
             )}
