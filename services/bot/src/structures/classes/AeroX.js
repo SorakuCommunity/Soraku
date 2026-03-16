@@ -14,7 +14,6 @@ import { CommandHandler } from '#handlers/CommandHandler';
 import { EventLoader } from '#handlers/EventLoader';
 import { MusicManager } from '#managers/MusicManager';
 import { logger } from '#utils/logger';
-import { startWebhookServer, setState } from '../../Webhooks/server.js';
 import { registerSlashCommands } from '#utils/slashRegistration';
 
 let shardInfo = null;
@@ -85,7 +84,6 @@ export class AeroX extends Client {
                             rows.forEach(u => this.noPrefixUsers.add(u.id));
                             this.logger.info('AeroX', `Loaded ${this.noPrefixUsers.size} no-prefix users`);
                         }).catch(() => {});
-                        await startWebhookServer(this);
                         await registerSlashCommands(this);
                         await this.login(config.token);
 

@@ -230,7 +230,7 @@ async function _handleExpiredGuildPerks(guildId, channel) {
   }
 }
 
-function _parseCommand(message, client) {
+async function _parseCommand(message, client) {
   const content = message.content.trim();
   const mentionPrefixRegex = new RegExp(`^<@!?${client.user.id}>\\s+`);
   const mentionMatch = content.match(mentionPrefixRegex);

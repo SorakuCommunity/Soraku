@@ -56,7 +56,7 @@ export class AntiAbuse extends Database {
 		);
 	}
 
-	checkCooldown(userId, command, messageOrInteraction) {
+	async checkCooldown(userId, command, messageOrInteraction) {
 		const commandName = command.name;
 		const baseCooldown = command.cooldown || 3;
 		const hasPremium = await db.hasAnyPremium(userId, null);
@@ -132,7 +132,7 @@ export class AntiAbuse extends Database {
 		}
 	}
 
-	blacklistUser(userId, messageOrInteraction) {
+	async blacklistUser(userId, messageOrInteraction) {
 		try {
 			await db.blacklistUser(
 				userId,
@@ -204,9 +204,9 @@ export class AntiAbuse extends Database {
 			};
 
 			if (messageOrInteraction.reply) {
-				messageOrInteraction.reply(payload).catch(() => {});
+				messageOrInteraction.reply(payload).catch(async () => {});
 			} else if (messageOrInteraction.editReply) {
-				messageOrInteraction.editReply(payload).catch(() => {});
+				messageOrInteraction.editReply(payload).catch(async () => {});
 			}
 		} catch (e) {
 			logger.error(
@@ -266,10 +266,10 @@ export class AntiAbuse extends Database {
 			};
 
 			if (messageOrInteraction.reply) {
-				messageOrInteraction.reply(payload).catch(() => {});
+				messageOrInteraction.reply(payload).catch(async () => {});
 			} else if (messageOrInteraction.followUp) {
 				// FIX: was calling .reply() in the followUp branch — now correctly calls .followUp()
-				messageOrInteraction.followUp(payload).catch(() => {});
+				messageOrInteraction.followUp(payload).catch(async () => {});
 			}
 		} catch (error) {
 			logger.error(
@@ -334,7 +334,7 @@ export class AntiAbuse extends Database {
 		this.mentionNotifications.clear();
 	}
 
-	getUserStats(userId, command) {
+	async getUserStats(userId, command) {
 		const data = this.getCooldownData(userId, command.name);
 		const baseCooldown = command.cooldown || 3;
 		const hasPremium = await db.hasAnyPremium(userId, null);

@@ -176,7 +176,7 @@ class QueueCommand extends Command {
     return container;
   }
 
-  _getPremiumStatus(guildId, userId) {
+  async _getPremiumStatus(guildId, userId) {
     const premiumStatus = await db.hasAnyPremium(userId, guildId);
     return {
       hasPremium: !!premiumStatus,

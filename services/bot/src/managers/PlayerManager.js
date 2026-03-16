@@ -292,7 +292,7 @@ export class PlayerManager {
     };
   }
 
-  getPremiumStatus(guildId, userId) {
+  async getPremiumStatus(guildId, userId) {
     try {
       const premiumStatus = await db.hasAnyPremium(userId, guildId);
 

@@ -177,7 +177,7 @@ class PlayNowCommand extends Command {
       client.logger?.error("PlayNowCommand", `Error in prefix command: ${error.message}`, error);
       const errorContainer = this._createErrorContainer("An error occurred. Please try again.");
       if (message) {
-        await message.reply({ components: [errorContainer], flags: MessageFlags.IsComponentsV2 }).catch(() => {});
+        await message.reply({ components: [errorContainer], flags: MessageFlags.IsComponentsV2 }).catch(async () => {});
       }
     }
   }
@@ -330,7 +330,7 @@ class PlayNowCommand extends Command {
     };
   }
 
-  _getPremiumStatus(guildId, userId) {
+  async _getPremiumStatus(guildId, userId) {
     const premiumStatus = await db.hasAnyPremium(userId, guildId);
     return {
       hasPremium: !!premiumStatus,

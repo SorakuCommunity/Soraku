@@ -491,10 +491,10 @@ async function handleTicketClose(interaction, client, channelId) {
             embeds: [reviewEmbed],
             components: [ratingRow, reviewActionRow],
           })
-          .then(() => {
+          .then(async () => {
             await db.markReviewSent(channelId);
           })
-          .catch(() => {});
+          .catch(async () => {});
       } catch (error) {
         logger.error("TicketInteraction", "Failed to send review DM:", error);
       }

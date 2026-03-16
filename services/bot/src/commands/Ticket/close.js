@@ -250,10 +250,10 @@ export default {
               embeds: [reviewEmbed],
               components: [ratingRow, reviewActionRow],
             })
-            .then(() => {
+            .then(async () => {
               await db.markReviewSent(message.channel.id);
             })
-            .catch(() => {
+            .catch(async () => {
               logger.warn("TicketClose", `Could not DM user ${user.tag} for review`);
             });
         } catch (error) {

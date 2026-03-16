@@ -31,7 +31,7 @@ export default {
 
             setTimeout(async () => {
               try {
-                await message.delete().catch(() => {});
+                await message.delete().catch(async () => {});
               } catch (deleteError) {
                 logger.debug('QueueEnd', 'Could not delete queue end message:', deleteError);
               }
@@ -249,7 +249,7 @@ async function handleAutoplay(player, lastTrack, client) {
 
       setTimeout(async () => {
         try {
-          await autoplayMessage.delete().catch(() => {});
+          await autoplayMessage.delete().catch(async () => {});
         } catch (deleteError) {
           logger.debug('QueueEnd', 'Could not delete autoplay success message:', deleteError);
         }
@@ -381,7 +381,7 @@ async function fetchRecommendations(track, client) {
   return processedTracks;
 }
 
-function getPremiumStatus(guildId, userId) {
+async function getPremiumStatus(guildId, userId) {
   if (!userId) return { hasPremium: false, maxSongs: config.queue.maxSongs.free };
 
   const premiumStatus = await db.hasAnyPremium(userId, guildId);

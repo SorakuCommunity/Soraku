@@ -267,7 +267,7 @@ class PlayCommand extends Command {
             components: [errorContainer],
             flags: MessageFlags.IsComponentsV2,
           })
-          .catch(() => {});
+          .catch(async () => {});
       }
     }
   }
@@ -582,7 +582,7 @@ class PlayCommand extends Command {
     }
   }
 
-  _getPremiumStatus(guildId, userId) {
+  async _getPremiumStatus(guildId, userId) {
     const premiumStatus = await db.hasAnyPremium(userId, guildId);
     return {
       hasPremium: !!premiumStatus,
@@ -1193,7 +1193,7 @@ class PlayCommand extends Command {
               content: "You must be in a voice channel to use this action.",
               ephemeral: true,
             })
-            .catch(() => {});
+            .catch(async () => {});
           return;
         }
 
@@ -1204,7 +1204,7 @@ class PlayCommand extends Command {
               content: "No active music player found.",
               ephemeral: true,
             })
-            .catch(() => {});
+            .catch(async () => {});
           return;
         }
 
@@ -1216,7 +1216,7 @@ class PlayCommand extends Command {
               content: "Track no longer exists in queue.",
               ephemeral: true,
             })
-            .catch(() => {});
+            .catch(async () => {});
           return;
         }
 
@@ -1263,7 +1263,7 @@ class PlayCommand extends Command {
                 content: "Unknown action requested.",
                 ephemeral: true,
               })
-              .catch(() => {});
+              .catch(async () => {});
             return;
         }
 

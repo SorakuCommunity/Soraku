@@ -398,7 +398,7 @@ class HistoryCommand extends Command {
     };
   }
 
-  _getPremiumStatus(guildId, userId) {
+  async _getPremiumStatus(guildId, userId) {
     const premiumStatus   =await db.hasAnyPremium(userId, guildId);
     return {
       hasPremium: !!premiumStatus,

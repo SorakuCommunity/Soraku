@@ -19,7 +19,7 @@ export function isOwner(userId) {
 	return ownerSet.has(userId);
 }
 
-export function canUseCommand(member, command) {
+export async function canUseCommand(member, command) {
 	if (command.ownerOnly && !isOwner(member.id)) return false;
 	if (command.userPermissions?.length > 0) {
 		return command.userPermissions.every(perm =>
@@ -45,15 +45,15 @@ export function inSameVoiceChannel(member, bot) {
 	);
 }
 
-export function isUserPremium(userId) {
+export async function isUserPremium(userId) {
 	return await db.isUserPremium(userId);
 }
 
-export function isGuildPremium(guildId) {
+export async function isGuildPremium(guildId) {
 	return await db.isGuildPremium(guildId);
 }
 
-export function hasAnyPremium(userId, guildId) {
+export async function hasAnyPremium(userId, guildId) {
 	return await db.hasAnyPremium(userId, guildId);
 }
 
