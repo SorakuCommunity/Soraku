@@ -13,7 +13,7 @@ const OWNER_DISCORD_IDS = new Set([
 export async function GET(req: NextRequest) {
   const { searchParams, origin } = new URL(req.url)
   const code  = searchParams.get('code')
-  const next  = searchParams.get('next') ?? '/dash/profile/me'
+  const next  = searchParams.get('next') ?? '/profile/me'
 
   // Error dari Supabase/OAuth provider (mis. bad_oauth_state)
   const oauthError = searchParams.get('error')

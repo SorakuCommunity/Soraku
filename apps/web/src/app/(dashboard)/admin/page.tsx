@@ -17,17 +17,17 @@ interface AdminStats {
 }
 
 const STAT_CARDS = [
-  { key: "blog_count",      label: "Total Blog",     icon: BookOpen,  href: "/dash/admin/blog",    cls: "text-blue-400  bg-blue-500/10"  },
-  { key: "event_count",     label: "Total Event",    icon: Calendar,  href: "/dash/admin/events",  cls: "text-green-400 bg-green-500/10" },
-  { key: "gallery_pending", label: "Pending Galeri", icon: ImageIcon, href: "/dash/admin/gallery", cls: "text-amber-400 bg-amber-500/10" },
-  { key: "member_count",    label: "Total Member",   icon: Users,     href: "/dash/admin/users",   cls: "text-primary   bg-primary/10"   },
+  { key: "blog_count",      label: "Total Blog",     icon: BookOpen,  href: "/admin/blog",    cls: "text-blue-400  bg-blue-500/10"  },
+  { key: "event_count",     label: "Total Event",    icon: Calendar,  href: "/admin/events",  cls: "text-green-400 bg-green-500/10" },
+  { key: "gallery_pending", label: "Pending Galeri", icon: ImageIcon, href: "/admin/gallery", cls: "text-amber-400 bg-amber-500/10" },
+  { key: "member_count",    label: "Total Member",   icon: Users,     href: "/admin/users",   cls: "text-primary   bg-primary/10"   },
 ] as const;
 
 const QUICK_ACTIONS = [
-  { label: "Buat Artikel",  href: "/dash/admin/blog/new",   icon: BookOpen,  cls: "text-blue-400  bg-blue-500/10  border-blue-500/20  hover:bg-blue-500/15"  },
-  { label: "Buat Event",    href: "/dash/admin/events/new", icon: Calendar,  cls: "text-green-400 bg-green-500/10 border-green-500/20 hover:bg-green-500/15" },
-  { label: "Review Galeri", href: "/dash/admin/gallery",    icon: ImageIcon, cls: "text-amber-400 bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/15" },
-  { label: "Kelola Users",  href: "/dash/admin/users",      icon: Users,     cls: "text-primary   bg-primary/10   border-primary/20   hover:bg-primary/15"   },
+  { label: "Buat Artikel",  href: "/admin/blog/new",   icon: BookOpen,  cls: "text-blue-400  bg-blue-500/10  border-blue-500/20  hover:bg-blue-500/15"  },
+  { label: "Buat Event",    href: "/admin/events/new", icon: Calendar,  cls: "text-green-400 bg-green-500/10 border-green-500/20 hover:bg-green-500/15" },
+  { label: "Review Galeri", href: "/admin/gallery",    icon: ImageIcon, cls: "text-amber-400 bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/15" },
+  { label: "Kelola Users",  href: "/admin/users",      icon: Users,     cls: "text-primary   bg-primary/10   border-primary/20   hover:bg-primary/15"   },
 ] as const;
 
 export default function AdminDashboardPage() {
@@ -104,7 +104,7 @@ export default function AdminDashboardPage() {
               <BookOpen className="h-4 w-4 text-blue-400" />
               <p className="text-sm font-bold">Artikel Terbaru</p>
             </div>
-            <Link href="/dash/admin/blog" className="flex items-center gap-1 text-xs text-primary/70 hover:text-primary transition-colors">
+            <Link href="/admin/blog" className="flex items-center gap-1 text-xs text-primary/70 hover:text-primary transition-colors">
               Semua <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -141,7 +141,7 @@ export default function AdminDashboardPage() {
             </div>
           )}
           <div className="px-5 py-3 border-t border-border/30">
-            <Link href="/dash/admin/blog/new"
+            <Link href="/admin/blog/new"
               className="flex items-center justify-center gap-1.5 w-full rounded-xl border border-dashed border-border/50 py-2 text-xs text-muted-foreground/50 hover:border-primary/30 hover:text-primary transition-all">
               <Plus className="h-3 w-3" /> Buat Artikel Baru
             </Link>
@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
                 </span>
               )}
             </div>
-            <Link href="/dash/admin/gallery" className="flex items-center gap-1 text-xs text-primary/70 hover:text-primary transition-colors">
+            <Link href="/admin/gallery" className="flex items-center gap-1 text-xs text-primary/70 hover:text-primary transition-colors">
               Moderasi <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -177,7 +177,7 @@ export default function AdminDashboardPage() {
           ) : (
             <div className="p-4 grid grid-cols-3 gap-2">
               {stats.pending_gallery.slice(0, 6).map(img => (
-                <Link key={img.id} href="/dash/admin/gallery"
+                <Link key={img.id} href="/admin/gallery"
                   className="relative aspect-square overflow-hidden rounded-xl bg-muted/20 group">
                   <Image src={img.imageurl} alt={img.title ?? ""} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
                   <div className="absolute top-1.5 right-1.5">
@@ -190,7 +190,7 @@ export default function AdminDashboardPage() {
 
           {(stats?.gallery_pending ?? 0) > 0 && (
             <div className="px-5 py-3 border-t border-border/30">
-              <Link href="/dash/admin/gallery"
+              <Link href="/admin/gallery"
                 className="flex items-center justify-center gap-1.5 w-full rounded-xl bg-amber-500/10 border border-amber-500/20 py-2 text-xs font-semibold text-amber-400 hover:bg-amber-500/15 transition-all">
                 <Clock className="h-3 w-3" /> Review {stats!.gallery_pending} upload pending
               </Link>

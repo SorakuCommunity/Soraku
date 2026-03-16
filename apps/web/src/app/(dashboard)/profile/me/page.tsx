@@ -536,7 +536,7 @@ function SettingsTab({
                 <p className="text-xs text-muted-foreground/50">Kelola blog, event, galeri, dan pengguna</p>
               </div>
             </div>
-            <Link href="/dash/admin"
+            <Link href="/admin"
               className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white hover:bg-primary/90 hover:-translate-y-0.5 transition-all shadow-lg shadow-primary/20">
               <Shield className="h-3.5 w-3.5" /> Admin Panel
             </Link>

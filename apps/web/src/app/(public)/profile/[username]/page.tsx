@@ -211,7 +211,7 @@ export default function PublicProfilePage() {
           <div className="absolute right-3 top-3 flex items-center gap-2">
             <ShareButton username={profile.username ?? username} />
             {isSelf && (
-              <Link href="/dash/profile/me" className="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white/80 backdrop-blur-sm hover:bg-white/20 hover:text-white transition-all">
+              <Link href="/profile/me" className="flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white/80 backdrop-blur-sm hover:bg-white/20 hover:text-white transition-all">
                 <Pencil className="h-3 w-3" /> Edit
               </Link>
             )}
@@ -380,7 +380,7 @@ export default function PublicProfilePage() {
       {isSelf && (
         <p className="text-center text-xs text-muted-foreground/30">
           Ini profil publikmu —{" "}
-          <Link href="/dash/profile/me" className="text-primary/50 hover:text-primary transition-colors">edit profil</Link>
+          <Link href="/profile/me" className="text-primary/50 hover:text-primary transition-colors">edit profil</Link>
         </p>
       )}
     </div>

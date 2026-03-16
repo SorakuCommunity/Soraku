@@ -47,23 +47,20 @@ export async function proxy(request: NextRequest) {
   if (pathname === '/premium/donatur' || pathname.startsWith('/premium/donatur/')) {
     return NextResponse.redirect(new URL('/donate/leaderboard', request.url), 301)
   }
-  if (pathname.startsWith('/admin')) {
-    return NextResponse.redirect(new URL(pathname.replace('/admin', '/dash/admin'), request.url), 301)
-  }
   if (pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL(pathname.replace('/dashboard', '/dash'), request.url), 301)
+    return NextResponse.redirect(new URL(pathname.replace('/dashboard', '/profile/me'), request.url), 301)
   }
 
   // ── Auth guards ──────────────────────────────────────────────────────────
 
-  // /dash/* — harus login
-  if (pathname.startsWith('/dash') && !user) {
+  // /* — harus login
+  if (pathname.startsWith('/profile/me') && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // /dash/admin/* — harus OWNER / MANAGER / ADMIN
+  // /admin/* — harus OWNER / MANAGER / ADMIN
   // Pakai maybeSingle() agar tidak crash jika row belum ada
-  if (pathname.startsWith('/dash/admin')) {
+  if (pathname.startsWith('/admin')) {
     if (!user) return NextResponse.redirect(new URL('/login', request.url))
 
     try {
@@ -76,16 +73,16 @@ export async function proxy(request: NextRequest) {
 
       // Kalau row belum ada → fallback ke USER → forbidden
       if (!['OWNER', 'MANAGER', 'ADMIN'].includes(data?.role ?? '')) {
-        return NextResponse.redirect(new URL('/dash/profile/me', request.url))
+        return NextResponse.redirect(new URL('/profile/me', request.url))
       }
     } catch {
-      return NextResponse.redirect(new URL('/dash/profile/me', request.url))
+      return NextResponse.redirect(new URL('/profile/me', request.url))
     }
   }
 
   // /login /register — sudah login → redirect ke dashboard
   if ((pathname === '/login' || pathname === '/register') && user) {
-    return NextResponse.redirect(new URL('/dash/profile/me', request.url))
+    return NextResponse.redirect(new URL('/profile/me', request.url))
   }
 
   return response

@@ -81,7 +81,7 @@ function AlreadyLoggedIn({ displayname, onLogout }: { displayname: string; onLog
             className="flex items-center justify-center gap-2 rounded-xl border border-border/60 px-4 py-3 text-sm font-medium text-muted-foreground hover:border-primary/30 hover:text-foreground transition-all">
             <Home className="h-4 w-4" />Kembali ke Beranda
           </Link>
-          <Link href="/dash/profile/me"
+          <Link href="/profile/me"
             className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-md shadow-primary/20 hover:bg-primary/90 hover:-translate-y-0.5 transition-all">
             <User className="h-4 w-4" />Lihat Profil Saya
           </Link>
@@ -155,7 +155,7 @@ function LoginPageInner() {
       });
       const data = await res.json();
       if (!res.ok || data.error) { setFormError(data.error ?? "Email atau password salah."); }
-      else { router.push("/dash"); router.refresh(); }
+      else { router.push("/profile/me"); router.refresh(); }
     } catch {
       setFormError("Gagal terhubung ke server. Coba lagi.");
     } finally { setLoading(false); }

@@ -68,25 +68,25 @@ Routes yang DIHAPUS
 
 Section 2 — Dashboard Routes (Butuh Login)
 
-Routes di bawah /dash menggunakan dashboard layout.
+Routes di bawah /profile/me menggunakan dashboard layout.
 
- /dash/profile/me
+ /profile/me
 
- /dash/admin
- /dash/admin/blog
- /dash/admin/blog/new
+ /admin
+ /admin/blog
+ /admin/blog/new
 
- /dash/admin/events
- /dash/admin/events/new
+ /admin/events
+ /admin/events/new
 
- /dash/admin/gallery
- /dash/admin/users
+ /admin/gallery
+ /admin/users
 
 Catatan:
 
-Route lama /admin/* akan di redirect otomatis ke /dash/admin/* melalui proxy.ts.
+Route lama /admin/* akan di redirect otomatis ke /admin/* melalui proxy.ts.
 
-Semua link baru WAJIB menggunakan /dash/admin/*.
+Semua link baru WAJIB menggunakan /admin/*.
 
 --------------------------------------------------
 
@@ -191,13 +191,13 @@ Aturan agar struktur route tidak rusak.
 BOLEH
 
 - Tambah halaman publik di (public)
-- Tambah halaman dashboard di (dashboard)/dash
+- Tambah halaman dashboard di (dashboard)/profile/me
 - Tambah API route baru di /api
 
 JANGAN
 
 - Jangan buat route /admin/*
-- Jangan ubah namespace /dash
+- Jangan ubah namespace /profile/me
 - Jangan buat halaman untuk fitur kecil
 - Jangan rename proxy.ts
 - Jangan lupa dynamic rendering pada page
@@ -213,8 +213,8 @@ Naming Convention
 Route Group : (group)
 Dynamic Route : [slug]
 
-Dashboard : /dash/*
-Admin : /dash/admin/*
+Dashboard : /profile/me/*
+Admin : /admin/*
 API : /api/*
 
 --------------------------------------------------
@@ -227,8 +227,8 @@ v1.0.1
 - /premium/donatur dipisah dari premium
 - /donate/donatur → /donate/leaderboard
 - /agensi/vtuber → /vtubers
-- /admin → /dash/admin
-- /dash/profile/me ditambahkan untuk menghindari konflik dengan /profile/[username]
+- /admin → /admin
+- /profile/me ditambahkan untuk menghindari konflik dengan /profile/[username]
 
 --------------------------------------------------
 
@@ -237,7 +237,7 @@ Untuk Bubu — Checklist UI
 [ ] Hapus link /social
 [ ] Update link Top Donatur → /donate/leaderboard
 [ ] Update link VTuber → /vtubers
-[ ] Update link Admin → /dash/admin
+[ ] Update link Admin → /admin
 [ ] Update form edit blog
 [ ] Update form edit event
 

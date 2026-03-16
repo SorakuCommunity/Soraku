@@ -65,24 +65,24 @@ Semua halaman user dashboard berada di namespace ini.
 
 Namespace:
 
-/dash
+/profile/me
 
 Contoh:
 
-/dash/profile/me
-/dash/admin
-/dash/admin/blog
-/dash/admin/events
+/profile/me
+/admin
+/admin/blog
+/admin/events
 
 Rules:
 
 JANGAN membuat namespace baru seperti:
 
-/dashboard
+/profile/meboard
 /user-dashboard
 /adminpanel
 
-Semua dashboard WAJIB berada di bawah /dash.
+Semua dashboard WAJIB berada di bawah /profile/me.
 
 --------------------------------------------------
 
@@ -92,14 +92,14 @@ Admin panel berada di dalam dashboard.
 
 Namespace:
 
-/dash/admin
+/admin
 
 Contoh:
 
-/dash/admin/blog
-/dash/admin/events
-/dash/admin/gallery
-/dash/admin/users
+/admin/blog
+/admin/events
+/admin/gallery
+/admin/users
 
 Rules:
 
@@ -229,7 +229,7 @@ BOLEH
 JANGAN
 
 - Mengubah namespace utama
-- Menghapus /dash
+- Menghapus /profile/me
 - Menghapus /api
 - Membuat route baru tanpa struktur
 
@@ -241,8 +241,8 @@ Jika AI coding tools membuat route baru,
 AI harus mengikuti aturan berikut:
 
 1. Public page → /blog /events /gallery dll
-2. Dashboard page → /dash/*
-3. Admin page → /dash/admin/*
+2. Dashboard page → /profile/me/*
+3. Admin page → /admin/*
 4. API endpoint → /api/*
 5. Authentication → /login atau /register
 

@@ -67,7 +67,7 @@ export default function AdminEventsPage() {
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40">
             <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
           </button>
-          <Link href="/dash/admin/events/new"
+          <Link href="/admin/events/new"
             className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors">
             <Plus className="h-4 w-4" /> Event Baru
           </Link>
@@ -101,7 +101,7 @@ export default function AdminEventsPage() {
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <Calendar className="h-10 w-10 text-muted-foreground/30" />
             <p className="text-sm text-muted-foreground">Belum ada event</p>
-            <Link href="/dash/admin/events/new" className="text-xs text-primary hover:underline">+ Buat sekarang</Link>
+            <Link href="/admin/events/new" className="text-xs text-primary hover:underline">+ Buat sekarang</Link>
           </div>
         ) : (
           <div className="divide-y divide-border/30">
@@ -131,7 +131,7 @@ export default function AdminEventsPage() {
                     {ev.ispublished ? "● Publik" : "○ Draft"}
                   </span>
                   <div className="flex items-center justify-end gap-1">
-                    <Link href={`/dash/admin/events/${ev.id}/edit`}
+                    <Link href={`/admin/events/${ev.id}/edit`}
                       className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground hover:text-primary transition-colors"
                       title="Edit">
                       <Pencil className="h-3.5 w-3.5" />

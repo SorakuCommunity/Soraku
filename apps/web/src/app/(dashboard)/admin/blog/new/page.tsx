@@ -67,7 +67,7 @@ export default function AdminBlogNewPage() {
       setLoading(false);
       return;
     }
-    router.push("/dash/admin/blog");
+    router.push("/admin/blog");
   };
 
   return (
@@ -75,7 +75,7 @@ export default function AdminBlogNewPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/dash/admin/blog"
+          <Link href="/admin/blog"
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4" />
           </Link>

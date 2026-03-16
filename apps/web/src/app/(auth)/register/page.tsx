@@ -259,7 +259,7 @@ export default function RegisterPage() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      if (loginRes.ok) { router.push("/dash"); router.refresh(); }
+      if (loginRes.ok) { router.push("/profile/me"); router.refresh(); }
       else             { router.push("/login?registered=1"); }
     } catch {
       setFormError("Gagal terhubung ke server. Coba lagi.");

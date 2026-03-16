@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   const { origin, searchParams } = new URL(req.url)
-  const next = searchParams.get('next') ?? '/dash/profile/me'
+  const next = searchParams.get('next') ?? '/profile/me'
 
   const pendingCookies: { name: string; value: string; options: CookieOptions }[] = []
 

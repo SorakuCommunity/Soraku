@@ -48,7 +48,7 @@ module.exports = {
       new ButtonBuilder().setLabel("Lihat Profil").setEmoji("🔗").setStyle(ButtonStyle.Link).setURL(client.webUrl + "/profile/" + user.username),
     )
     if (isSelf) row.addComponents(
-      new ButtonBuilder().setLabel("Edit Profil").setEmoji("✏️").setStyle(ButtonStyle.Link).setURL(client.webUrl + "/dash/profile/me"),
+      new ButtonBuilder().setLabel("Edit Profil").setEmoji("✏️").setStyle(ButtonStyle.Link).setURL(client.webUrl + "/profile/me"),
     )
 
     message.reply({ embeds: [embed], components: [row] })

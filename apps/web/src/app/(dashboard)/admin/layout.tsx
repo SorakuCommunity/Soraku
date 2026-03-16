@@ -6,11 +6,11 @@ import { LayoutDashboard, BookOpen, Calendar, Image, Users, Shield } from "lucid
 import { cn } from "@/lib/utils";
 
 const ADMIN_NAV = [
-  { href: "/dash/admin",         label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dash/admin/blog",    label: "Blog",       icon: BookOpen        },
-  { href: "/dash/admin/events",  label: "Event",      icon: Calendar        },
-  { href: "/dash/admin/gallery", label: "Galeri",     icon: Image           },
-  { href: "/dash/admin/users",   label: "Users",      icon: Users           },
+  { href: "/admin",         label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/blog",    label: "Blog",       icon: BookOpen        },
+  { href: "/admin/events",  label: "Event",      icon: Calendar        },
+  { href: "/admin/gallery", label: "Galeri",     icon: Image           },
+  { href: "/admin/users",   label: "Users",      icon: Users           },
 ];
 
 export default function DashAdminLayout({ children }: { children: React.ReactNode }) {
@@ -32,8 +32,8 @@ export default function DashAdminLayout({ children }: { children: React.ReactNod
           </div>
           <nav className="space-y-0.5">
             {ADMIN_NAV.map(({ href, label, icon: Icon }) => {
-              const isActive = href === "/dash/admin"
-                ? pathname === "/dash/admin"
+              const isActive = href === "/admin"
+                ? pathname === "/admin"
                 : pathname.startsWith(href);
               return (
                 <Link key={href} href={href}
@@ -49,7 +49,7 @@ export default function DashAdminLayout({ children }: { children: React.ReactNod
             })}
           </nav>
           <div className="mt-4 pt-4 border-t border-border/50">
-            <Link href="/dash/profile/me"
+            <Link href="/profile/me"
               className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
               ← Dashboard
             </Link>
@@ -61,8 +61,8 @@ export default function DashAdminLayout({ children }: { children: React.ReactNod
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-background/90 backdrop-blur-xl lg:hidden">
         <nav className="flex items-center justify-around px-2 py-2">
           {ADMIN_NAV.map(({ href, label, icon: Icon }) => {
-            const isActive = href === "/dash/admin"
-              ? pathname === "/dash/admin"
+            const isActive = href === "/admin"
+              ? pathname === "/admin"
               : pathname.startsWith(href);
             return (
               <Link key={href} href={href}

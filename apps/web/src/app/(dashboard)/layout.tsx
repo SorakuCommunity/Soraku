@@ -14,11 +14,11 @@ interface SessionUser {
 }
 
 const SIDEBAR_LINKS = [
-  { href: "/dash",              label: "Beranda",    icon: LayoutDashboard },
-  { href: "/dash/profile/me",   label: "Profil",     icon: User },
-  { href: "/dash/posts",        label: "Postingan",  icon: BookOpen },
-  { href: "/dash/gallery",      label: "Galeri",     icon: ImageIcon },
-  { href: "/dash/settings",     label: "Pengaturan", icon: Settings },
+  { href: "/profile/me",              label: "Beranda",    icon: LayoutDashboard },
+  { href: "/profile/me",   label: "Profil",     icon: User },
+  { href: "/posts",        label: "Postingan",  icon: BookOpen },
+  { href: "/gallery/upload",      label: "Galeri",     icon: ImageIcon },
+  { href: "/settings",     label: "Pengaturan", icon: Settings },
 ];
 
 const IS_ADMIN = (r: string) => ["OWNER","MANAGER","ADMIN"].includes(r.toUpperCase());
@@ -77,9 +77,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ))}
             <div className="pt-2 border-t border-border/50 mt-2">
               {user && IS_ADMIN(user.role) && (
-                <Link href="/dash/admin"
+                <Link href="/admin"
                   className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname.startsWith("/dash/admin") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-primary/8 hover:text-foreground"
+                    pathname.startsWith("/admin") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-primary/8 hover:text-foreground"
                   }`}>
                   <Shield className="h-4 w-4" />Admin Panel
                 </Link>

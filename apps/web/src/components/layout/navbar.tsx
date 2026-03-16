@@ -259,7 +259,7 @@ function UserDropdown({ user }: { user: SessionUser }) {
 
           {/* Links */}
           <div className="p-1.5">
-            <Link href="/dash/profile/me" onClick={() => setOpen(false)}
+            <Link href="/profile/me" onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/8 hover:text-foreground">
               <LayoutDashboard className="h-4 w-4" />Profil Saya
             </Link>
@@ -268,7 +268,7 @@ function UserDropdown({ user }: { user: SessionUser }) {
               <Settings className="h-4 w-4" />Pengaturan
             </Link>
             {isAdmin && (
-              <Link href="/dash/admin" onClick={() => setOpen(false)}
+              <Link href="/admin" onClick={() => setOpen(false)}
                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/8 hover:text-foreground">
                 <Shield className="h-4 w-4" />Admin Panel
               </Link>
