@@ -165,3 +165,72 @@ Bot perlu restart agar koneksi Supabase client fresh dan tidak pakai cache lama.
 **BASE TABLE (22):** afk, antilink, antinuke, antispam, autoreact, autorespond, autorole, blacklist, guilds, ignorechan, invite_data, invite_ranks, invite_settings, music247, mutes, noprefix, playlists, premium, reminders, roles, snipe, ticket_counters, ticket_data, ticket_panels, tickets, users, warns, welcome
 
 **VIEW (5, backward-compat):** guild_premium, invite_members, member_invites, reminds, user_premium
+
+
+---
+
+## 📋 LAPORAN — 2026-03-17 #2 (Bubu — migration applied, commit 6f1a02e)
+
+### 🔴 Analisis log bot setelah restart pertama (18:03 - 18:14)
+
+**Progress:** PGRST205 sudah hilang ✅ tapi muncul error baru:
+
+```
+[DB] findOne guilds
+code: '42703'
+message: 'column guilds.id does not exist'
+```
+
+---
+
+### Root Cause: tabel bot tidak punya kolom `id`
+
+Bot query semua tabel dengan `.eq('id', value)` tapi di DB, kolom
+primary key adalah `guild_id` / `user_id` / `channel_id` — bukan `id`.
+
+**16 tabel terdampak:**
+
+| Tabel | PK asli | id alias ke |
+|-------|---------|-------------|
+| guilds, music247, invite_settings, autorespond, autorole, antilink, antinuke, antispam, afk, ignorechan, roles, ticket_counters, welcome | `guild_id` | `guild_id` |
+| blacklist, noprefix | `user_id` | `user_id` |
+| snipe | `channel_id` | `channel_id` |
+
+**Fix yang diapply:**
+```sql
+ALTER TABLE bot.guilds ADD COLUMN id TEXT GENERATED ALWAYS AS (guild_id) STORED;
+-- (dan 15 tabel lainnya)
+```
+
+`id` sekarang adalah **generated column** — otomatis sama dengan PK asli,
+tidak bisa di-INSERT manual (immutable). Query `.eq('id', x)` sekarang valid.
+
+**Side effect yang ikut fix:**
+- `guilds247 is not iterable` → terjadi karena query `music247` gagal (tidak ada kolom `id`) → return error object bukan array → `.map()` crash. Sekarang query `music247` sukses → `guilds247` jadi array normal.
+
+---
+
+### ❌ KAIZO — Bug di Kode Bot (bukan DB, perlu fix manual)
+
+**1. `[object Promise]` di cooldown message** (screenshot Discord)
+```
+"Please wait [object Promise] more second(s) before using this command"
+```
+Ada `await` yang hilang saat format sisa waktu cooldown.
+Cari di kode: semua tempat yang format cooldown time, pastikan `getCooldown()` atau fungsi async-nya di-`await`.
+
+**2. "This command seems to be outdated or improperly configured"**
+Slash command `/about` mengembalikan "No command file found" di log.
+Kemungkinan command file belum ada atau salah nama. Cek folder commands.
+
+**3. RESTART BOT sekarang** ← WAJIB
+Dua migration sudah diapply langsung ke DB tapi bot perlu restart
+agar Supabase client clear connection pool dan baca schema terbaru.
+
+---
+
+### Urutan setelah restart:
+1. Tidak boleh ada lagi `column guilds.id does not exist`
+2. `music247` query sukses → `247 mode` tidak lagi crash
+3. Prefix commands dan slash commands harusnya berfungsi normal
+4. Fix `[object Promise]` di kode bot secara manual
