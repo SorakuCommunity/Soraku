@@ -89,7 +89,7 @@ export default function RequirementsPage() {
             konsisten, dan berdampak.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <a href="https://sorakunews.blogspot.com/p/requirement.html" target="_blank" rel="noopener noreferrer"
+            <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5">
               Daftar Sekarang <ExternalLink className="h-3.5 w-3.5" />
             </a>
@@ -200,7 +200,7 @@ export default function RequirementsPage() {
             Soraku adalah ekosistem komunitas yang dibangun bersama oleh para penggemar anime dan pop culture Jepang.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-            <a href="https://sorakunews.blogspot.com/p/requirement.html" target="_blank" rel="noopener noreferrer"
+            <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5">
               Baca Requirement Lengkap <ExternalLink className="h-3.5 w-3.5" />
             </a>
