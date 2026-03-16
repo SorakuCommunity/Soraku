@@ -1,116 +1,132 @@
-const { Hono } = require("hono")
-const { serve } = require("@hono/node-server")
+import express from 'express'
+import { config } from '#config/config'
+import { logger } from '#utils/logger'
 
-let _client
-const _state = {
-  loginError:   null,
-  startedAt:    null,
-  envMissing:   [],
-  discordReady: false,
-}
+let _client = null
+const _state = { startedAt: null, envMissing: [], discordReady: false, loginError: null }
 
-function setState(key, val) { _state[key] = val }
+export function setState(key, val) { _state[key] = val }
 
-async function startWebhookServer(client) {
+export async function startWebhookServer(client) {
   _state.startedAt = new Date().toISOString()
   _client = client
-  const app  = new Hono()
-  const port = parseInt(process.env.PORT ?? "3000")
 
-  // Health check — NO AUTH, selalu 200 agar Railway tidak kill container
-  // Meski bot belum login Discord, server sudah harus respond
-  app.get("/health", c => {
-    return c.json({
-      status: "ok",
-      bot:    _client?.isReady() ? "online" : "starting",
-      uptime: process.uptime(),
-      guilds: _client?.guilds?.cache?.size ?? 0,
-      version: "0.2.0",
-    })
-  })
+  const app  = express()
+  const port = parseInt(process.env.PORT ?? '8080', 10)
+  app.use(express.json())
 
-  // Status endpoint — debug info (tidak butuh auth, baca saja)
-  app.get("/status", c => {
-    const required = ["TOKEN","CLIENT_ID","GUILD_ID","SUPABASE_URL","SUPABASE_SERVICE_KEY","SORAKU_WEB_URL","WEBHOOK"]
+  // Health — Railway butuh ini segera respond
+  app.get('/health', (_req, res) => res.json({
+    status: 'ok',
+    bot:    _client?.isReady() ? 'online' : 'starting',
+    uptime: process.uptime(),
+    guilds: _client?.guilds?.cache?.size ?? 0,
+    version: config.version,
+  }))
+
+  // Status — debug info
+  app.get('/status', (_req, res) => {
+    const required = ['TOKEN', 'CLIENT_ID', 'GUILD_ID', 'SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'SORAKU_WEB_URL', 'WEBHOOK']
     const envCheck = {}
-    // Check dengan alias support
-    const aliases = {
-      TOKEN: ["TOKEN"],
-      GUILD_ID: ["GUILD_ID"],
-      SUPABASE_SERVICE_KEY: ["SUPABASE_SERVICE_KEY","SUPABASE_SERVICE_ROLE_KEY"],
-    }
+    const aliases  = { SUPABASE_SERVICE_KEY: ['SUPABASE_SERVICE_KEY', 'SUPABASE_SERVICE_ROLE_KEY'] }
     for (const k of required) {
-      const keys = aliases[k] ?? [k]
-      const found = keys.some(a => !!process.env[a])
-      envCheck[k] = found ? "✅ set" : "❌ MISSING"
+      const keys  = aliases[k] ?? [k]
+      envCheck[k] = keys.some(a => !!process.env[a]) ? '✅ set' : '❌ MISSING'
     }
-    return c.json({
-      bot:        _client?.isReady() ? "🟢 online" : "🔴 offline",
-      uptime:     Math.floor(process.uptime()) + "s",
+    res.json({
+      bot:        _client?.isReady() ? '🟢 online' : '🔴 offline',
+      uptime:     Math.floor(process.uptime()) + 's',
       startedAt:  _state.startedAt,
       loginError: _state.loginError ?? null,
       envMissing: _state.envMissing,
       env:        envCheck,
       guilds:     _client?.guilds?.cache?.size ?? 0,
-      version:    "0.2.0",
+      version:    config.version,
     })
   })
 
-  // Auth middleware — hanya untuk webhook routes
-  app.use("/webhook/*", async (c, next) => {
-    if (c.req.header("x-soraku-secret") !== process.env.WEBHOOK)
-      return c.json({ error: "Unauthorized" }, 401)
-    await next()
-  })
+  // Auth middleware untuk webhook routes
+  const authMiddleware = (req, res, next) => {
+    const secret = req.headers['x-soraku-secret']
+    if (secret !== config.soraku.webhook) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+    next()
+  }
 
   // POST /webhook/notify — kirim DM ke user Discord
-  app.post("/webhook/notify", async c => {
-    const { discordId, message } = await c.req.json()
+  app.post('/webhook/notify', authMiddleware, async (req, res) => {
     try {
-      const user = await _client.users.fetch(discordId)
+      const { discordId, message } = req.body
+      if (!discordId || !message) return res.status(400).json({ error: 'discordId dan message wajib' })
+      const user = await _client.users.fetch(discordId).catch(() => null)
+      if (!user) return res.status(404).json({ error: 'User tidak ditemukan' })
       await user.send(message)
-      return c.json({ sent: true })
+      res.json({ ok: true })
     } catch (err) {
-      return c.json({ sent: false, error: String(err) }, 500)
+      logger.error('Webhook', 'notify error', err)
+      res.status(500).json({ error: err.message })
     }
   })
 
-  // POST /webhook/role-sync — sync supporter tier dari web
-  app.post("/webhook/role-sync", async c => {
-    const { discordId, tier } = await c.req.json()
-    const guildId = process.env.GUILD_ID ?? process.env.GUILD_ID
-    const ROLES   = { DONATUR: process.env.ROLE_DONATUR, VIP: process.env.ROLE_VIP, VVIP: process.env.ROLE_VVIP }
+  // POST /webhook/role-sync — assign Discord role berdasarkan tier
+  app.post('/webhook/role-sync', authMiddleware, async (req, res) => {
     try {
-      const guild  = _client.guilds.cache.get(guildId)
-      if (!guild) return c.json({ error: "Guild not cached" }, 404)
-      const member = await guild.members.fetch(discordId)
-      for (const id of Object.values(ROLES)) if (id && member.roles.cache.has(id)) await member.roles.remove(id).catch(() => {})
-      if (tier && ROLES[tier]) await member.roles.add(ROLES[tier]).catch(() => {})
-      return c.json({ synced: true, tier })
+      const { discordId, tier } = req.body
+      if (!discordId || !tier) return res.status(400).json({ error: 'discordId dan tier wajib' })
+
+      const guild = _client.guilds.cache.get(config.soraku.guildId)
+      if (!guild) return res.status(404).json({ error: 'Guild tidak ditemukan' })
+
+      const member = await guild.members.fetch(discordId).catch(() => null)
+      if (!member) return res.status(404).json({ error: 'Member tidak ditemukan' })
+
+      const roleMap = { DONATUR: config.soraku.roles.donatur, VIP: config.soraku.roles.vip, VVIP: config.soraku.roles.vvip }
+      // Hapus semua supporter roles dulu
+      for (const roleId of Object.values(roleMap)) {
+        if (member.roles.cache.has(roleId)) await member.roles.remove(roleId).catch(() => {})
+      }
+      // Tambah role baru
+      if (roleMap[tier]) await member.roles.add(roleMap[tier]).catch(() => {})
+
+      res.json({ ok: true, tier, discordId })
     } catch (err) {
-      return c.json({ synced: false, error: String(err) }, 500)
+      logger.error('Webhook', 'role-sync error', err)
+      res.status(500).json({ error: err.message })
     }
   })
 
-  // POST /webhook/event-announce — announce event ke channel
-  app.post("/webhook/event-announce", async c => {
-    const { title, description, startAt, eventUrl } = await c.req.json()
-    const channelId = process.env.CHANNEL_ID
-    if (!channelId) return c.json({ error: "DISCORD_EVENT_CHANNEL_ID not set" }, 500)
+  // POST /webhook/event-announce — announce event ke channel Discord
+  app.post('/webhook/event-announce', authMiddleware, async (req, res) => {
     try {
+      const { title, description, startAt, eventUrl } = req.body
+      if (!title) return res.status(400).json({ error: 'title wajib' })
+
+      const channelId = config.soraku.channelId
+      if (!channelId) return res.json({ ok: false, reason: 'CHANNEL_ID not set' })
+
       const channel = _client.channels.cache.get(channelId)
-      if (!channel?.send) return c.json({ error: "Channel not found" }, 404)
-      const date = new Date(startAt).toLocaleString("id-ID", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Jakarta" })
-      const msg  = [`📣 **Event Baru: ${title}**`, description ? `> ${description}` : "", `🗓️ **Waktu:** ${date} WIB`, eventUrl ? `🔗 **Detail:** ${eventUrl}` : "", `\n🔔 Jangan sampai terlewat, Sorakuuu~`].filter(Boolean).join("\n")
-      await channel.send(msg)
-      return c.json({ announced: true })
+      if (!channel) return res.status(404).json({ error: 'Channel tidak ditemukan' })
+
+      const { EmbedBuilder } = await import('discord.js')
+      const embed = new EmbedBuilder()
+        .setTitle('📅 ' + title)
+        .setColor('#7c3aed')
+        .setTimestamp()
+      if (description) embed.setDescription(description)
+      if (startAt) embed.addFields({ name: '🕐 Mulai', value: `<t:${Math.floor(new Date(startAt).getTime() / 1000)}:F>`, inline: true })
+      if (eventUrl) embed.setURL(eventUrl)
+      embed.setFooter({ text: 'Soraku Community • ' + config.soraku.webUrl })
+
+      await channel.send({ embeds: [embed] })
+      res.json({ ok: true })
     } catch (err) {
-      return c.json({ announced: false, error: String(err) }, 500)
+      logger.error('Webhook', 'event-announce error', err)
+      res.status(500).json({ error: err.message })
     }
   })
 
-  serve({ fetch: app.fetch, port, hostname: "0.0.0.0" })
-  console.log(`[bot] 🌐 Webhook server on 0.0.0.0:${port}`)
+  app.listen(port, '0.0.0.0', () => {
+    logger.success('Webhook', `HTTP server started on port ${port}`)
+  })
 }
-
-module.exports = { startWebhookServer, setState }
