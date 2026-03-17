@@ -31,42 +31,60 @@ const EventSchema = z.object({
 async function sendDiscordEventEmbed(event: {
   title: string; description?: string; slug: string; startdate: string
   enddate?: string; location?: string; isonline: boolean; tags: string[]
-  coverurl?: string; registrationurl?: string
+  coverurl?: string; registrationurl?: string; ispaid?: boolean; price?: number
 }) {
   const siteUrl   = env.NEXT_PUBLIC_SITE_URL ?? 'https://soraku.vercel.app'
   const eventUrl  = `${siteUrl}/events/${event.slug}`
   const daftarUrl = `${siteUrl}/events/${event.slug}/daftar`
-  const dateStr   = new Date(event.startdate).toLocaleDateString('id-ID', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+
+  const startStr = new Date(event.startdate).toLocaleDateString('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta',
   }) + ' WIB'
 
+  const endStr = event.enddate
+    ? new Date(event.enddate).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta',
+      }) + ' WIB'
+    : null
+
   const fields: { name: string; value: string; inline?: boolean }[] = [
-    { name: '📅 Tanggal Mulai',  value: dateStr, inline: false },
-    { name: '🗺️ Tipe',           value: event.isonline ? '🌐 Online' : '📍 Offline', inline: true },
-    { name: '🏷️ Tags',           value: event.tags?.length ? event.tags.map(t => `\`${t}\``).join(' ') : '—', inline: true },
+    { name: '📅 Waktu Mulai', value: startStr, inline: false },
   ]
-  if (!event.isonline && event.location) fields.push({ name: '📍 Lokasi', value: event.location, inline: false })
-  if (event.enddate) fields.push({
-    name: '🏁 Selesai', inline: false,
-    value: new Date(event.enddate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB',
-  })
+  if (endStr) fields.push({ name: '🏁 Waktu Selesai', value: endStr, inline: false })
+  fields.push({ name: '🌐 Tipe', value: event.isonline ? 'Online' : `Offline${event.location ? ` — ${event.location}` : ''}`, inline: true })
+  fields.push({ name: '💰 Biaya', value: event.ispaid ? (event.price ? `Rp ${event.price.toLocaleString('id-ID')}` : 'Berbayar') : 'Gratis 🎟️', inline: true })
+  if (event.tags?.length) fields.push({ name: '🏷️ Tags', value: event.tags.map(t => `\`${t}\``).join(' '), inline: false })
 
   const regLink = event.registrationurl
     ? `[📝 Daftar Eksternal](${event.registrationurl})`
     : `[⚔️ Daftar Sekarang](${daftarUrl})`
 
   await sendDiscordWebhook('discord_event_webhook_url', {
-    username: 'Soraku Events', avatar_url: `${siteUrl}/logo.png`,
-    content: `@everyone 🎉 **Event baru!** Segera daftarkan tim kamu!`,
+    username:   'Soraku Events',
+    avatar_url: `${siteUrl}/logo.png`,
+    content:    `@everyone 🎉 **Event baru dari Soraku Community!**`,
     embeds: [{
-      title:       `⚔️ ${event.title}`,
-      description: (event.description?.slice(0, 280) ?? 'Event baru dari Soraku Community!') + `\n\n[🔗 Lihat Event](${eventUrl})  •  ${regLink}`,
+      author: {
+        name:     '🎮 Event Baru Telah Dibuka!',
+        icon_url: `${siteUrl}/logo.png`,
+      },
+      title:       event.title,
+      url:         eventUrl,
+      description: (event.description?.slice(0, 300) ?? 'Event baru dari Soraku Community!') +
+        `
+
+━━━━━━━━━━━━━━━━━━━━━━
+[🔗 Lihat Detail Event](${eventUrl})  •  ${regLink}`,
       color:       0x4FA3D1,
       fields,
-      footer:      { text: 'Soraku Community · soraku.id' },
-      timestamp:   new Date().toISOString(),
-      ...(event.coverurl ? { image: { url: event.coverurl } } : {}),
+      image:       event.coverurl ? { url: event.coverurl } : undefined,
+      footer: {
+        text:     `Soraku Community · soraku.id`,
+        icon_url: `${siteUrl}/logo.png`,
+      },
+      timestamp: new Date().toISOString(),
     }],
   })
 }

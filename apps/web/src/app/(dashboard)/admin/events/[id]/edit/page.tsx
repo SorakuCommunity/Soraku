@@ -19,7 +19,7 @@ import {
 type PaymentMethod =
   | { type: "bank";    bank: string;     account: string; name: string; }
   | { type: "ewallet"; provider: string; account: string; name: string; }
-  | { type: "qris";    provider: string; qrisImageUrl: string;           };
+  | { type: "qris";    provider: string; qrisImageUrl: string; qrisUrl: string; };
 
 const BANK_OPTIONS    = ["BCA", "BRI", "BTN", "Seabank"];
 const EWALLET_OPTIONS = ["Dana"];
@@ -164,7 +164,7 @@ export default function AdminEventEditPage() {
       setIspublished(d.ispublished ?? false);
       setIspaid(d.ispaid ?? false);
       setPrice(d.price ? String(d.price) : "");
-      setPaymentMethods(d.paymentmethods ?? []);
+      setPaymentMethods((d.paymentmethods ?? []).map((m: any) => m.type === 'qris' ? { ...m, qrisUrl: m.qrisUrl ?? '' } : m));
       setFetching(false);
     })();
   }, [id]);
@@ -192,7 +192,7 @@ export default function AdminEventEditPage() {
   };
 
   const addPaymentMethod = (option: string, type: "bank" | "ewallet" | "qris") => {
-    if (type === "qris") setPaymentMethods(prev => [...prev, { type: "qris", provider: option, qrisImageUrl: "" }]);
+    if (type === "qris") setPaymentMethods(prev => [...prev, { type: "qris", provider: option, qrisImageUrl: "", qrisUrl: "" }]);
     else if (type === "bank") setPaymentMethods(prev => [...prev, { type: "bank", bank: option, account: "", name: "" }]);
     else setPaymentMethods(prev => [...prev, { type: "ewallet", provider: option, account: "", name: "" }]);
     setAddingType(null);

@@ -393,7 +393,7 @@ export default function EventRegisterPage() {
                     {event.paymentmethods.map((m, i) => {
                       const key  = getPaymentKey(m);
                       const Icon = PAYMENT_ICON_MAP[key];
-                      if (m.type === "qris" && m.qrisImageUrl) {
+                      if (m.type === "qris") {
                         return (
                           <div key={i} className="flex items-center gap-3 rounded-xl border border-amber-500/15 bg-black/20 px-4 py-3">
                             {Icon ? <Icon className="h-7 w-auto flex-shrink-0" /> : <span className="text-xs font-bold text-amber-400 uppercase flex-shrink-0">QRIS</span>}

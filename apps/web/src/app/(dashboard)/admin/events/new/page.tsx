@@ -19,7 +19,7 @@ import {
 type PaymentMethod =
   | { type: "bank";    bank: string;     account: string; name: string;     }
   | { type: "ewallet"; provider: string; account: string; name: string;     }
-  | { type: "qris";    provider: string; qrisImageUrl: string;               };
+  | { type: "qris";    provider: string; qrisImageUrl: string; qrisUrl: string; };
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 
@@ -201,7 +201,7 @@ export default function AdminEventNewPage() {
 
   const addPaymentMethod = (option: string, type: "bank" | "ewallet" | "qris") => {
     if (type === "qris") {
-      setPaymentMethods(prev => [...prev, { type: "qris", provider: option, qrisImageUrl: "" }]);
+      setPaymentMethods(prev => [...prev, { type: "qris", provider: option, qrisImageUrl: "", qrisUrl: "" }]);
     } else if (type === "bank") {
       setPaymentMethods(prev => [...prev, { type: "bank", bank: option, account: "", name: "" }]);
     } else {

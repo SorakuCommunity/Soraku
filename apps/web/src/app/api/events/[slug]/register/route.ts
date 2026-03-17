@@ -3,7 +3,6 @@ export const dynamic = 'force-dynamic'
 import { NextRequest } from 'next/server'
 import { adminDb } from '@/lib/supabase/admin'
 import { getSession, isStaff } from '@/lib/auth'
-// session opsional - tidak block daftar, tapi simpan userId kalau ada
 import { ok, err, FORBIDDEN, NOT_FOUND, SERVER_ERROR } from '@/lib/api'
 import { sendDiscordWebhook } from '@/lib/discord-webhook'
 import { z } from 'zod'
@@ -35,18 +34,16 @@ export async function POST(
 
     const { data: event, error: eventErr } = await adminDb()
       .from('events')
-      .select('id, title, ispublished, registrationurl, gametype')
+      .select('id, title, ispublished, registrationurl, gametype, ispaid, price')
       .eq('slug', slug)
       .eq('ispublished', true)
       .maybeSingle()
 
     if (eventErr || !event) return NOT_FOUND()
 
-    // Ambil session opsional - tidak block kalau belum login (sudah diblok di frontend)
     const session = await getSession()
-
-    const body   = await req.json()
-    const parsed = RegisterSchema.safeParse(body)
+    const body    = await req.json()
+    const parsed  = RegisterSchema.safeParse(body)
     if (!parsed.success) return err(parsed.error.issues[0]?.message ?? 'Data tidak valid')
 
     const { data, error } = await adminDb()
@@ -69,49 +66,108 @@ export async function POST(
 
     if (error) return err(error.message)
 
-    // Hitung total pendaftar
     const { count } = await adminDb()
       .from('eventregistrations')
       .select('*', { count: 'exact', head: true })
       .eq('eventid', event.id)
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://soraku.vercel.app'
+    const regId   = data.id.slice(0, 8).toUpperCase()
+    const d       = parsed.data
 
-    const activeFmt = parsed.data.activeplayers.map((p, i) =>
-      `\`${i + 1}.\` **${p.name}**${p.nickname ? ` *(${p.nickname})*` : ''}${p.role ? ` — ${p.role}` : ''}`
-    ).join('\n')
+    // ── Build player list (compact, max 10 rows Discord limit) ──
+    const playerLines = d.activeplayers
+      .slice(0, 10)
+      .map((p, i) => {
+        const role = p.role ? ` *[${p.role}]*` : ''
+        return `\`${String(i + 1).padStart(2, ' ')}.\` **${p.name}**${role}`
+      })
+      .join('\n')
 
-    const reserveFmt = parsed.data.reserveplayers.length > 0
-      ? parsed.data.reserveplayers.map((p, i) =>
-          `\`C${i + 1}.\` ${p.name}${p.nickname ? ` *(${p.nickname})*` : ''}${p.role ? ` — ${p.role}` : ''}`
-        ).join('\n')
+    const reserveLines = d.reserveplayers.length > 0
+      ? d.reserveplayers
+          .map((p, i) => `\`C${i + 1}.\` ${p.name}${p.role ? ` *[${p.role}]*` : ''}`)
+          .join('\n')
       : null
 
+    // ── Fields ──
     const fields: Array<{ name: string; value: string; inline?: boolean }> = [
-      { name: '⚔️ Nama Tim',        value: parsed.data.teamname,          inline: true  },
-      { name: '📋 Total Pendaftar', value: `${count ?? 1} tim`,           inline: true  },
-      { name: `👥 Pemain Aktif (${parsed.data.activeplayers.length})`, value: activeFmt, inline: false },
+      {
+        name:   '🏆 Tim',
+        value:  `**${d.teamname}**`,
+        inline: true,
+      },
+      {
+        name:   '📊 Total Pendaftar',
+        value:  `**${count ?? 1}** tim`,
+        inline: true,
+      },
+      {
+        name:   '🆔 ID Registrasi',
+        value:  `\`${regId}\``,
+        inline: true,
+      },
+      {
+        name:   `👥 Pemain Aktif — ${d.activeplayers.length} orang`,
+        value:  playerLines || '—',
+        inline: false,
+      },
     ]
-    if (reserveFmt) fields.push({ name: `🔄 Cadangan (${parsed.data.reserveplayers.length})`, value: reserveFmt, inline: false })
-    if (parsed.data.contactname || parsed.data.contactdiscord) {
-      const contact = [parsed.data.contactname, parsed.data.contactdiscord].filter(Boolean).join(' · ')
-      fields.push({ name: '📬 Kontak PIC', value: contact, inline: false })
-    }
-    if (parsed.data.notes) fields.push({ name: '📝 Catatan', value: parsed.data.notes, inline: false })
 
-    // Kirim notif Discord (await — bukan fire & forget supaya error terlog)
+    if (reserveLines) {
+      fields.push({
+        name:   `🔄 Cadangan — ${d.reserveplayers.length} orang`,
+        value:  reserveLines,
+        inline: false,
+      })
+    }
+
+    if (d.contactname || d.contactdiscord) {
+      fields.push({
+        name:   '📬 Kontak PIC',
+        value:  [d.contactname, d.contactdiscord].filter(Boolean).join(' · '),
+        inline: false,
+      })
+    }
+
+    if (d.notes) {
+      fields.push({ name: '📝 Catatan', value: d.notes, inline: false })
+    }
+
+    if (d.paymentproof) {
+      fields.push({
+        name:   '💳 Bukti Pembayaran',
+        value:  `[Lihat Bukti ↗](${d.paymentproof})`,
+        inline: false,
+      })
+    }
+
+    if ((event as any).ispaid && (event as any).price) {
+      fields.push({
+        name:   '💰 Biaya',
+        value:  `Rp ${((event as any).price as number).toLocaleString('id-ID')}`,
+        inline: true,
+      })
+    }
+
     await sendDiscordWebhook('discord_registration_webhook_url', {
-      username:   'Soraku Registrasi',
+      username:   'Soraku Events',
       avatar_url: `${siteUrl}/logo.png`,
-      content:    `🎮 Tim baru mendaftar untuk **${event.title}**!`,
       embeds: [{
-        title:       `📝 Pendaftaran Baru`,
-        description: `Tim **${parsed.data.teamname}** mendaftar ke [${event.title}](${siteUrl}/events/${slug})`,
-        color:       0x57F287,
+        author: {
+          name:     '📝 Pendaftaran Baru Masuk!',
+          icon_url: `${siteUrl}/logo.png`,
+        },
+        title:       `⚔️ ${d.teamname}`,
+        description: `Tim **${d.teamname}** mendaftar untuk event **[${event.title}](${siteUrl}/events/${slug})**\n\n━━━━━━━━━━━━━━━━━━━━━━`,
+        color:       0x57F287, // hijau
         fields,
-        footer:      { text: `ID: ${data.id.slice(0, 8).toUpperCase()} · Soraku Community` },
-        timestamp:   new Date().toISOString(),
-        ...(parsed.data.teamlogourl ? { thumbnail: { url: parsed.data.teamlogourl } } : {}),
+        footer: {
+          text:     `Soraku Community · ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB`,
+          icon_url: `${siteUrl}/logo.png`,
+        },
+        timestamp: new Date().toISOString(),
+        ...(d.teamlogourl ? { thumbnail: { url: d.teamlogourl } } : {}),
       }],
     })
 

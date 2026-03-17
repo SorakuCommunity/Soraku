@@ -28,7 +28,7 @@ export async function PATCH(
 
     const { data: reg } = await adminDb()
       .from('eventregistrations')
-      .select('id, teamname, teamlogourl, contactdiscord, events:eventid(title, slug)')
+      .select('id, teamname, teamlogourl, contactdiscord, activeplayers, events:eventid(title, slug)')
       .eq('id', regId)
       .maybeSingle()
 
@@ -53,21 +53,54 @@ export async function PATCH(
     const eventTitle = (reg.events as any)?.title ?? 'Event Soraku'
     const eventSlug  = (reg.events as any)?.slug  ?? slug
     const isApproved = parsed.data.status === 'approved'
+    const shortId    = regId.slice(0, 8).toUpperCase()
+
+    // ── Player preview (max 5) ──
+    const players = (reg.activeplayers as any[]) ?? []
+    const playerPreview = players.slice(0, 5)
+      .map((p: any, i: number) => `\`${i + 1}.\` ${p.name}${p.role ? ` *[${p.role}]*` : ''}`)
+      .join('\n')
+
+    const fields: Array<{ name: string; value: string; inline?: boolean }> = [
+      { name: '🏆 Tim',          value: `**${reg.teamname}**`,                            inline: true  },
+      { name: '👤 Direview oleh', value: session.displayname ?? session.username ?? '—',  inline: true  },
+      { name: '🆔 ID',           value: `\`${shortId}\``,                                 inline: true  },
+    ]
+
+    if (playerPreview) {
+      fields.push({
+        name:   `👥 Anggota Tim (${players.length} orang)`,
+        value:  playerPreview + (players.length > 5 ? `\n*... dan ${players.length - 5} lainnya*` : ''),
+        inline: false,
+      })
+    }
+
+    if (reg.contactdiscord) {
+      fields.push({ name: '📬 Discord Tim', value: reg.contactdiscord, inline: false })
+    }
+
+    if (!isApproved && parsed.data.rejectreason) {
+      fields.push({ name: '❌ Alasan Penolakan', value: parsed.data.rejectreason, inline: false })
+    }
 
     await sendDiscordWebhook('discord_registration_webhook_url', {
-      username:   'Soraku Registrasi',
+      username:   'Soraku Events',
       avatar_url: `${siteUrl}/logo.png`,
       embeds: [{
-        title:       isApproved ? `✅ Pendaftaran DITERIMA` : `❌ Pendaftaran DITOLAK`,
-        description: `Tim **${reg.teamname}** untuk event [${eventTitle}](${siteUrl}/events/${eventSlug})`,
-        color:       isApproved ? 0x57F287 : 0xED4245,
-        fields: [
-          { name: '⚔️ Tim',    value: reg.teamname,                                   inline: true },
-          { name: '👤 Admin',  value: session.displayname ?? session.username ?? '—', inline: true },
-          ...(parsed.data.rejectreason ? [{ name: '📝 Alasan', value: parsed.data.rejectreason, inline: false }] : []),
-          ...(reg.contactdiscord ? [{ name: '📬 Discord Tim', value: reg.contactdiscord, inline: false }] : []),
-        ],
-        footer:    { text: `ID: ${regId.slice(0,8).toUpperCase()} · Soraku` },
+        author: {
+          name:     isApproved ? '✅ Pendaftaran DITERIMA' : '❌ Pendaftaran DITOLAK',
+          icon_url: `${siteUrl}/logo.png`,
+        },
+        title:       `${isApproved ? '🎉' : '😔'} ${reg.teamname}`,
+        description: isApproved
+          ? `Selamat! Tim **${reg.teamname}** berhasil diterima di event **[${eventTitle}](${siteUrl}/events/${eventSlug})**!\n\nSilakan pantau Discord untuk informasi lebih lanjut.\n\n━━━━━━━━━━━━━━━━━━━━━━`
+          : `Maaf, pendaftaran tim **${reg.teamname}** untuk event **[${eventTitle}](${siteUrl}/events/${eventSlug})** tidak dapat diterima.\n\n━━━━━━━━━━━━━━━━━━━━━━`,
+        color:  isApproved ? 0x57F287 : 0xED4245,
+        fields,
+        footer: {
+          text:     `Soraku Community · ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB`,
+          icon_url: `${siteUrl}/logo.png`,
+        },
         timestamp: new Date().toISOString(),
         ...(reg.teamlogourl ? { thumbnail: { url: reg.teamlogourl } } : {}),
       }],
