@@ -234,3 +234,67 @@ agar Supabase client clear connection pool dan baca schema terbaru.
 2. `music247` query sukses → `247 mode` tidak lagi crash
 3. Prefix commands dan slash commands harusnya berfungsi normal
 4. Fix `[object Promise]` di kode bot secara manual
+
+
+---
+
+## 📋 LAPORAN — 2026-03-17 #3 (Bubu — commit c78d0b8)
+
+### ✅ Semua fix code bot + DB yang dikerjakan sesi ini
+
+#### DB Migrations (auto-applied via Supabase MCP)
+
+| Migration | Fix |
+|-----------|-----|
+| `20260317_bot_schema_expose_and_consolidate` | Expose schema `bot` ke PostgREST, konsolidasi tabel duplikat |
+| `20260317_bot_add_id_alias_columns` | Tambah kolom `id` alias ke 16 tabel yang tidak punya `id` |
+| `20260317_bot_fix_ticketcounters_aliases` | `panel_counter`/`ticket_counter` alias dari `panel_count`/`ticket_count` |
+
+DB final: **30 tabel BASE TABLE**, semua tanpa underscore, semua punya kolom `id`.
+
+---
+
+#### Code fixes (commit c78d0b8) — 24 files, 139 insertions
+
+**`[object Promise]` di cooldown message — ROOT CAUSE:**
+`antiAbuse.checkCooldown()` adalah async tapi dipanggil tanpa `await`.
+- `slashcmd.js` → `await antiAbuse.checkCooldown(...)`
+- `Prefixcmd.js` → `await antiAbuse.checkCooldown(...)`
+
+**`guilds247 is not iterable` di 247 mode:**
+- `ready.js` → `await db.guild.getValid247Guilds()` (2x)
+- `ready.js` → `await db.guild.set247Mode(...)` (4x)
+- `ready.js` → `await db.guild.getDefaultVolume(...)` (hoisted, 2x)
+- `ready.js` → `await db.invites.ensureGuildSettings` + `setTrackingEnabled`
+
+**Invite cache crashes:**
+- `guildMemberAdd.js` → `await getMemberInvites`, `await getEligibleRanks`
+- `guildMemberRemove.js` → `await getMemberInvites`
+
+**Playlist commands semua crash silently (20 fixes):**
+add2pl, create-pl, del-playlists, load-pl, my-playlists, pl-edit, pl-info, pl-remove
+
+**Premium commands (11 fixes):**
+`developer/Prem.js` → semua grant/revoke/getStats calls
+
+**`/about` → "Command Error":**
+- `CommandHandler._finalizeSlashCommands()` sekarang daftarkan `slashAliases` ke Discord
+- `/about`, `/stats`, `/info` sekarang terdaftar sebagai slash commands resmi
+
+**Legacy SQLite code dihapus:**
+`history.js` ada sisa `db.user.get('SELECT history FROM users WHERE id=?')` — sudah dihapus.
+
+---
+
+### ❌ KAIZO — Action Required
+
+**RESTART BOT di Railway** — semua fix hanya berlaku setelah restart.
+
+Setelah restart, yang diharapkan:
+- Tidak ada lagi `[object Promise]` di cooldown message
+- `/about`, `/ping`, `/help` semua berfungsi normal
+- Playlist commands (`/play`, `/queue`, dll) tidak crash
+- 247 mode tidak lagi `guilds247 is not iterable`
+- Invite tracking tidak crash saat member join/leave
+
+Kalau setelah restart ada error baru, kirim log Railway ke Bubu.
