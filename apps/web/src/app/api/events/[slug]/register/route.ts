@@ -21,6 +21,7 @@ const RegisterSchema = z.object({
   contactname:    z.string().max(60).optional(),
   contactdiscord: z.string().max(60).optional(),
   notes:          z.string().max(500).optional(),
+  paymentproof:   z.string().optional().or(z.literal('')),
 })
 
 // POST /api/events/[slug]/register
@@ -55,6 +56,7 @@ export async function POST(
         contactname:    parsed.data.contactname    || null,
         contactdiscord: parsed.data.contactdiscord || null,
         notes:          parsed.data.notes          || null,
+        paymentproof:   parsed.data.paymentproof   || null,
         status: 'pending',
       })
       .select('id, teamname, createdat')

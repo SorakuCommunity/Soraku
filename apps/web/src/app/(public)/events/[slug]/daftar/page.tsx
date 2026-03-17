@@ -29,6 +29,9 @@ interface EventInfo {
   startdate:       string;
   registrationurl: string | null;
   gametype:        string | null;
+  ispaid:          boolean;
+  price:           number | null;
+  priceinfo:       string | null;
 }
 
 const ROLES_ML = ["Goldlaner", "Jungler", "Midlaner", "Roamer", "EXP Laner", "Hyper"] as const;
@@ -189,6 +192,16 @@ export default function EventRegisterPage() {
   const [contactname,     setContactname]     = useState("");
   const [contactdiscord,  setContactdiscord]  = useState("");
   const [notes,           setNotes]           = useState("");
+  const [paymentproof,    setPaymentproof]    = useState("");
+  const [sessionUserId,   setSessionUserId]   = useState<string | null>(null);
+  const [loginRequired,   setLoginRequired]   = useState(false);
+
+  // Cek session login
+  useEffect(() => {
+    fetch('/api/auth/me').then(r => r.json()).then(d => {
+      if (d.data?.id) setSessionUserId(d.data.id);
+    }).catch(() => {});
+  }, []);
 
   // Load event
   useEffect(() => {
@@ -232,6 +245,7 @@ export default function EventRegisterPage() {
           contactname:    contactname.trim() || undefined,
           contactdiscord: contactdiscord.trim() || undefined,
           notes:          notes.trim() || undefined,
+          paymentproof:   paymentproof.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -245,6 +259,29 @@ export default function EventRegisterPage() {
   if (loading) return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
+    </div>
+  );
+
+  // Guard: wajib login untuk daftar
+  if (!sessionUserId) return (
+    <div className="mx-auto max-w-md px-4 py-20 text-center space-y-5">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20 mx-auto">
+        <Swords className="h-8 w-8 text-primary/50" />
+      </div>
+      <div>
+        <h1 className="text-xl font-black">Login Dulu!</h1>
+        <p className="mt-2 text-sm text-foreground/50">Kamu harus login untuk mendaftar event ini.</p>
+      </div>
+      <div className="flex justify-center gap-3">
+        <Link href={`/login?next=/events/${slug}/daftar`}
+          className="flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white hover:bg-primary/90 transition-colors">
+          Login / Daftar
+        </Link>
+        <Link href={`/events/${slug}`}
+          className="flex items-center gap-2 rounded-xl border border-border/50 px-5 py-2.5 text-sm font-semibold text-foreground/60 hover:text-foreground transition-colors">
+          Kembali
+        </Link>
+      </div>
     </div>
   );
 
@@ -552,6 +589,35 @@ export default function EventRegisterPage() {
               <div className="rounded-xl border border-border/30 bg-black/20 px-4 py-3">
                 <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30 mb-1">Catatan</p>
                 <p className="text-xs text-foreground/60">{notes}</p>
+              </div>
+            )}
+
+            {/* Payment section - hanya tampil kalau event berbayar */}
+            {event?.ispaid && (
+              <div className="rounded-2xl border border-amber-500/25 bg-amber-500/5 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-4 w-4 text-amber-400" />
+                  <p className="text-xs font-black uppercase tracking-widest text-amber-400/70">
+                    Pendaftaran Berbayar
+                    {event.price ? ` · Rp ${event.price.toLocaleString('id-ID')}` : ''}
+                  </p>
+                </div>
+                {event.priceinfo && (
+                  <p className="text-xs text-foreground/60 whitespace-pre-line border-t border-amber-500/15 pt-3">{event.priceinfo}</p>
+                )}
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-amber-400/60">
+                    Bukti Transfer / Pembayaran
+                  </label>
+                  <input
+                    type="text"
+                    value={paymentproof}
+                    onChange={e => setPaymentproof(e.target.value)}
+                    placeholder="Paste URL screenshot bukti transfer..."
+                    className="w-full rounded-xl border border-amber-500/25 bg-black/30 px-4 py-2.5 text-sm outline-none placeholder:text-foreground/15 focus:border-amber-500/40 transition-all"
+                  />
+                  <p className="text-[10px] text-amber-400/40 pl-1">Upload screenshot ke Imgur/ImgBB lalu paste URL-nya</p>
+                </div>
               </div>
             )}
           </div>

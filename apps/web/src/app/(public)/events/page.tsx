@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Calendar, MapPin, Wifi, ArrowRight, Clock } from "lucide-react";
+import Image from "next/image";
+import { Calendar, MapPin, Wifi, ArrowRight, Clock, DollarSign } from "lucide-react";
 import { db } from "@/lib/supabase/server";
 import { formatEventDate } from "@/lib/utils";
 
@@ -20,7 +21,7 @@ const FILTERS = [
 
 type EventRow = {
   id: string; slug: string; title: string; description: string | null;
-  coverurl: string | null; startdate: string; enddate: string | null;
+  coverurl: string | null; ispaid?: boolean; price?: number; startdate: string; enddate: string | null;
   location: string | null; isonline: boolean; tags: string[] | null;
 };
 
@@ -42,7 +43,17 @@ function EventCard({ event }: { event: EventRow }) {
         isUpcoming ? "bg-gradient-to-br from-primary/20 via-accent/10 to-violet-500/15"
                    : "bg-gradient-to-br from-muted/40 to-muted/20"
       }`}>
-        <span className="text-[5rem] font-black opacity-[0.06] select-none">空</span>
+        {event.coverurl ? (
+          <Image
+            src={event.coverurl}
+            alt={event.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            unoptimized
+          />
+        ) : (
+          <span className="text-[5rem] font-black opacity-[0.06] select-none">空</span>
+        )}
         <div className="absolute top-3 left-3 flex gap-2">
           <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
             isUpcoming ? "bg-primary text-white shadow-md shadow-primary/30" : "bg-muted text-muted-foreground"
@@ -56,6 +67,17 @@ function EventCard({ event }: { event: EventRow }) {
             <Clock className="h-3 w-3" />
             {daysUntil === 0 ? "Hari ini!" : `${daysUntil} hari lagi`}
           </div>
+        )}
+        {/* Paid badge */}
+        {event.ispaid && (
+          <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-amber-500/20 border border-amber-500/30 px-2.5 py-0.5 text-[11px] font-bold text-amber-400 backdrop-blur-sm">
+            <DollarSign className="h-3 w-3" />
+            {event.price ? `Rp ${event.price.toLocaleString("id-ID")}` : "Berbayar"}
+          </div>
+        )}
+        {/* Cover overlay gradient */}
+        {event.coverurl && (
+          <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
         )}
       </div>
       <div className="flex flex-1 flex-col p-5">
@@ -91,7 +113,7 @@ export default async function EventsPage({
 
   let query = (await db())
     .from("events")
-    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags")
+    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags,ispaid,price")
     .eq("ispublished", true)
     .order("startdate", { ascending: true });
 

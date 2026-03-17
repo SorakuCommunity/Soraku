@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, MapPin, Wifi, ExternalLink, Swords } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, Calendar, MapPin, Wifi, ExternalLink, Swords, DollarSign, Tag } from "lucide-react";
 import { db } from "@/lib/supabase/server";
 import { formatEventDate } from "@/lib/utils";
 
@@ -26,7 +27,7 @@ export default async function EventDetailPage({ params }: Props) {
 
   const { data: event } = await (await db())
     .from("events")
-    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags,ispublished,registrationurl,gametype")
+    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags,ispublished,registrationurl,gametype,ispaid,price,priceinfo")
     .eq("slug", slug)
     .eq("ispublished", true)
     .single();
@@ -45,11 +46,25 @@ export default async function EventDetailPage({ params }: Props) {
         <ArrowLeft className="h-4 w-4" /> Kembali ke Event
       </Link>
 
-      <div className={`mb-8 h-56 rounded-2xl flex items-center justify-center sm:h-72 ${
-        isUpcoming ? "bg-gradient-to-br from-primary/20 via-accent/10 to-violet-500/15"
-                   : "bg-gradient-to-br from-border/20 to-border/5"
-      }`}>
-        <span className="text-8xl opacity-10">空</span>
+      <div className="mb-8 h-56 sm:h-72 rounded-2xl overflow-hidden relative">
+        {event.coverurl ? (
+          <Image
+            src={event.coverurl}
+            alt={event.title}
+            fill
+            className="object-cover"
+            priority
+            unoptimized
+          />
+        ) : (
+          <div className={`absolute inset-0 flex items-center justify-center ${
+            isUpcoming ? "bg-gradient-to-br from-primary/20 via-accent/10 to-violet-500/15"
+                       : "bg-gradient-to-br from-border/20 to-border/5"
+          }`}>
+            <span className="text-8xl opacity-10">空</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -59,6 +74,17 @@ export default async function EventDetailPage({ params }: Props) {
         <span className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-sm text-muted-foreground">
           <TypeIcon className="h-3.5 w-3.5" />{typeLabel}
         </span>
+        {/* Badge free / berbayar */}
+        {(event as any).ispaid ? (
+          <span className="flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-sm font-bold text-amber-400">
+            <DollarSign className="h-3.5 w-3.5" />
+            {(event as any).price ? `Rp ${((event as any).price as number).toLocaleString('id-ID')}` : 'Berbayar'}
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 rounded-full border border-green-500/40 bg-green-500/10 px-3 py-1 text-sm font-bold text-green-400">
+            <Tag className="h-3.5 w-3.5" /> Gratis
+          </span>
+        )}
         {(event.tags ?? []).map((t: string) => (
           <span key={t} className="rounded-full border border-border px-3 py-1 text-sm text-muted-foreground">{t}</span>
         ))}
@@ -93,6 +119,16 @@ export default async function EventDetailPage({ params }: Props) {
           </div>
         )}
       </div>
+
+      {/* Info pembayaran jika berbayar */}
+      {(event as any).ispaid && (event as any).priceinfo && (
+        <div className="mt-6 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-4">
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber-400/70 mb-2">
+            <DollarSign className="h-3.5 w-3.5" /> Info Pembayaran
+          </p>
+          <p className="text-sm text-foreground/80 whitespace-pre-line">{(event as any).priceinfo}</p>
+        </div>
+      )}
 
       <div className="mt-8 prose prose-sm max-w-none text-muted-foreground prose-headings:text-foreground">
         <p className="leading-relaxed">{event.description}</p>

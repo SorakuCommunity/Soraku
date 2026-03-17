@@ -41,6 +41,9 @@ export default function AdminEventNewPage() {
   const [tagInput,    setTagInput]    = useState("");
   const [tags,        setTags]        = useState<string[]>([]);
   const [regUrl,      setRegUrl]      = useState("");
+  const [ispaid,      setIspaid]      = useState(false);
+  const [price,       setPrice]       = useState("");
+  const [priceinfo,   setPriceinfo]   = useState("");
   const [gametype,    setGametype]    = useState<GameValue>("");
 
   const selectedGame = GAME_OPTIONS.find(g => g.value === gametype);
@@ -83,6 +86,9 @@ export default function AdminEventNewPage() {
         location:        !isonline ? location.trim() || undefined : undefined,
         tags,
         registrationurl: regUrl.trim() || undefined,
+        ispaid:          ispaid,
+        price:           ispaid && price ? parseInt(price) : 0,
+        priceinfo:       ispaid ? priceinfo.trim() || undefined : undefined,
         gametype:        gametype || undefined,
         ispublished:     publish,
       }),
@@ -256,6 +262,40 @@ export default function AdminEventNewPage() {
               ? "Kosongkan untuk menggunakan form pendaftaran tim ML bawaan Soraku."
               : "Isi jika punya form pendaftaran eksternal."}
           </p>
+        </div>
+
+        {/* Free / Berbayar */}
+        <div className="glass-card p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              Biaya Pendaftaran
+            </label>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setIspaid(false)}
+                className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${!ispaid ? "border-green-500/50 bg-green-500/10 text-green-400" : "border-border text-muted-foreground hover:bg-muted/30"}`}>
+                🎟️ Gratis
+              </button>
+              <button type="button" onClick={() => setIspaid(true)}
+                className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${ispaid ? "border-amber-500/50 bg-amber-500/10 text-amber-400" : "border-border text-muted-foreground hover:bg-muted/30"}`}>
+                💰 Berbayar
+              </button>
+            </div>
+          </div>
+          {ispaid && (
+            <div className="space-y-3 pt-1">
+              <div>
+                <label className="mb-1 block text-xs text-muted-foreground/60">Harga (Rupiah)</label>
+                <input type="number" value={price} onChange={e => setPrice(e.target.value)}
+                  placeholder="50000" min="0" className={fieldCls} />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-muted-foreground/60">Info Rekening / Cara Bayar</label>
+                <textarea value={priceinfo} onChange={e => setPriceinfo(e.target.value)} rows={3}
+                  placeholder="BCA 1234567890 a/n Soraku Community&#10;Konfirmasi ke Discord admin setelah transfer"
+                  className={`${fieldCls} resize-none`} />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Cover + Tags */}

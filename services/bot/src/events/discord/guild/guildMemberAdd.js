@@ -13,7 +13,30 @@ export default {
 
     try {
       const oldInvites = client.inviteCache?.get(guildId) || new Map();
-      const newInvites = await member.guild.invites.fetch({ cache: false });
+      
+      // Guard: cek permission Manage Guild sebelum fetch invites
+      // Cek cache dulu, lalu fallback ke hasPermission
+      const me = member.guild.members.me;
+      const hasManageGuild = me?.permissions?.has('ManageGuild') || 
+                              me?.permissions?.has(8n) || // ADMINISTRATOR
+                              false;
+      if (!hasManageGuild) {
+        logger.debug('InviteTracker', `Bot tidak punya permission ManageGuild di ${member.guild.name}, skip invite tracking`);
+        return;
+      }
+
+      // Wrap fetch dengan try-catch untuk handle 50013 gracefully
+      let newInvites;
+      try {
+        newInvites = await member.guild.invites.fetch({ cache: false });
+      } catch (fetchErr) {
+        if (fetchErr?.code === 50013) {
+          logger.debug('InviteTracker', `Missing Permissions fetch invites di ${member.guild.name} (${guildId}), skip`);
+        } else {
+          logger.warn('InviteTracker', `Gagal fetch invites di ${member.guild.name}:`, fetchErr?.message);
+        }
+        return;
+      }
 
       let usedInvite = null;
       let inviter = null;

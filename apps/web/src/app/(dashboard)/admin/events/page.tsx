@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { Plus, Trash2, Eye, EyeOff, Loader2, RefreshCw, Calendar, Wifi, MapPin, Pencil } from "lucide-react";
+import { Plus, Trash2, Eye, EyeOff, Loader2, RefreshCw, Calendar, Wifi, MapPin, Pencil, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AdminEvent {
@@ -15,6 +15,9 @@ interface AdminEvent {
   isonline:    boolean;
   ispublished: boolean;
   tags:        string[];
+  gametype:    string | null;
+  ispaid:      boolean;
+  registrationurl: string | null;
 }
 
 export default function AdminEventsPage() {
@@ -111,7 +114,7 @@ export default function AdminEventsPage() {
               const dateStr = new Date(ev.startdate).toLocaleDateString("id-ID", { day:"2-digit", month:"short", year:"numeric" });
               return (
                 <div key={ev.id}
-                  className="grid grid-cols-1 sm:grid-cols-[1fr_140px_80px_80px_120px] gap-3 sm:gap-4 px-5 py-4 items-center hover:bg-primary/2 transition-colors">
+                  className="grid grid-cols-1 sm:grid-cols-[1fr_140px_80px_80px_160px] gap-3 sm:gap-4 px-5 py-4 items-center hover:bg-primary/2 transition-colors">
                   <div className="min-w-0">
                     <p className="font-medium text-sm truncate">{ev.title}</p>
                     <p className="text-xs text-muted-foreground/50 font-mono">/events/{ev.slug}</p>
@@ -131,6 +134,13 @@ export default function AdminEventsPage() {
                     {ev.ispublished ? "● Publik" : "○ Draft"}
                   </span>
                   <div className="flex items-center justify-end gap-1">
+                    {ev.gametype === "ml" && (
+                      <Link href={`/admin/events/${ev.id}/registrations`}
+                        className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground hover:text-primary transition-colors"
+                        title="Lihat Pendaftar">
+                        <Users className="h-3.5 w-3.5" />
+                      </Link>
+                    )}
                     <Link href={`/admin/events/${ev.id}/edit`}
                       className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground hover:text-primary transition-colors"
                       title="Edit">
