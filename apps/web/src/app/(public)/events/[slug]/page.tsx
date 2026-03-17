@@ -27,7 +27,7 @@ export default async function EventDetailPage({ params }: Props) {
 
   const { data: event } = await (await db())
     .from("events")
-    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags,ispublished,registrationurl,gametype,ispaid,price,priceinfo")
+    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags,ispublished,registrationurl,gametype,ispaid,price,priceinfo,registrationopen")
     .eq("slug", slug)
     .eq("ispublished", true)
     .single();

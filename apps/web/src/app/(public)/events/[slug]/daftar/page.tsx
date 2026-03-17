@@ -8,7 +8,7 @@ import Link from "next/link";
 import {
   ArrowLeft, Users, UserPlus, Shield,
   ChevronRight, Loader2, CheckCircle2, AlertCircle,
-  Swords, X, Plus, Star, Trophy
+  Swords, X, Plus, Star, Trophy, Upload
 } from "lucide-react";
 import { ImageUrlInput } from "@/components/ui/image-url-input";
 import { cn } from "@/lib/utils";
@@ -193,6 +193,7 @@ export default function EventRegisterPage() {
   const [contactdiscord,  setContactdiscord]  = useState("");
   const [notes,           setNotes]           = useState("");
   const [paymentproof,    setPaymentproof]    = useState("");
+  const [uploading,       setUploading]       = useState(false);
   const [sessionUserId,   setSessionUserId]   = useState<string | null>(null);
   const [loginRequired,   setLoginRequired]   = useState(false);
 
@@ -231,7 +232,28 @@ export default function EventRegisterPage() {
   const canGoStep2 = teamname.trim().length >= 2;
   const canGoStep3 = activeplayers.every(p => p.name.trim().length > 0);
 
+  // Upload gambar bukti bayar via freeimage.host
+  const uploadImage = async (file: File): Promise<string | null> => {
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("source", file);
+      const res = await fetch(
+        "https://freeimage.host/api/1/upload?key=6d207e02198a847aa98d0a2a901485a2&action=upload&format=json",
+        { method: "POST", body: fd }
+      );
+      const data = await res.json();
+      return data?.image?.url ?? null;
+    } catch { return null; }
+    finally { setUploading(false); }
+  };
+
   const handleSubmit = async () => {
+    // Validasi wajib bukti bayar jika event berbayar
+    if (event?.ispaid && !paymentproof.trim()) {
+      setError("Bukti pembayaran wajib diisi untuk event berbayar.");
+      return;
+    }
     setSaving(true); setError("");
     try {
       const res = await fetch(`/api/events/${slug}/register`, {
@@ -592,31 +614,108 @@ export default function EventRegisterPage() {
               </div>
             )}
 
-            {/* Payment section - hanya tampil kalau event berbayar */}
+            {/* Payment section - WAJIB jika event berbayar */}
             {event?.ispaid && (
-              <div className="rounded-2xl border border-amber-500/25 bg-amber-500/5 p-4 space-y-3">
+              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 space-y-4">
                 <div className="flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-amber-400" />
-                  <p className="text-xs font-black uppercase tracking-widest text-amber-400/70">
-                    Pendaftaran Berbayar
-                    {event.price ? ` · Rp ${event.price.toLocaleString('id-ID')}` : ''}
-                  </p>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/20 border border-amber-500/30">
+                    <Trophy className="h-4 w-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-widest text-amber-400/80">
+                      Bukti Pembayaran
+                      <span className="text-red-400 ml-1">*</span>
+                    </p>
+                    {event.price && (
+                      <p className="text-[11px] text-amber-400/50">
+                        Rp {event.price.toLocaleString("id-ID")}
+                      </p>
+                    )}
+                  </div>
                 </div>
+
+                {/* Info rekening */}
                 {event.priceinfo && (
-                  <p className="text-xs text-foreground/60 whitespace-pre-line border-t border-amber-500/15 pt-3">{event.priceinfo}</p>
+                  <div className="rounded-xl border border-amber-500/15 bg-black/20 px-4 py-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/50 mb-1.5">Info Pembayaran</p>
+                    <p className="text-xs text-foreground/70 whitespace-pre-line leading-relaxed">{event.priceinfo}</p>
+                  </div>
                 )}
-                <div className="space-y-1.5 pt-1">
+
+                {/* Upload / input bukti bayar */}
+                <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-amber-400/60">
-                    Bukti Transfer / Pembayaran
+                    Screenshot / Foto Bukti Transfer <span className="text-red-400">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={paymentproof}
-                    onChange={e => setPaymentproof(e.target.value)}
-                    placeholder="Paste URL screenshot bukti transfer..."
-                    className="w-full rounded-xl border border-amber-500/25 bg-black/30 px-4 py-2.5 text-sm outline-none placeholder:text-foreground/15 focus:border-amber-500/40 transition-all"
-                  />
-                  <p className="text-[10px] text-amber-400/40 pl-1">Upload screenshot ke Imgur/ImgBB lalu paste URL-nya</p>
+
+                  {/* File upload button */}
+                  <label className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed cursor-pointer transition-all py-6 ${
+                    paymentproof
+                      ? "border-green-500/30 bg-green-500/5"
+                      : "border-amber-500/25 bg-amber-500/5 hover:border-amber-500/40 hover:bg-amber-500/8"
+                  }`}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const url = await uploadImage(file);
+                        if (url) setPaymentproof(url);
+                        else setError("Gagal upload gambar. Coba paste URL manual.");
+                      }}
+                    />
+                    {uploading ? (
+                      <div className="flex items-center gap-2 text-amber-400/70 text-xs">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Mengupload...
+                      </div>
+                    ) : paymentproof ? (
+                      <div className="flex flex-col items-center gap-1.5">
+                        <CheckCircle2 className="h-6 w-6 text-green-400" />
+                        <p className="text-xs font-bold text-green-400">Bukti terupload!</p>
+                        <p className="text-[10px] text-foreground/30">Klik untuk ganti</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1.5">
+                        <Upload className="h-6 w-6 text-amber-400/50" />
+                        <p className="text-xs font-semibold text-amber-400/70">Klik untuk upload gambar</p>
+                        <p className="text-[10px] text-foreground/30">JPG, PNG, WebP — maks 5MB</p>
+                      </div>
+                    )}
+                  </label>
+
+                  {/* Preview gambar yang diupload */}
+                  {paymentproof && (
+                    <div className="relative rounded-xl overflow-hidden border border-green-500/20">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={paymentproof}
+                        alt="Bukti bayar"
+                        className="w-full max-h-48 object-contain bg-black/20"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPaymentproof("")}
+                        className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-lg bg-background/80 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Fallback: paste URL manual */}
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-amber-400/40">atau paste URL gambar</label>
+                    <input
+                      type="text"
+                      value={paymentproof}
+                      onChange={e => setPaymentproof(e.target.value)}
+                      placeholder="https://i.imgur.com/..."
+                      className="w-full rounded-xl border border-amber-500/20 bg-black/20 px-3 py-2 text-xs outline-none placeholder:text-foreground/15 focus:border-amber-500/30 transition-all"
+                    />
+                  </div>
                 </div>
               </div>
             )}

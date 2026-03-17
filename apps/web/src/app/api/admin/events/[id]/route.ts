@@ -17,8 +17,12 @@ const PatchSchema = z.object({
   enddate:     z.string().optional(),
   location:    z.string().optional(),
   isonline:    z.boolean().optional(),
-  ispublished: z.boolean().optional(),
-  tags:        z.array(z.string()).optional(),
+  ispublished:      z.boolean().optional(),
+  registrationopen: z.boolean().optional(),
+  ispaid:           z.boolean().optional(),
+  price:            z.number().int().min(0).optional(),
+  priceinfo:        z.string().optional(),
+  tags:             z.array(z.string()).optional(),
 })
 
 // GET /api/admin/events/[id] — prefill form edit

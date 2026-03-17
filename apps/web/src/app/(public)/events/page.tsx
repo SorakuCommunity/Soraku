@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, MapPin, Wifi, ArrowRight, Clock, DollarSign } from "lucide-react";
+import {
+  Calendar, MapPin, Wifi, ArrowRight, Clock,
+  DollarSign, Tag, ExternalLink
+} from "lucide-react";
 import { db } from "@/lib/supabase/server";
 import { formatEventDate } from "@/lib/utils";
 
@@ -12,89 +15,131 @@ export const metadata: Metadata = {
   description: "Event, gathering, dan workshop komunitas Soraku Indonesia.",
 };
 
-// DB: isonline (bool) — UI tetap tampil Online/Offline/Hybrid lewat tags
 const FILTERS = [
-  { slug: "Semua",   emoji: "✨" },
-  { slug: "Online",  emoji: "🌐" },
+  { slug: "Semua", emoji: "✨" },
+  { slug: "Online", emoji: "🌐" },
   { slug: "Offline", emoji: "📍" },
 ];
 
 type EventRow = {
   id: string; slug: string; title: string; description: string | null;
-  coverurl: string | null; ispaid?: boolean; price?: number; startdate: string; enddate: string | null;
-  location: string | null; isonline: boolean; tags: string[] | null;
+  coverurl: string | null; ispaid: boolean; price: number | null;
+  startdate: string; enddate: string | null; location: string | null;
+  isonline: boolean; tags: string[] | null; gametype: string | null;
+  registrationopen: boolean;
 };
 
 function EventCard({ event }: { event: EventRow }) {
-  const now      = new Date();
-  const start    = new Date(event.startdate);
+  const now        = new Date();
+  const start      = new Date(event.startdate);
   const isUpcoming = start > now;
-  const typeLabel  = event.isonline ? "Online" : "Offline";
   const TypeIcon   = event.isonline ? Wifi : MapPin;
+  const typeLabel  = event.isonline ? "Online" : "Offline";
 
   const daysUntil = isUpcoming
     ? Math.ceil((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
   return (
-    <Link href={`/events/${event.slug}`}
-      className="glass-card group flex flex-col overflow-hidden transition-all hover:-translate-y-1 hover:border-primary/30">
-      <div className={`relative h-44 overflow-hidden flex items-center justify-center ${
-        isUpcoming ? "bg-gradient-to-br from-primary/20 via-accent/10 to-violet-500/15"
-                   : "bg-gradient-to-br from-muted/40 to-muted/20"
-      }`}>
+    <Link
+      href={`/events/${event.slug}`}
+      className="glass-card group flex flex-col overflow-hidden rounded-2xl border border-border/50 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+    >
+      {/* ── Cover image ── */}
+      <div className="relative h-44 overflow-hidden">
         {event.coverurl ? (
           <Image
             src={event.coverurl}
             alt={event.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             unoptimized
           />
         ) : (
-          <span className="text-[5rem] font-black opacity-[0.06] select-none">空</span>
+          <div className={`absolute inset-0 flex items-center justify-center ${
+            isUpcoming
+              ? "bg-gradient-to-br from-primary/25 via-accent/10 to-violet-500/15"
+              : "bg-gradient-to-br from-muted/40 to-muted/20"
+          }`}>
+            <span className="text-[5rem] font-black opacity-[0.06] select-none">空</span>
+          </div>
         )}
-        <div className="absolute top-3 left-3 flex gap-2">
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
+
+        {/* Top-left: Free / Paid */}
+        <div className="absolute left-3 top-3">
+          {event.ispaid ? (
+            <span className="flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/20 px-2.5 py-1 text-[11px] font-black text-amber-300 backdrop-blur-sm">
+              <DollarSign className="h-3 w-3" />
+              {event.price ? `Rp ${event.price.toLocaleString("id-ID")}` : "Berbayar"}
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 rounded-full border border-green-500/30 bg-green-500/15 px-2.5 py-1 text-[11px] font-black text-green-300 backdrop-blur-sm">
+              <Tag className="h-3 w-3" /> Gratis
+            </span>
+          )}
+        </div>
+
+        {/* Top-right: Upcoming/Selesai + Tipe */}
+        <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
           <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-            isUpcoming ? "bg-primary text-white shadow-md shadow-primary/30" : "bg-muted text-muted-foreground"
-          }`}>{isUpcoming ? "Upcoming" : "Selesai"}</span>
+            isUpcoming ? "bg-primary text-white shadow-md shadow-primary/30" : "bg-muted/80 text-muted-foreground backdrop-blur-sm"
+          }`}>
+            {isUpcoming ? "🔥 Upcoming" : "✓ Selesai"}
+          </span>
           <span className="flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-0.5 text-[11px] font-medium text-foreground/80 backdrop-blur-sm">
             <TypeIcon className="h-3 w-3" />{typeLabel}
           </span>
         </div>
+
+        {/* Countdown badge */}
         {isUpcoming && daysUntil !== null && daysUntil <= 7 && (
-          <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-accent/20 border border-accent/30 px-2.5 py-0.5 text-[11px] font-bold text-accent/90">
+          <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full border border-accent/30 bg-accent/20 px-2.5 py-0.5 text-[11px] font-bold text-accent/90 backdrop-blur-sm">
             <Clock className="h-3 w-3" />
             {daysUntil === 0 ? "Hari ini!" : `${daysUntil} hari lagi`}
           </div>
         )}
-        {/* Paid badge */}
-        {event.ispaid && (
-          <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-amber-500/20 border border-amber-500/30 px-2.5 py-0.5 text-[11px] font-bold text-amber-400 backdrop-blur-sm">
-            <DollarSign className="h-3 w-3" />
-            {event.price ? `Rp ${event.price.toLocaleString("id-ID")}` : "Berbayar"}
-          </div>
-        )}
-        {/* Cover overlay gradient */}
-        {event.coverurl && (
-          <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
-        )}
       </div>
+
+      {/* ── Body ── */}
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-bold leading-snug group-hover:text-primary transition-colors line-clamp-2">{event.title}</h3>
-        <p className="mt-2 text-sm text-muted-foreground line-clamp-2 leading-relaxed flex-1">{event.description}</p>
-        <div className="mt-4 space-y-1.5 text-xs text-muted-foreground/60 border-t border-border/30 pt-4">
+        <h3 className="font-bold leading-snug line-clamp-2 transition-colors group-hover:text-primary">
+          {event.title}
+        </h3>
+
+        {event.description && (
+          <p className="mt-2 text-sm text-muted-foreground/70 line-clamp-2 leading-relaxed flex-1">
+            {event.description}
+          </p>
+        )}
+
+        {/* Date & location */}
+        <div className="mt-4 space-y-1 border-t border-border/30 pt-4 text-xs text-muted-foreground/60">
           <div className="flex items-center gap-2">
-            <Calendar className="h-3.5 w-3.5 flex-shrink-0 text-primary/50" />
+            <Calendar className="h-3.5 w-3.5 flex-shrink-0 text-primary/40" />
             {formatEventDate(event.startdate)}
           </div>
           {event.location && (
             <div className="flex items-center gap-2">
-              <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-primary/50" />{event.location}
+              <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-primary/40" />
+              {event.location}
             </div>
           )}
         </div>
-        <div className="mt-3 flex items-center justify-end text-xs font-semibold text-primary/70 group-hover:text-primary transition-colors">
+
+        {/* Tags row - kiri bawah */}
+        {(event.tags ?? []).length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {(event.tags ?? []).slice(0, 3).map((t) => (
+              <span key={t} className="rounded-full border border-border/40 bg-muted/30 px-2 py-0.5 text-[10px] text-muted-foreground/60">
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-3 flex items-center justify-end text-xs font-semibold text-primary/60 transition-colors group-hover:text-primary">
           Detail <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-0.5" />
         </div>
       </div>
@@ -107,13 +152,13 @@ export default async function EventsPage({
 }: {
   searchParams?: Promise<{ filter?: string }>;
 }) {
-  const params      = await searchParams;
+  const params       = await searchParams;
   const activeFilter = params?.filter ?? "Semua";
-  const now         = new Date().toISOString();
+  const now          = new Date().toISOString();
 
   let query = (await db())
     .from("events")
-    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags,ispaid,price")
+    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags,ispaid,price,gametype,registrationopen")
     .eq("ispublished", true)
     .order("startdate", { ascending: true });
 
@@ -128,6 +173,7 @@ export default async function EventsPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      {/* Header */}
       <div className="mb-10">
         <p className="mb-3 text-xs font-bold uppercase tracking-widest text-primary/70">Komunitas</p>
         <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
@@ -138,47 +184,57 @@ export default async function EventsPage({
         </p>
       </div>
 
+      {/* Filters */}
       <div className="mb-10 flex flex-wrap gap-2">
         {FILTERS.map(({ slug, emoji }) => (
-          <Link key={slug}
+          <Link
+            key={slug}
             href={slug === "Semua" ? "/events" : `/events?filter=${slug}`}
             className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
               activeFilter === slug
                 ? "bg-primary text-white shadow-md shadow-primary/20"
                 : "border border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground hover:-translate-y-0.5"
-            }`}>
+            }`}
+          >
             <span>{emoji}</span><span>{slug}</span>
           </Link>
         ))}
       </div>
 
+      {/* Upcoming section */}
       {upcoming.length > 0 && (
         <section className="mb-14">
           <div className="mb-5 flex items-center gap-3">
             <h2 className="text-lg font-black tracking-tight">Upcoming</h2>
-            <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-bold text-primary">{upcoming.length}</span>
+            <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-bold text-primary">
+              {upcoming.length}
+            </span>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {upcoming.map((e) => <EventCard key={e.id} event={e} />)}
+          {/* Grid 1 col mobile, 2 sm, 3 lg */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {upcoming.map((e) => <EventCard key={e.id} event={e as EventRow} />)}
           </div>
         </section>
       )}
 
+      {/* Past section */}
       {past.length > 0 && (
         <section>
           <div className="mb-5 flex items-center gap-3">
-            <h2 className="text-lg font-black tracking-tight text-muted-foreground/70">Selesai</h2>
-            <span className="rounded-full bg-muted/50 px-2.5 py-0.5 text-xs font-bold text-muted-foreground/50">{past.length}</span>
+            <h2 className="text-lg font-black tracking-tight text-muted-foreground/60">Selesai</h2>
+            <span className="rounded-full bg-muted/50 px-2.5 py-0.5 text-xs font-bold text-muted-foreground/40">
+              {past.length}
+            </span>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 opacity-65">
-            {past.map((e) => <EventCard key={e.id} event={e} />)}
+          <div className="grid grid-cols-1 gap-5 opacity-60 sm:grid-cols-2 lg:grid-cols-3">
+            {past.map((e) => <EventCard key={e.id} event={e as EventRow} />)}
           </div>
         </section>
       )}
 
       {events.length === 0 && (
         <div className="py-20 text-center">
-          <p className="text-4xl mb-3">🗓️</p>
+          <p className="mb-3 text-4xl">🗓️</p>
           <p className="text-muted-foreground">Belum ada event dengan filter ini.</p>
         </div>
       )}
