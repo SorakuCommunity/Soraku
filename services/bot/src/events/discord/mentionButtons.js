@@ -65,7 +65,7 @@ async function buildHomePage(interaction, client) {
   const currentPrefix = guildPrefixes[0] || "!";
   const guildIconUrl = interaction.guild.iconURL({ dynamic: true, size: 256 });
   
-  const homeContent = `> *Hey <@${interaction.user.id}>, I'm* __**AeroX**__ ${emoji.get("status")}\n` +
+  const homeContent = `> *Hey <@${interaction.user.id}>, I'm* __**Soraku**__ ${emoji.get("status")}\n` +
     `> *A **multipurpose** bot made to manage your server safely and smoothly with **moderation, music, ticket and more...** ${emoji.get("info")}*\n\n` +
     `*Type \`${currentPrefix}help\` to know more about my commands and more...*\n\n` +
     `**Server Prefix:** \`${currentPrefix}\``;
@@ -190,7 +190,7 @@ async function buildDevsPage(interaction, client) {
     .addSectionComponents(
       new SectionBuilder()
         .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent("*The creator behind AeroX*")
+          new TextDisplayBuilder().setContent("*The creator behind Soraku*")
         )
         .setThumbnailAccessory(
           new ThumbnailBuilder().setURL(ownerAvatarUrl)

@@ -424,7 +424,7 @@ class HelpCommand extends Command {
             ? `<:${category}:` + emojiValue.id + ">"
             : emojiValue;
 
-        content += `> ${emojiString} \`»\` **[${this._capitalize(category)}](https://discord.gg/AeroX)**\n`;
+        content += `> ${emojiString} \`»\` **[${this._capitalize(category)}](https://discord.gg/Soraku)**\n`;
       });
 
       container.addTextDisplayComponents(

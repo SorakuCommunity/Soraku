@@ -261,7 +261,7 @@ class LoadPlaylistCommand extends Command {
                 return Array.from(indices);
         }
 
-        _findPlaylist(userId, query) {
+        async _findPlaylist(userId, query) {
                 const userPlaylists = await db.playlists.getUserPlaylists(userId);
                 const trimmedQuery = query.trim();
                 if (trimmedQuery.startsWith("pl_"))

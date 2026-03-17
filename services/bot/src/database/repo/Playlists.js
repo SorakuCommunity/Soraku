@@ -14,7 +14,7 @@ export class Playlists extends Database {
     if (exists) throw new Error(`Playlist "${name}" already exists`)
     return this.upsert('playlists', {
       id: randomUUID(), user_id: userId, name, description,
-      tracks: '[]', total_duration: 0, track_count: 0,
+      tracks: [], total_duration: 0, track_count: 0,
     }, 'id')
   }
 
@@ -37,29 +37,29 @@ export class Playlists extends Database {
   async addTrack(playlistId, userId, track) {
     const pl = await this.getPlaylist(playlistId)
     if (!pl || pl.user_id !== userId) throw new Error('Playlist not found')
-    const tracks = JSON.parse(pl.tracks ?? '[]')
+    const tracks = pl.tracks ?? []
     if (tracks.length >= TRACKS_LIMIT) throw new Error(`Max ${TRACKS_LIMIT} tracks`)
     tracks.push(track)
     const total_duration = tracks.reduce((a, t) => a + (t.duration ?? 0), 0)
-    await this.update('playlists', { tracks: JSON.stringify(tracks), track_count: tracks.length, total_duration, updated_at: new Date().toISOString() }, { id: playlistId })
+    await this.update('playlists', { tracks: tracks, track_count: tracks.length, total_duration, updated_at: new Date().toISOString() }, { id: playlistId })
     return { ...pl, tracks, track_count: tracks.length }
   }
 
   async removeTrack(playlistId, userId, index) {
     const pl = await this.getPlaylist(playlistId)
     if (!pl || pl.user_id !== userId) throw new Error('Playlist not found')
-    const tracks = JSON.parse(pl.tracks ?? '[]')
+    const tracks = pl.tracks ?? []
     if (index < 0 || index >= tracks.length) throw new Error('Invalid index')
     tracks.splice(index, 1)
     const total_duration = tracks.reduce((a, t) => a + (t.duration ?? 0), 0)
-    await this.update('playlists', { tracks: JSON.stringify(tracks), track_count: tracks.length, total_duration, updated_at: new Date().toISOString() }, { id: playlistId })
+    await this.update('playlists', { tracks: tracks, track_count: tracks.length, total_duration, updated_at: new Date().toISOString() }, { id: playlistId })
     return { ...pl, tracks }
   }
 
   async getTracks(playlistId) {
     const pl = await this.getPlaylist(playlistId)
     if (!pl) return []
-    try { return JSON.parse(pl.tracks) } catch { return [] }
+    return Array.isArray(pl.tracks) ? pl.tracks : []
   }
 
   async updatePlaylistInfo(playlistId, userId, updates) {

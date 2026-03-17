@@ -599,7 +599,7 @@ export default class MusicCard {
                 ctx.shadowBlur = 10;
                 ctx.fillStyle = '#e0e8f0';
                 ctx.font = '16px "Inter SemiBold"';
-                ctx.fillText('AeroX', width - margin - 40, bottomY);
+                ctx.fillText('Soraku', width - margin - 40, bottomY);
 
                 this.createFrostSnowflake(ctx, width - margin - 15, bottomY, 12, 0.6);
                 ctx.restore();

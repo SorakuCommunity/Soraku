@@ -51,19 +51,19 @@ export default {
         const accountAge = now - memberCreatedAt;
         const sevenDays = 7 * 24 * 60 * 60 * 1000;
 
-        db.invites.incrementTracked(guildId, inviter.id, 1);
+        await db.invites.incrementTracked(guildId, inviter.id, 1);
 
         if (accountAge < sevenDays) {
-          db.invites.incrementFake(guildId, inviter.id, 1);
+          await db.invites.incrementFake(guildId, inviter.id, 1);
           logger.debug("InviteTracker", `Fake invite detected for ${member.user.tag} (account < 7 days old)`);
         }
 
-        db.invites.setInviterData(guildId, member.id, inviter.id, usedInvite.code);
+        await db.invites.setInviterData(guildId, member.id, inviter.id, usedInvite.code);
 
         logger.debug("InviteTracker", `${member.user.tag} was invited by ${inviter.tag} using code ${usedInvite.code}`);
 
         const inviterData = await db.invites.getMemberInvites(guildId, inviter.id);
-        const effectiveInvites = db.invites.getEffectiveInvites(inviterData);
+        const effectiveInvites = await db.invites.getEffectiveInvites(inviterData);
 
         const eligibleRanks = await db.invites.getEligibleRanks(guildId, effectiveInvites);
         if (eligibleRanks.length > 0) {
@@ -83,7 +83,7 @@ export default {
           }
         }
       } else {
-        db.invites.ensureMember(guildId, member.id);
+        await db.invites.ensureMember(guildId, member.id);
         logger.debug("InviteTracker", `${member.user.tag} joined but inviter could not be determined`);
       }
     } catch (error) {

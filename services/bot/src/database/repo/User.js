@@ -16,7 +16,7 @@ export class User extends Database {
   async hasNoPrefix(userId) {
     const u = await this.getUser(userId)
     if (!u?.no_prefix) return false
-    if (u.no_prefix_expiry && new Date(u.no_prefix_expiry) < new Date()) {
+    if (u.no_prefix_expiry && u.no_prefix_expiry < Date.now()) {
       await this.setNoPrefix(userId, false, null)
       return false
     }
@@ -24,7 +24,7 @@ export class User extends Database {
   }
   async setNoPrefix(userId, enabled, expiryTimestamp = null) {
     await this.ensureUser(userId)
-    await this.update('users', { no_prefix: enabled, no_prefix_expiry: expiryTimestamp ? new Date(expiryTimestamp).toISOString() : null, updated_at: new Date().toISOString() }, { id: userId })
+    await this.update('users', { no_prefix: enabled, no_prefix_expiry: expiryTimestamp ? Number(expiryTimestamp) : null, updated_at: new Date().toISOString() }, { id: userId })
   }
 
   async getUserPrefixes(userId) {

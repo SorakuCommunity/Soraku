@@ -6,7 +6,7 @@ export class Moderation extends Database {
   // ── Mutes ──────────────────────────────────────────────────
   async addMute(guildId, userId, moderatorId, reason, duration = null) {
     await this.sb.bot().from('mutes').update({ active: false }).match({ guild_id: guildId, user_id: userId, active: true })
-    const expiresAt = duration ? new Date(Date.now() + duration).toISOString() : null
+    const expiresAt = duration ? (Date.now() + duration) : null
     return this.sb.bot().from('mutes').insert({ guild_id: guildId, user_id: userId, moderator_id: moderatorId, reason, duration, expires_at: expiresAt, active: true })
   }
   async removeMute(guildId, userId) {
@@ -24,7 +24,7 @@ export class Moderation extends Database {
     await this.sb.bot().from('mutes').delete().match({ guild_id: guildId, user_id: userId })
   }
   async getExpiredMutes() {
-    const { data } = await this.sb.bot().from('mutes').select('*').eq('active', true).not('expires_at', 'is', null).lte('expires_at', new Date().toISOString())
+    const { data } = await this.sb.bot().from('mutes').select('*').eq('active', true).not('expires_at', 'is', null).lte('expires_at', Date.now())
     return data ?? []
   }
 

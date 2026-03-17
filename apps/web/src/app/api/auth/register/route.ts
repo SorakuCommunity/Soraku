@@ -54,6 +54,27 @@ export async function POST(req: NextRequest) {
 
     if (dbErr) return err(dbErr.message)
 
+
+    // Kirim notif pendaftaran ke Discord channel
+    const regWebhookUrl = process.env.DISCORD_REGISTRATION_WEBHOOK_URL
+    if (regWebhookUrl) {
+      fetch(regWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [{
+            title: '🌸 Anggota Baru Bergabung!',
+            color: 0x7c3aed,
+            fields: [
+              { name: 'Username', value: `@${username}`, inline: true },
+              { name: 'Email', value: authData.user.email ?? '-', inline: true },
+            ],
+            footer: { text: 'Soraku Community' },
+            timestamp: new Date().toISOString(),
+          }],
+        }),
+      }).catch(() => {}) // non-blocking
+    }
     return ok({
       id:       authData.user.id,
       email:    authData.user.email,

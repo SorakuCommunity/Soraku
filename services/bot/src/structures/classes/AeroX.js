@@ -24,7 +24,7 @@ try {
         // console.error(`Error while getting shard info: ${error}`);
 }
 
-export class AeroX extends Client {
+export class Soraku extends Client {
         constructor() {
                 const clientOptions = {
                         intents: [
@@ -74,7 +74,7 @@ export class AeroX extends Client {
         }
 
         async init() {
-                this.logger.info('AeroX', `❄️ Initializing bot...`);
+                this.logger.info('Soraku', `❄️ Initializing bot...`);
                 try {
                         await this.eventHandler.loadAllEvents();
                         await this.commandHandler.loadCommands();
@@ -82,19 +82,19 @@ export class AeroX extends Client {
                         // noPrefixUsers diload async dari Supabase — tidak blocking
                         this.db.user.findAll('users', { no_prefix: true }).then(rows => {
                             rows.forEach(u => this.noPrefixUsers.add(u.id));
-                            this.logger.info('AeroX', `Loaded ${this.noPrefixUsers.size} no-prefix users`);
+                            this.logger.info('Soraku', `Loaded ${this.noPrefixUsers.size} no-prefix users`);
                         }).catch(() => {});
                         await registerSlashCommands(this);
                         await this.login(config.token);
 
                         this.logger.success(
-                                'AeroX',
+                                'Soraku',
                                 `❄️ Bot has successfully initialized. 🌸`,
                         );
-                        this.logger.info('AeroX', '❄️ Coded by Shinchan');
+                        this.logger.info('Soraku', '🌸 Soraku Community Bot');
                 } catch (error) {
                         this.logger.error(
-                                'AeroX',
+                                'Soraku',
                                 '❄️ Failed to initialize bot cluster:',
                                 error,
                         );
@@ -103,17 +103,17 @@ export class AeroX extends Client {
         }
 
         async cleanup() {
-                this.logger.warn('AeroX', `❄️ Starting cleanup for bot...`);
+                this.logger.warn('Soraku', `❄️ Starting cleanup for bot...`);
                 try {
                         await this.db.closeAll();
                         this.destroy();
                         this.logger.success(
-                                'AeroX',
+                                'Soraku',
                                 '❄️ Cleanup completed successfully. 🌸',
                         );
                 } catch (error) {
                         this.logger.error(
-                                'AeroX',
+                                'Soraku',
                                 '❄️ An error occurred during cleanup:',
                                 error,
                         );

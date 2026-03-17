@@ -1,11 +1,11 @@
-import { AeroX } from '#structures/classes/AeroX';
+import { Soraku } from '#structures/classes/Soraku';
 import { logger } from '#utils/logger';
 
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-const client = new AeroX();
+const client = new Soraku();
 
 const main = async () => {
         try {

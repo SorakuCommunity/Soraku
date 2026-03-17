@@ -1,6 +1,6 @@
 /**
  * SupabaseAdapter — mengganti BetterSQLite3
- * Interface async yang compatible dengan semua repo AeroX
+ * Interface async yang compatible dengan semua repo Soraku
  */
 import { createClient } from '@supabase/supabase-js'
 import { logger } from '#utils/logger'

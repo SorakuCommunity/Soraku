@@ -5,7 +5,7 @@ import { config } from '#config/config';
 
 /**
  * Registers slash commands with Discord API
- * @param {AeroX} client - The Discord client instance
+ * @param {Soraku} client - The Discord client instance
  */
 export async function registerSlashCommands(client) {
     try {

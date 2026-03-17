@@ -1,24 +1,22 @@
 import { Database } from '#structures/classes/Database'
 import { config } from '#config/config'
-import { logger } from '#utils/logger'
 
 export class Guild extends Database {
   constructor() { super() }
 
   async ensureGuild(guildId) {
-    if (!guildId) throw new Error('guildId required')
-    let g = await this.findOne('guilds', { id: guildId })
+    let g = await this.findOne('guilds', { guild_id: guildId })
     if (!g) {
       g = await this.upsert('guilds', {
-        id: guildId, prefixes: JSON.stringify([config.prefix]),
+        guild_id: guildId, prefixes: JSON.stringify([config.prefix]),
         default_volume: 100, auto_disconnect: true, stay_247: false,
-      }, 'id')
+      }, 'guild_id')
     }
     return g
   }
 
-  async getGuild(guildId)           { return this.findOne('guilds', { id: guildId }) }
-  async getAllGuilds()               { return this.findAll('guilds') }
+  async getGuild(guildId)   { return this.findOne('guilds', { guild_id: guildId }) }
+  async getAllGuilds()       { return this.findAll('guilds') }
 
   async getPrefixes(guildId) {
     const g = await this.ensureGuild(guildId)
@@ -27,26 +25,26 @@ export class Guild extends Database {
   }
   async setPrefixes(guildId, prefixes) {
     await this.ensureGuild(guildId)
-    await this.update('guilds', { prefixes: JSON.stringify(prefixes), updated_at: new Date().toISOString() }, { id: guildId })
+    await this.update('guilds', { prefixes: JSON.stringify(prefixes), updated_at: new Date().toISOString() }, { guild_id: guildId })
   }
 
-  async getDefaultVolume(guildId)   { const g = await this.ensureGuild(guildId); return g.default_volume ?? 100 }
+  async getDefaultVolume(guildId)    { const g = await this.ensureGuild(guildId); return g.default_volume ?? 100 }
   async setDefaultVolume(guildId, v) {
-    if (v < 1 || v > 100) throw new Error('Volume must be 1-100')
-    await this.update('guilds', { default_volume: v, updated_at: new Date().toISOString() }, { id: guildId })
+    if (v < 1 || v > 100) throw new Error('Volume 1-100')
+    await this.update('guilds', { default_volume: v, updated_at: new Date().toISOString() }, { guild_id: guildId })
   }
 
   async updateSettings(guildId, settings) {
     await this.ensureGuild(guildId)
-    await this.update('guilds', { ...settings, updated_at: new Date().toISOString() }, { id: guildId })
+    await this.update('guilds', { ...settings, updated_at: new Date().toISOString() }, { guild_id: guildId })
   }
 
   async blacklistGuild(guildId, reason = 'No reason') {
     await this.ensureGuild(guildId)
-    await this.update('guilds', { blacklisted: true, blacklist_reason: reason, updated_at: new Date().toISOString() }, { id: guildId })
+    await this.update('guilds', { blacklisted: true, blacklist_reason: reason, updated_at: new Date().toISOString() }, { guild_id: guildId })
   }
   async unblacklistGuild(guildId) {
-    await this.update('guilds', { blacklisted: false, blacklist_reason: null, updated_at: new Date().toISOString() }, { id: guildId })
+    await this.update('guilds', { blacklisted: false, blacklist_reason: null, updated_at: new Date().toISOString() }, { guild_id: guildId })
   }
   async isBlacklisted(guildId) {
     const g = await this.getGuild(guildId)
@@ -68,13 +66,13 @@ export class Guild extends Database {
       stay_247: enabled, stay_247_voice_channel: enabled ? voiceChannelId : null,
       stay_247_text_channel: enabled ? textChannelId : null, auto_disconnect: !enabled,
       updated_at: new Date().toISOString(),
-    }, { id: guildId })
+    }, { guild_id: guildId })
   }
   async getValid247Guilds() {
     const { data } = await this.sb.bot().from('guilds').select('*').eq('stay_247', true).not('stay_247_voice_channel', 'is', null)
     return (data ?? []).filter(g => g.stay_247_voice_channel?.length > 0)
   }
   async setAutoDisconnect(guildId, enabled) {
-    await this.update('guilds', { auto_disconnect: enabled, updated_at: new Date().toISOString() }, { id: guildId })
+    await this.update('guilds', { auto_disconnect: enabled, updated_at: new Date().toISOString() }, { guild_id: guildId })
   }
 }

@@ -77,7 +77,7 @@ class SupportCommand extends Command {
                         new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small)
                 );
 
-                const content = `**Need help with AeroX?**\n\n` +
+                const content = `**Need help with Soraku?**\n\n` +
                         `**${emoji.get('check')} Get Support For:**\n` +
                         `├─ Music playback issues\n` +
                         `├─ Command usage and setup\n` +
