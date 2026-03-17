@@ -243,7 +243,7 @@ async function initialize247Mode(client) {
           } catch (error) {
             logger.error(
               "247Mode",
-              `Failed to connect guild ${guildData.id}:`,
+              `Failed to connect guild ${guildData.guild_id}:`,
               error,
             );
             resolve();
@@ -261,13 +261,13 @@ async function initialize247Mode(client) {
 
 async function connect247Guild(client, guildData) {
   try {
-    const guild = client.guilds.cache.get(guildData.id);
+    const guild = client.guilds.cache.get(guildData.guild_id);
     if (!guild) {
       logger.warn(
         "247Mode",
-        `Guild ${guildData.id} not found, removing from 24/7 list`,
+        `Guild ${guildData.guild_id} not found, removing from 24/7 list`,
       );
-      await db.guild.set247Mode(guildData.id, false);
+      await db.guild.set247Mode(guildData.guild_id, false);
       return;
     }
 
@@ -347,7 +347,7 @@ async function connect247Guild(client, guildData) {
   } catch (error) {
     logger.error(
       "247Mode",
-      `Error connecting 24/7 for guild ${guildData.id}:`,
+      `Error connecting 24/7 for guild ${guildData.guild_id}:`,
       error,
     );
   }
@@ -361,7 +361,7 @@ async function check247Connections(client) {
       try {
         await checkSingle247Connection(client, guildData);
       } catch (error) {
-        logger.error("247Mode", `Error checking guild ${guildData.id}:`, error);
+        logger.error("247Mode", `Error checking guild ${guildData.guild_id}:`, error);
       }
     }
   } catch (error) {
@@ -370,13 +370,13 @@ async function check247Connections(client) {
 }
 
 async function checkSingle247Connection(client, guildData) {
-  const guild = client.guilds.cache.get(guildData.id);
+  const guild = client.guilds.cache.get(guildData.guild_id);
   if (!guild) {
     logger.warn(
       "247Mode",
-      `Guild ${guildData.id} not found, disabling 24/7 mode`,
+      `Guild ${guildData.guild_id} not found, disabling 24/7 mode`,
     );
-    await db.guild.set247Mode(guildData.id, false);
+    await db.guild.set247Mode(guildData.guild_id, false);
     return;
   }
 
