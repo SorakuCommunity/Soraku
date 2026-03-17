@@ -19,6 +19,7 @@ const EventSchema = z.object({
   ispublished:      z.boolean().default(false),
   tags:             z.array(z.string()).default([]),
   registrationurl:  z.string().url().optional().or(z.literal('')).transform(v => v || undefined),
+  gametype:         z.enum(['ml','valorant','freefire','pubg','chess','other']).optional(),
 })
 
 /** Kirim Discord embed ke webhook */

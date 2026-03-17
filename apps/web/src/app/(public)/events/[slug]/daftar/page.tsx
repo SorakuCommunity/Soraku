@@ -27,6 +27,7 @@ interface EventInfo {
   coverurl:        string | null;
   startdate:       string;
   registrationurl: string | null;
+  gametype:        string | null;
 }
 
 const ROLES_ML = ["Goldlaner", "Jungler", "Midlaner", "Roamer", "EXP Laner", "Hyper"] as const;
@@ -193,8 +194,18 @@ export default function EventRegisterPage() {
     fetch(`/api/events/${slug}`)
       .then(r => r.json())
       .then(d => {
-        if (d.data) setEvent(d.data);
-        else router.push("/events");
+        if (!d.data) { router.push("/events"); return; }
+        const ev = d.data;
+        // Halaman ini khusus ML — kalau bukan ML dan ada external link, redirect
+        if (ev.gametype !== 'ml' && ev.registrationurl) {
+          window.location.href = ev.registrationurl;
+          return;
+        }
+        if (ev.gametype !== 'ml' && !ev.registrationurl) {
+          router.push(`/events/${slug}`);
+          return;
+        }
+        setEvent(ev);
       })
       .catch(() => router.push("/events"))
       .finally(() => setLoading(false));

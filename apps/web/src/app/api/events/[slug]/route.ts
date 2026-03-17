@@ -13,7 +13,7 @@ export async function GET(
     const { slug } = await params
     const { data, error } = await adminDb()
       .from('events')
-      .select('id,slug,title,coverurl,startdate,enddate,ispublished,registrationurl')
+      .select('id,slug,title,coverurl,startdate,enddate,ispublished,registrationurl,gametype')
       .eq('slug', slug)
       .eq('ispublished', true)
       .maybeSingle()

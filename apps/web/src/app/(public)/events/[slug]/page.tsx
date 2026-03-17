@@ -26,7 +26,7 @@ export default async function EventDetailPage({ params }: Props) {
 
   const { data: event } = await (await db())
     .from("events")
-    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags,ispublished,registrationurl")
+    .select("id,slug,title,description,coverurl,startdate,enddate,location,isonline,tags,ispublished,registrationurl,gametype")
     .eq("slug", slug)
     .eq("ispublished", true)
     .single();
@@ -114,21 +114,25 @@ export default async function EventDetailPage({ params }: Props) {
           </div>
           <div className="px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
-              Siapkan tim terbaikmu dan daftarkan sekarang. Slot terbatas!
+              {(event as any).gametype === 'ml'
+              ? 'Siapkan 5 pemain terbaikmu dan daftarkan tim sekarang. Slot terbatas!'
+              : 'Daftarkan diri dan dapatkan info lengkap di Discord Soraku.'}
             </p>
             <div className="flex items-center gap-3 flex-shrink-0">
               {(event as any).registrationurl ? (
+                /* Link eksternal — untuk semua gametype */
                 <a href={(event as any).registrationurl} target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-black text-white hover:bg-primary/90 hover:-translate-y-0.5 transition-all shadow-lg shadow-primary/20">
                   <Swords className="h-4 w-4" /> Daftar Sekarang
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
-              ) : (
+              ) : (event as any).gametype === 'ml' ? (
+                /* Form ML bawaan — hanya untuk gametype ml */
                 <Link href={`/events/${event.slug}/daftar`}
                   className="flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-black text-white hover:bg-primary/90 hover:-translate-y-0.5 transition-all shadow-lg shadow-primary/20">
-                  <Swords className="h-4 w-4" /> Daftar Sekarang
+                  <Swords className="h-4 w-4" /> Daftar Tim ML
                 </Link>
-              )}
+              ) : null}
               <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-4 py-2.5 text-sm font-semibold text-indigo-400 hover:bg-indigo-500/20 transition-colors">
                 Discord <ExternalLink className="h-3.5 w-3.5" />
