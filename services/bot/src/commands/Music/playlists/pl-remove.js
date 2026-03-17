@@ -57,7 +57,7 @@ class RemoveTrackCommand extends Command {
 	}
 
 	async _handleRemove(user, context, query, positionsStr) {
-		const playlist = this._findPlaylist(user.id, query);
+		const playlist = await this._findPlaylist(user.id, query);
 		if (!playlist)
 			return this._reply(
 				context,
@@ -152,7 +152,7 @@ class RemoveTrackCommand extends Command {
 		return Array.from(indices);
 	}
 
-	_findPlaylist(userId, query) {
+	async _findPlaylist(userId, query) {
 		const userPlaylists = await db.playlists.getUserPlaylists(userId);
 		const trimmedQuery = query.trim();
 		if (trimmedQuery.startsWith("pl_"))

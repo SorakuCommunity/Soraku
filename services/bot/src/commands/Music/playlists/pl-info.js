@@ -61,7 +61,7 @@ class PlaylistInfoCommand extends Command {
 		const userId = user.id;
 
 		if (query) {
-			const playlist = this._findPlaylist(userId, query);
+			const playlist = await this._findPlaylist(userId, query);
 			if (!playlist) {
 				return this._reply(
 					context,
@@ -72,7 +72,7 @@ class PlaylistInfoCommand extends Command {
 				context,
 				this._createMainInfoContainer(playlist),
 			);
-			if (message) this._setupCollector(message, userId, playlist);
+			if (message) await this._setupCollector(message, userId, playlist);
 		} else {
 			const playlists = await db.playlists.getUserPlaylists(userId);
 			if (playlists.length === 0) {
@@ -82,11 +82,11 @@ class PlaylistInfoCommand extends Command {
 				context,
 				this._createSelectionContainer(playlists),
 			);
-			if (message) this._setupCollector(message, userId, null, playlists);
+			if (message) await this._setupCollector(message, userId, null, playlists);
 		}
 	}
 
-	_findPlaylist(userId, query) {
+	async _findPlaylist(userId, query) {
 		const userPlaylists = await db.playlists.getUserPlaylists(userId);
 		const trimmedQuery = query.trim();
 
@@ -256,7 +256,7 @@ class PlaylistInfoCommand extends Command {
 		return container;
 	}
 
-	_setupCollector(message, userId, initialPlaylist, allPlaylists = null) {
+	async _setupCollector(message, userId, initialPlaylist, allPlaylists = null) {
 		const filter = (i) => i.user.id === userId;
 		const collector = message.createMessageComponentCollector({
 			filter,

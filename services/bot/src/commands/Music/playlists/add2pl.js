@@ -76,7 +76,7 @@ class Add2PlaylistCommand extends Command {
 	}
 
 	async _handleDirectAdd(context, userId, player, playlistIdentifier) {
-		const playlist = this._findPlaylist(userId, playlistIdentifier);
+		const playlist = await this._findPlaylist(userId, playlistIdentifier);
 		if (!playlist) {
 			return this._reply(
 				context,
@@ -92,7 +92,7 @@ class Add2PlaylistCommand extends Command {
 		);
 
 		if (message) {
-			this._setupDirectCollector(message, context, userId, player, playlist);
+			await this._setupDirectCollector(message, context, userId, player, playlist);
 		}
 	}
 
@@ -108,7 +108,7 @@ class Add2PlaylistCommand extends Command {
 		);
 
 		if (message) {
-			this._setupSelectionCollector(
+			await this._setupSelectionCollector(
 				message,
 				context,
 				userId,
@@ -118,7 +118,7 @@ class Add2PlaylistCommand extends Command {
 		}
 	}
 
-	_findPlaylist(userId, identifier) {
+	async _findPlaylist(userId, identifier) {
 		const playlists = await db.playlists.getUserPlaylists(userId);
 
 		return playlists.find(
@@ -444,7 +444,7 @@ class Add2PlaylistCommand extends Command {
 		return container;
 	}
 
-	_setupSelectionCollector(message, context, userId, player, playlists) {
+	async _setupSelectionCollector(message, context, userId, player, playlists) {
 		const filter = (i) => i.user.id === userId;
 		const collector = message.createMessageComponentCollector({
 			filter,
@@ -502,7 +502,7 @@ class Add2PlaylistCommand extends Command {
 		});
 	}
 
-	_setupDirectCollector(message, context, userId, player, playlist) {
+	async _setupDirectCollector(message, context, userId, player, playlist) {
 		const filter = (i) => i.user.id === userId;
 		const collector = message.createMessageComponentCollector({
 			filter,

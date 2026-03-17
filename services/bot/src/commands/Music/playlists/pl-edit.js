@@ -54,7 +54,7 @@ class EditPlaylistCommand extends Command {
 	}
 
 	async _handleEdit(user, context, query) {
-		let playlist = this._findPlaylist(user.id, query);
+		let playlist = await this._findPlaylist(user.id, query);
 		if (!playlist) {
 			return this._reply(context, this._createNotFoundContainer(query));
 		}
@@ -64,7 +64,7 @@ class EditPlaylistCommand extends Command {
 			this._buildEditorContainer(playlist),
 		);
 		if (message) {
-			this._setupCollector(message, user.id, playlist.id);
+			await this._setupCollector(message, user.id, playlist.id);
 		}
 	}
 
@@ -106,7 +106,7 @@ class EditPlaylistCommand extends Command {
 		return container;
 	}
 
-	_setupCollector(message, userId, playlistId) {
+	async _setupCollector(message, userId, playlistId) {
 		const filter = (i) =>
 			i.user.id === userId && i.customId.startsWith("editpl_");
 		const collector = message.createMessageComponentCollector({
@@ -195,7 +195,7 @@ class EditPlaylistCommand extends Command {
 		);
 	}
 
-	_findPlaylist(userId, query) {
+	async _findPlaylist(userId, query) {
 		const userPlaylists = await db.playlists.getUserPlaylists(userId);
 		const trimmedQuery = query.trim();
 		if (trimmedQuery.startsWith("pl_"))
