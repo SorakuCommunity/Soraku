@@ -97,7 +97,7 @@ class Add2PlaylistCommand extends Command {
 	}
 
 	async _showPlaylistSelection(context, userId, player) {
-		const playlists = db.playlists.getUserPlaylists(userId);
+		const playlists = await db.playlists.getUserPlaylists(userId);
 		if (playlists.length === 0) {
 			return this._reply(context, this._createNoPlaylistsContainer());
 		}
@@ -119,7 +119,7 @@ class Add2PlaylistCommand extends Command {
 	}
 
 	_findPlaylist(userId, identifier) {
-		const playlists = db.playlists.getUserPlaylists(userId);
+		const playlists = await db.playlists.getUserPlaylists(userId);
 
 		return playlists.find(
 			(pl) =>
@@ -567,7 +567,7 @@ class Add2PlaylistCommand extends Command {
 				};
 
 				try {
-					playlist = db.playlists.addTrackToPlaylist(
+					playlist = await db.playlists.addTrackToPlaylist(
 						playlist.id,
 						userId,
 						trackInfo,

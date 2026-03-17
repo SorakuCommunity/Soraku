@@ -107,9 +107,9 @@ class PremiumCommand extends Command {
     try {
       let result;
       if (type === "user") {
-        result = db.premium.grantUserPremium(id, message.author.id, expiresAt, reason);
+        result = await db.premium.grantUserPremium(id, message.author.id, expiresAt, reason);
       } else {
-        result = db.premium.grantGuildPremium(id, message.author.id, expiresAt, reason);
+        result = await db.premium.grantGuildPremium(id, message.author.id, expiresAt, reason);
       }
 
       if (result && result.changes > 0) {
@@ -151,9 +151,9 @@ class PremiumCommand extends Command {
     try {
       let result;
       if (type === "user") {
-        result = db.premium.revokeUserPremium(id);
+        result = await db.premium.revokeUserPremium(id);
       } else {
-        result = db.premium.revokeGuildPremium(id);
+        result = await db.premium.revokeGuildPremium(id);
       }
 
       if (result && result.changes > 0) {
@@ -177,9 +177,9 @@ class PremiumCommand extends Command {
 
   async _handleStats(client, message) {
     try {
-      const stats = db.premium.getStats();
-      const userPremiums = db.premium.getAllUserPremiums();
-      const guildPremiums = db.premium.getAllGuildPremiums();
+      const stats = await db.premium.getStats();
+      const userPremiums = await db.premium.getAllUserPremiums();
+      const guildPremiums = await db.premium.getAllGuildPremiums();
 
       const sent = await message.reply({
         components: [this._createStatsContainer(stats, userPremiums, guildPremiums, 0, 0)],
@@ -196,7 +196,7 @@ class PremiumCommand extends Command {
 
   async _handleCleanup(client, message) {
     try {
-      const result = db.premium.cleanupExpired();
+      const result = await db.premium.cleanupExpired();
 
       return this._sendSuccess(
         message,
@@ -374,9 +374,9 @@ class PremiumCommand extends Command {
       try {
         if (interaction.customId === "prem_stats") {
           await interaction.deferUpdate();
-          const stats = db.premium.getStats();
-          const userPremiums = db.premium.getAllUserPremiums();
-          const guildPremiums = db.premium.getAllGuildPremiums();
+          const stats = await db.premium.getStats();
+          const userPremiums = await db.premium.getAllUserPremiums();
+          const guildPremiums = await db.premium.getAllGuildPremiums();
           
           await interaction.editReply({
             components: [this._createStatsContainer(stats, userPremiums, guildPremiums, 0, 0)]

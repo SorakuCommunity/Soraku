@@ -64,7 +64,7 @@ export default {
       let is247Mode = false;
       
       try {
-        const guild247Settings = db.guild.get247Settings(player.guildId);
+        const guild247Settings = await db.guild.get247Settings(player.guildId);
         is247Mode = guild247Settings.enabled;
         shouldDisconnect = !is247Mode && guild247Settings.autoDisconnect;
         
@@ -91,7 +91,7 @@ export default {
         const disconnectTimeoutId = setTimeout(async () => {
           try {
             if (player && player.queue.tracks.length === 0 && !player.queue.current) {
-              const current247Settings = db.guild.get247Settings(player.guildId);
+              const current247Settings = await db.guild.get247Settings(player.guildId);
               if (!current247Settings.enabled) {
                 logger.info('QueueEnd', `Auto-disconnecting from guild ${player.guildId} after queue completion`);
 

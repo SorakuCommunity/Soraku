@@ -9,7 +9,7 @@ export default {
     const guildId = member.guild.id;
 
     try {
-      const memberData = db.invites.getMemberInvites(guildId, member.id);
+      const memberData = await db.invites.getMemberInvites(guildId, member.id);
 
       if (memberData && memberData.inviter_id) {
         db.invites.incrementLeft(guildId, memberData.inviter_id, 1);

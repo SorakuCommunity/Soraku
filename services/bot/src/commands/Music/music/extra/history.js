@@ -65,26 +65,14 @@ class HistoryCommand extends Command {
     logger.debug('HistoryCommand', `User ID type: ${typeof userId}`);
     logger.debug('HistoryCommand', `Context user: ${context.user?.id || context.author?.id}`);
 
-    const userExists   =db.user.getUser(userId);
+    const userExists   = await db.user.getUser(userId);
     logger.debug('HistoryCommand', `User exists in DB: ${!!userExists}`);
     logger.debug('HistoryCommand', `User data: ${JSON.stringify(userExists)}`);
 
-    let history   =db.user.getHistory(userId);
+    let history   = await db.user.getHistory(userId);
     logger.debug('HistoryCommand', `Raw history result: ${JSON.stringify(history)}`);
     logger.debug('HistoryCommand', `History length: ${history?.length || 0}`);
     logger.debug('HistoryCommand', `History type: ${typeof history}`);
-
-    try {
-      const directQuery   =db.user.get('SELECT history FROM users WHERE id   =?', [userId]);
-      logger.debug('HistoryCommand', `Direct DB query result: ${JSON.stringify(directQuery)}`);
-      if (directQuery?.history) {
-        const parsedDirect   =JSON.parse(directQuery.history);
-        logger.debug('HistoryCommand', `Direct parsed history: ${JSON.stringify(parsedDirect)}`);
-        logger.debug('HistoryCommand', `Direct history length: ${parsedDirect.length}`);
-      }
-    } catch (e) {
-      logger.debug('HistoryCommand', `Direct query error: ${e.message}`);
-    }
 
     logger.debug('HistoryCommand', '  ===END DEBUG   ===');
 
@@ -241,7 +229,7 @@ class HistoryCommand extends Command {
 
       if (action   ==='page') {
         currentPage   =parseInt(parts[2], 10);
-        let history   =db.user.getHistory(userId);
+        let history   = await db.user.getHistory(userId);
 
         const validHistory   =history.filter(track   => track && track.title && track.identifier);
         if (validHistory.length   !==history.length) {

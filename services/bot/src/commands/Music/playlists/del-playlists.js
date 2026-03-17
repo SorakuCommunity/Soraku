@@ -67,7 +67,7 @@ class DeletePlaylistCommand extends Command {
 		);
 
 		try {
-			const userPlaylists = db.playlists.getUserPlaylists(user.id);
+			const userPlaylists = await db.playlists.getUserPlaylists(user.id);
 
 			if (userPlaylists.length === 0) {
 				return this._editReply(
@@ -93,7 +93,7 @@ class DeletePlaylistCommand extends Command {
 				);
 			}
 
-			const success = db.playlists.deletePlaylist(targetPlaylist.id, user.id);
+			const success = await db.playlists.deletePlaylist(targetPlaylist.id, user.id);
 
 			if (success) {
 				return this._editReply(

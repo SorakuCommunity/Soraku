@@ -108,6 +108,12 @@ export class CommandHandler {
 					command.slashData.name.toString(),
 					command,
 				);
+				// Register slash aliases (e.g. /about → botinfo)
+				if (command.slashAliases?.length > 0) {
+					command.slashAliases.forEach(alias =>
+						this.slashCommandFiles.set(alias.toString(), command)
+					);
+				}
 			}
 
 			this.categories.get(category)?.push(command);
@@ -154,6 +160,16 @@ export class CommandHandler {
 					name,
 					...restOfSlashData,
 				});
+				// Register slashAliases ke Discord sebagai command terpisah
+				if (command.slashAliases?.length > 0) {
+					command.slashAliases.forEach(alias => {
+						this.slashCommands.set(alias, {
+							name: alias,
+							description: restOfSlashData.description,
+							...(restOfSlashData.options ? { options: restOfSlashData.options } : {}),
+						});
+					});
+				}
 			}
 		}
 	}

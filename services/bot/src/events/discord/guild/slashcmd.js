@@ -231,7 +231,7 @@ async function handleChatInputCommand(interaction, client) {
   }
 
   try {
-    const cooldownTime = antiAbuse.checkCooldown(
+    const cooldownTime = await antiAbuse.checkCooldown(
       interaction.user.id,
       commandToExecute,
     );

@@ -74,7 +74,7 @@ class PlaylistInfoCommand extends Command {
 			);
 			if (message) this._setupCollector(message, userId, playlist);
 		} else {
-			const playlists = db.playlists.getUserPlaylists(userId);
+			const playlists = await db.playlists.getUserPlaylists(userId);
 			if (playlists.length === 0) {
 				return this._reply(context, this._createNoPlaylistsContainer());
 			}
@@ -87,7 +87,7 @@ class PlaylistInfoCommand extends Command {
 	}
 
 	_findPlaylist(userId, query) {
-		const userPlaylists = db.playlists.getUserPlaylists(userId);
+		const userPlaylists = await db.playlists.getUserPlaylists(userId);
 		const trimmedQuery = query.trim();
 
 		if (trimmedQuery.startsWith("pl_")) {
@@ -331,7 +331,7 @@ class PlaylistInfoCommand extends Command {
 						}
 					}
 
-					currentPlaylist = db.playlists.getPlaylist(currentPlaylist.id);
+					currentPlaylist = await db.playlists.getPlaylist(currentPlaylist.id);
 
 					const totalPages =
 						Math.ceil(currentPlaylist.tracks.length / TRACKS_PER_PAGE) || 1;

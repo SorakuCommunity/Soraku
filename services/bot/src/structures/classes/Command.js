@@ -26,6 +26,7 @@ export class Command {
 
 		this.enabledSlash = options.enabledSlash || false;
 		this.slashData = options.slashData || null;
+		this.slashAliases = options.slashAliases || [];
 	}
 
 	async execute(context) {

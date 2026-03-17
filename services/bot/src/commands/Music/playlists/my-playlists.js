@@ -53,7 +53,7 @@ class MyPlaylistsCommand extends Command {
 	}
 
 	async _handleList(user, context, page) {
-		const playlists = db.playlists.getUserPlaylists(user.id);
+		const playlists = await db.playlists.getUserPlaylists(user.id);
 
 		if (playlists.length === 0) {
 			return this._reply(context, this._createNoPlaylistsContainer());

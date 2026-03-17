@@ -62,10 +62,10 @@ export default {
 
         logger.debug("InviteTracker", `${member.user.tag} was invited by ${inviter.tag} using code ${usedInvite.code}`);
 
-        const inviterData = db.invites.getMemberInvites(guildId, inviter.id);
+        const inviterData = await db.invites.getMemberInvites(guildId, inviter.id);
         const effectiveInvites = db.invites.getEffectiveInvites(inviterData);
 
-        const eligibleRanks = db.invites.getEligibleRanks(guildId, effectiveInvites);
+        const eligibleRanks = await db.invites.getEligibleRanks(guildId, effectiveInvites);
         if (eligibleRanks.length > 0) {
           try {
             const inviterMember = await member.guild.members.fetch(inviter.id).catch(() => null);

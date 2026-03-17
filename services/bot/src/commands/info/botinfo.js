@@ -28,6 +28,7 @@ class BotInfoCommand extends Command {
                                 name: "botinfo",
                                 description: "Get detailed information about the bot.",
                         },
+                        slashAliases: ["about", "stats", "info"],
                 });
         }
 

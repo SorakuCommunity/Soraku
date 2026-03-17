@@ -46,20 +46,20 @@ export class Moderation extends Database {
 
   // ── Reminders ──────────────────────────────────────────────
   async addRemind(guildId, channelId, userId, message, remindAt) {
-    return this.sb.bot().from('reminds').insert({ guild_id: guildId, channel_id: channelId, user_id: userId, message, remind_at: new Date(remindAt).toISOString(), created_at: Date.now(), reminded: false })
+    return this.sb.bot().from('reminders').insert({ guild_id: guildId, channel_id: channelId, user_id: userId, message, remind_at: new Date(remindAt).toISOString(), done: false })
   }
   async getReminders(userId) {
-    const { data } = await this.sb.bot().from('reminds').select('*').eq('user_id', userId).eq('reminded', false)
+    const { data } = await this.sb.bot().from('reminders').select('*').eq('user_id', userId).eq('done', false)
     return data ?? []
   }
   async getPendingReminders() {
-    const { data } = await this.sb.bot().from('reminds').select('*').eq('reminded', false).lte('remind_at', new Date().toISOString())
+    const { data } = await this.sb.bot().from('reminders').select('*').eq('done', false).lte('remind_at', new Date().toISOString())
     return data ?? []
   }
   async markReminded(id) {
-    await this.sb.bot().from('reminds').update({ reminded: true }).eq('id', id)
+    await this.sb.bot().from('reminders').update({ done: true }).eq('id', id)
   }
   async resetReminds(userId) {
-    await this.sb.bot().from('reminds').delete().eq('user_id', userId)
+    await this.sb.bot().from('reminders').delete().eq('user_id', userId)
   }
 }

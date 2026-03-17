@@ -374,7 +374,7 @@ export default {
     if (!command) return;
 
     try {
-      const cooldownTime = antiAbuse.checkCooldown(message.author.id, command,message);
+      const cooldownTime = await antiAbuse.checkCooldown(message.author.id, command,message);
       if (cooldownTime) {
         return _sendCooldownError(message, cooldownTime, command);
       }

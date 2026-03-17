@@ -77,7 +77,7 @@ class CreatePlaylistCommand extends Command {
 		);
 
 		try {
-			const playlist = db.playlists.createPlaylist(user.id, name, description);
+			const playlist = await db.playlists.createPlaylist(user.id, name, description);
 
 			return this._editReply(
 				loadingMessage,

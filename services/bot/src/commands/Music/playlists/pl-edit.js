@@ -116,7 +116,7 @@ class EditPlaylistCommand extends Command {
 
 		collector.on("collect", async (interaction) => {
 			const [_, type] = interaction.customId.split("_");
-			let playlist = db.playlists.getPlaylist(playlistId);
+			let playlist = await db.playlists.getPlaylist(playlistId);
 			const modal = new ModalBuilder()
 				.setCustomId(`editmodal_${type}_${playlistId}`)
 				.setTitle(`Edit Playlist ${type === "name" ? "Name" : "Description"}`);
@@ -158,8 +158,8 @@ class EditPlaylistCommand extends Command {
 				if (type === "desc")
 					updates.description = submitted.fields.getTextInputValue("newDesc");
 
-				db.playlists.updatePlaylist(playlistId, userId, updates);
-				playlist = db.playlists.getPlaylist(playlistId);
+				await db.playlists.updatePlaylist(playlistId, userId, updates);
+				playlist = await db.playlists.getPlaylist(playlistId);
 				await interaction.editReply({
 					components: [
 						this._buildEditorContainer(
@@ -196,7 +196,7 @@ class EditPlaylistCommand extends Command {
 	}
 
 	_findPlaylist(userId, query) {
-		const userPlaylists = db.playlists.getUserPlaylists(userId);
+		const userPlaylists = await db.playlists.getUserPlaylists(userId);
 		const trimmedQuery = query.trim();
 		if (trimmedQuery.startsWith("pl_"))
 			return userPlaylists.find((p) => p.id === trimmedQuery);

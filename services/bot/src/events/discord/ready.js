@@ -92,8 +92,8 @@ async function initializeInviteCache(client) {
     
     for (const [guildId, guild] of client.guilds.cache) {
       try {
-        db.invites.ensureGuildSettings(guildId);
-        db.invites.setTrackingEnabled(guildId, true);
+        await db.invites.ensureGuildSettings(guildId);
+        await db.invites.setTrackingEnabled(guildId, true);
         
         const invites = await guild.invites.fetch({ cache: false }).catch(() => null);
         if (invites) {
@@ -223,7 +223,7 @@ async function initialize247Mode(client) {
       return;
     }
 
-    const guilds247 = db.guild.getValid247Guilds();
+    const guilds247 = await db.guild.getValid247Guilds();
     logger.info(
       "247Mode",
       `Found ${guilds247.length} guilds with valid 24/7 configuration`,
@@ -267,7 +267,7 @@ async function connect247Guild(client, guildData) {
         "247Mode",
         `Guild ${guildData.id} not found, removing from 24/7 list`,
       );
-      db.guild.set247Mode(guildData.id, false);
+      await db.guild.set247Mode(guildData.id, false);
       return;
     }
 
@@ -279,7 +279,7 @@ async function connect247Guild(client, guildData) {
         "247Mode",
         `Invalid voice channel for guild ${guild.name}, disabling 24/7 mode`,
       );
-      db.guild.set247Mode(guild.id, false);
+      await db.guild.set247Mode(guild.id, false);
       return;
     }
 
@@ -324,13 +324,14 @@ async function connect247Guild(client, guildData) {
       `Connecting to 24/7 channel ${voiceChannel.name} in guild ${guild.name}`,
     );
 
+    const defaultVolume = await db.guild.getDefaultVolume(guild.id);
     const rawPlayer = await client.music.createPlayer({
       guildId: guild.id,
       textChannelId: textChannel.id,
       voiceChannelId: voiceChannel.id,
       selfMute: false,
       selfDeaf: true,
-      volume: db.guild.getDefaultVolume(guild.id),
+      volume: defaultVolume,
     });
 
     const player = new PlayerManager(rawPlayer);
@@ -354,7 +355,7 @@ async function connect247Guild(client, guildData) {
 
 async function check247Connections(client) {
   try {
-    const guilds247 = db.guild.getValid247Guilds();
+    const guilds247 = await db.guild.getValid247Guilds();
 
     for (const guildData of guilds247) {
       try {
@@ -375,7 +376,7 @@ async function checkSingle247Connection(client, guildData) {
       "247Mode",
       `Guild ${guildData.id} not found, disabling 24/7 mode`,
     );
-    db.guild.set247Mode(guildData.id, false);
+    await db.guild.set247Mode(guildData.id, false);
     return;
   }
 
@@ -387,7 +388,7 @@ async function checkSingle247Connection(client, guildData) {
       "247Mode",
       `Voice channel ${guildData.stay_247_voice_channel} no longer exists in guild ${guild.name}`,
     );
-    db.guild.set247Mode(guild.id, false);
+    await db.guild.set247Mode(guild.id, false);
     return;
   }
 
@@ -419,13 +420,14 @@ async function checkSingle247Connection(client, guildData) {
         textChannel = voiceChannel;
       }
 
+      const defaultVolume = await db.guild.getDefaultVolume(guild.id);
       const rawNewPlayer = await client.music.createPlayer({
         guildId: guild.id,
         textChannelId: textChannel.id,
         voiceChannelId: voiceChannel.id,
         selfMute: false,
         selfDeaf: true,
-        volume: db.guild.getDefaultVolume(guild.id),
+        volume: defaultVolume,
       });
       if (!rawNewPlayer.connected) {
         await rawNewPlayer.connect();

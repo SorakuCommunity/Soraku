@@ -112,7 +112,7 @@ class RemoveTrackCommand extends Command {
 			}
 		}
 
-		const finalPlaylist = db.playlists.getPlaylist(playlist.id);
+		const finalPlaylist = await db.playlists.getPlaylist(playlist.id);
 		return this._reply(
 			context,
 			this._createSuccessContainer(
@@ -153,7 +153,7 @@ class RemoveTrackCommand extends Command {
 	}
 
 	_findPlaylist(userId, query) {
-		const userPlaylists = db.playlists.getUserPlaylists(userId);
+		const userPlaylists = await db.playlists.getUserPlaylists(userId);
 		const trimmedQuery = query.trim();
 		if (trimmedQuery.startsWith("pl_"))
 			return userPlaylists.find((p) => p.id === trimmedQuery);
