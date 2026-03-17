@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Save, Eye, Loader2, Plus, X, Wifi, MapPin,
-  Gamepad2, Swords, ChevronDown,
+  Gamepad2, Swords,
 } from "lucide-react";
+import { ImageUrlInput } from "@/components/ui/image-url-input";
 import { cn } from "@/lib/utils";
 
 // ─── Game Types ────────────────────────────────────────────────────────────
@@ -260,15 +261,15 @@ export default function AdminEventNewPage() {
         {/* Cover + Tags */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="glass-card p-5">
-            <label className="mb-1.5 block text-xs font-semibold text-muted-foreground uppercase tracking-wide">Cover URL</label>
-            <input value={coverurl} onChange={e => setCoverurl(e.target.value)}
-              placeholder="https://..." className={fieldCls} />
-            {coverurl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={coverurl} alt="preview"
-                className="mt-3 h-24 w-full rounded-xl object-cover"
-                onError={e => (e.currentTarget.style.display = "none")} />
-            )}
+            <ImageUrlInput
+              label="Cover / Banner"
+              value={coverurl}
+              onChange={setCoverurl}
+              placeholder="https://... atau paste gambar langsung"
+              hint="Rekomendasi: 1280×360px. Paste URL, drag & drop, atau Ctrl+V."
+              previewClass="h-28"
+              required={false}
+            />
           </div>
           <div className="glass-card p-5">
             <label className="mb-1.5 block text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tags</label>

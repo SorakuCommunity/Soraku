@@ -6,10 +6,11 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowLeft, Upload, Users, UserPlus, Shield,
+  ArrowLeft, Users, UserPlus, Shield,
   ChevronRight, Loader2, CheckCircle2, AlertCircle,
   Swords, X, Plus, Star, Trophy
 } from "lucide-react";
+import { ImageUrlInput } from "@/components/ui/image-url-input";
 import { cn } from "@/lib/utils";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -338,30 +339,16 @@ export default function EventRegisterPage() {
             />
 
             {/* Logo Tim */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-foreground/40">
-                Logo Tim <span className="text-foreground/20">(Opsional)</span>
-              </label>
-              <div className="flex gap-3">
-                {/* Preview */}
-                <div className="h-16 w-16 flex-shrink-0 rounded-xl border border-border/40 bg-black/30 overflow-hidden flex items-center justify-center">
-                  {teamlogourl ? (
-                    <Image src={teamlogourl} alt="logo" width={64} height={64} className="h-full w-full object-cover"
-                      onError={() => setTeamlogourl("")} />
-                  ) : (
-                    <Shield className="h-5 w-5 text-foreground/15" />
-                  )}
-                </div>
-                <div className="flex-1 space-y-1.5">
-                  <input
-                    type="url" value={teamlogourl} onChange={e => setTeamlogourl(e.target.value)}
-                    placeholder="https://cdn.example.com/logo.png"
-                    className="w-full rounded-xl border border-border/40 bg-black/30 px-4 py-2.5 text-sm outline-none placeholder:text-foreground/15 focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition-all"
-                  />
-                  <p className="text-[11px] text-foreground/25 pl-1">Paste URL gambar logo tim kamu (JPG, PNG, WebP)</p>
-                </div>
-              </div>
-            </div>
+            <ImageUrlInput
+              label="Logo Tim"
+              value={teamlogourl}
+              onChange={setTeamlogourl}
+              placeholder="https://cdn.example.com/logo.png"
+              hint="Paste URL, drag & drop, atau Ctrl+V gambar langsung"
+              compact
+              icon={<Shield className="h-3 w-3" />}
+              className="bg-black/30 border-border/40 focus:border-primary/40"
+            />
 
             <div className="grid gap-4 sm:grid-cols-2">
               <GamingInput
