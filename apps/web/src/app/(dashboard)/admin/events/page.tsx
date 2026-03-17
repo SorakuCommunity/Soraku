@@ -133,7 +133,15 @@ export default function AdminEventsPage() {
                   )}>
                     {ev.ispublished ? "● Publik" : "○ Draft"}
                   </span>
-                  <div className="flex items-center justify-end gap-1">
+                  <div className="flex items-center gap-1.5 justify-end flex-wrap">
+                    {/* Badge free/paid */}
+                    {ev.ispaid ? (
+                      <span className="rounded-full bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-400/80">💰 Bayar</span>
+                    ) : (
+                      <span className="rounded-full bg-green-500/10 border border-green-500/20 px-2 py-0.5 text-[10px] font-bold text-green-400/70">🎟️ Gratis</span>
+                    )}
+                    <div className="flex items-center gap-1">
+                    {/* Tombol pendaftar - tampil untuk ML event */}
                     {ev.gametype === "ml" && (
                       <Link href={`/admin/events/${ev.id}/registrations`}
                         className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground hover:text-primary transition-colors"
@@ -157,6 +165,7 @@ export default function AdminEventsPage() {
                       title="Hapus">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
+                    </div>
                   </div>
                 </div>
               );

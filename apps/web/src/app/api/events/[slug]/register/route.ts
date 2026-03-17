@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest } from 'next/server'
 import { adminDb } from '@/lib/supabase/admin'
 import { getSession, isStaff } from '@/lib/auth'
+// session opsional - tidak block daftar, tapi simpan userId kalau ada
 import { ok, err, FORBIDDEN, NOT_FOUND, SERVER_ERROR } from '@/lib/api'
 import { sendDiscordWebhook } from '@/lib/discord-webhook'
 import { z } from 'zod'
@@ -41,6 +42,9 @@ export async function POST(
 
     if (eventErr || !event) return NOT_FOUND()
 
+    // Ambil session opsional - tidak block kalau belum login (sudah diblok di frontend)
+    const session = await getSession()
+
     const body   = await req.json()
     const parsed = RegisterSchema.safeParse(body)
     if (!parsed.success) return err(parsed.error.issues[0]?.message ?? 'Data tidak valid')
@@ -57,6 +61,7 @@ export async function POST(
         contactdiscord: parsed.data.contactdiscord || null,
         notes:          parsed.data.notes          || null,
         paymentproof:   parsed.data.paymentproof   || null,
+        userid:         session?.id ?? null,
         status: 'pending',
       })
       .select('id, teamname, createdat')
