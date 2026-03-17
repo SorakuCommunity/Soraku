@@ -124,79 +124,72 @@ export const SunoIcon: React.FC<IconProps> = (props) => (
   </svg>
 );
 
-// ── Payment / Bank ─────────────────────────────────────────────────────────────
+// ── Payment / Bank — compact square icons ─────────────────────────────────────
 
 export const BCAIcon: React.FC<IconProps> = (props) => (
-  <svg viewBox="0 0 64 24" fill="none" aria-hidden="true" {...props}>
-    <rect width="64" height="24" rx="4" fill="#005BAB"/>
-    <text x="32" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#FFFFFF" letterSpacing="1">BCA</text>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="24" height="24" rx="6" fill="#005BAB"/>
+    <text x="12" y="16.5" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="900" fontSize="7.5" fill="#FFFFFF" letterSpacing="0.3">BCA</text>
   </svg>
 );
 
 export const BRIIcon: React.FC<IconProps> = (props) => (
-  <svg viewBox="0 0 64 24" fill="none" aria-hidden="true" {...props}>
-    <rect width="64" height="24" rx="4" fill="#003D7A"/>
-    <text x="32" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#F5A623" letterSpacing="1">BRI</text>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="24" height="24" rx="6" fill="#003D7A"/>
+    <text x="12" y="16.5" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="900" fontSize="7.5" fill="#F5A623" letterSpacing="0.3">BRI</text>
   </svg>
 );
 
 export const BTNIcon: React.FC<IconProps> = (props) => (
-  <svg viewBox="0 0 64 24" fill="none" aria-hidden="true" {...props}>
-    <rect width="64" height="24" rx="4" fill="#1B5E20"/>
-    <text x="32" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#FFFFFF" letterSpacing="1">BTN</text>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="24" height="24" rx="6" fill="#1B5E20"/>
+    <text x="12" y="16.5" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="900" fontSize="7.5" fill="#FFFFFF" letterSpacing="0.3">BTN</text>
   </svg>
 );
 
 export const SeabankIcon: React.FC<IconProps> = (props) => (
-  <svg viewBox="0 0 80 24" fill="none" aria-hidden="true" {...props}>
-    <rect width="80" height="24" rx="4" fill="#0B4EAB"/>
-    <text x="40" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="10" fill="#FFFFFF" letterSpacing="0.5">SEABANK</text>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="24" height="24" rx="6" fill="#0B4EAB"/>
+    {/* anchor icon */}
+    <circle cx="12" cy="9" r="2.2" stroke="white" strokeWidth="1.3" fill="none"/>
+    <line x1="12" y1="11.2" x2="12" y2="18" stroke="white" strokeWidth="1.3" strokeLinecap="round"/>
+    <path d="M8 14.5 Q10 18 12 18 Q14 18 16 14.5" stroke="white" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+    <line x1="9.5" y1="9" x2="14.5" y2="9" stroke="white" strokeWidth="1.3" strokeLinecap="round"/>
   </svg>
 );
 
 export const DanaIcon: React.FC<IconProps> = (props) => (
-  <svg viewBox="0 0 60 24" fill="none" aria-hidden="true" {...props}>
-    <rect width="60" height="24" rx="12" fill="#118EEA"/>
-    <text x="30" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#FFFFFF" letterSpacing="1">DANA</text>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="24" height="24" rx="12" fill="#118EEA"/>
+    <text x="12" y="16.5" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="900" fontSize="8" fill="#FFFFFF" letterSpacing="0.2">D</text>
   </svg>
 );
 
 export const QRISIcon: React.FC<IconProps> = (props) => (
-  <svg viewBox="0 0 120 40" fill="none" aria-hidden="true" {...props}>
-    {/* White background card */}
-    <rect width="120" height="40" rx="6" fill="white"/>
-    {/* Red QRIS stripe */}
-    <rect width="120" height="14" rx="0" fill="#E30613"/>
-    <rect width="120" height="14" y="0" rx="6" fill="#E30613"/>
-    <rect width="120" height="8" y="6" fill="#E30613"/>
-    <text x="60" y="11" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="900" fontSize="9" fill="white" letterSpacing="2">QRIS</text>
-    {/* Bottom section */}
-    <text x="60" y="31" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="700" fontSize="8" fill="#E30613" letterSpacing="0.5">QUICK RESPONSE</text>
-    {/* Small QR grid hint */}
-    <rect x="8" y="16" width="5" height="5" rx="0.5" fill="#333"/>
-    <rect x="9" y="17" width="3" height="3" rx="0" fill="white"/>
-    <rect x="9.5" y="17.5" width="2" height="2" rx="0" fill="#333"/>
-    <rect x="8" y="22" width="2" height="2" rx="0" fill="#333"/>
-    <rect x="11" y="22" width="2" height="2" rx="0" fill="#333"/>
-    <rect x="8" y="25" width="5" height="5" rx="0.5" fill="#333"/>
-    <rect x="9" y="26" width="3" height="3" rx="0" fill="white"/>
-    <rect x="9.5" y="26.5" width="2" height="2" rx="0" fill="#333"/>
-    <rect x="14" y="16" width="2" height="2" rx="0" fill="#333"/>
-    <rect x="17" y="16" width="2" height="2" rx="0" fill="#333"/>
-    <rect x="14" y="19" width="5" height="2" rx="0" fill="#333"/>
-    <rect x="14" y="22" width="2" height="2" rx="0" fill="#333"/>
-    <rect x="17" y="22" width="5" height="5" rx="0.5" fill="#333"/>
-    <rect x="18" y="23" width="3" height="3" rx="0" fill="white"/>
-    <rect x="18.5" y="23.5" width="2" height="2" rx="0" fill="#333"/>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="24" height="24" rx="6" fill="#E30613"/>
+    {/* top-left QR corner */}
+    <rect x="4" y="4" width="6" height="6" rx="1" fill="white"/>
+    <rect x="5.5" y="5.5" width="3" height="3" rx="0.5" fill="#E30613"/>
+    {/* top-right QR corner */}
+    <rect x="14" y="4" width="6" height="6" rx="1" fill="white"/>
+    <rect x="15.5" y="5.5" width="3" height="3" rx="0.5" fill="#E30613"/>
+    {/* bottom-left QR corner */}
+    <rect x="4" y="14" width="6" height="6" rx="1" fill="white"/>
+    <rect x="5.5" y="15.5" width="3" height="3" rx="0.5" fill="#E30613"/>
+    {/* data dots */}
+    <rect x="14" y="14" width="2" height="2" rx="0.3" fill="white"/>
+    <rect x="17" y="14" width="2" height="2" rx="0.3" fill="white"/>
+    <rect x="14" y="17" width="2" height="2" rx="0.3" fill="white"/>
+    <rect x="17" y="17" width="2" height="2" rx="0.3" fill="white"/>
   </svg>
 );
 
 export const GopayIcon: React.FC<IconProps> = (props) => (
-  <svg viewBox="0 0 80 24" fill="none" aria-hidden="true" {...props}>
-    <rect width="80" height="24" rx="12" fill="#00AED6"/>
-    <circle cx="12" cy="12" r="7" fill="white" opacity="0.2"/>
-    <circle cx="12" cy="12" r="4" fill="white"/>
-    <text x="46" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#FFFFFF" letterSpacing="0.5">GoPay</text>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="24" height="24" rx="12" fill="#00AED6"/>
+    {/* G letter */}
+    <path d="M8.5 12 C8.5 9.5 10.5 7.5 13 7.5 C14.4 7.5 15.6 8.1 16.4 9.1 L14.8 10.3 C14.3 9.7 13.7 9.3 13 9.3 C11.5 9.3 10.3 10.5 10.3 12 C10.3 13.5 11.5 14.7 13 14.7 C14 14.7 14.8 14.2 15.3 13.4 L13.2 13.4 L13.2 11.7 L17.2 11.7 L17.2 12.2 C17.2 14.8 15.3 16.5 13 16.5 C10.5 16.5 8.5 14.5 8.5 12 Z" fill="white"/>
   </svg>
 );
 

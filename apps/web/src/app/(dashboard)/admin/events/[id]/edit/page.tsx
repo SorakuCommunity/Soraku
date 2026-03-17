@@ -179,12 +179,14 @@ export default function AdminEventEditPage() {
     setUploading(true);
     try {
       const fd = new FormData();
-      fd.append("source", file);
-      const res  = await fetch("https://freeimage.host/api/1/upload?key=6d207e02198a847aa98d0a2a901485a2&action=upload&format=json", { method: "POST", body: fd });
+      fd.append("file", file);
+      fd.append("bucket", "events");
+      fd.append("folder", "qris");
+      const res  = await fetch("/api/upload/image", { method: "POST", body: fd });
       const data = await res.json();
-      const url  = data?.image?.url ?? null;
-      if (url) setPaymentMethods(prev => prev.map((m, i) => i === index && m.type === "qris" ? { ...m, qrisImageUrl: url } : m));
-      else setSaveError("Gagal upload QRIS image.");
+      if (!res.ok || !data?.data?.url) { setSaveError("Gagal upload QRIS image."); return; }
+      const url = data.data.url;
+      setPaymentMethods(prev => prev.map((m, i) => i === index && m.type === "qris" ? { ...m, qrisImageUrl: url } : m));
     } catch { setSaveError("Gagal upload QRIS."); }
     finally { setUploading(false); }
   };

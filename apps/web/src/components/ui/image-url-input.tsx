@@ -52,21 +52,21 @@ export function ImageUrlInput({
       if (!file) return;
 
       // Upload ke ImgBB atau fallback ke object URL sementara
-      // Kita pakai free image hosting via freeimage.host API
+      // Upload via Supabase Storage
       try {
         setStatus("loading");
         const fd = new FormData();
-        fd.append("source", file);
-        const res = await fetch("https://freeimage.host/api/1/upload?key=6d207e02198a847aa98d0a2a901485a2&action=upload&format=json", {
-          method: "POST", body: fd,
-        });
+        fd.append("file", file);
+        fd.append("bucket", "events");
+        fd.append("folder", "uploads");
+        const res  = await fetch("/api/upload/image", { method: "POST", body: fd });
         const data = await res.json();
-        if (data?.image?.url) {
-          onChange(data.image.url);
+        if (res.ok && data?.data?.url) {
+          onChange(data.data.url);
           setStatus("ok");
           return;
         }
-      } catch { /* fallback ke URL kosong */ }
+      } catch { /* fallback ke object URL */ }
 
       // Fallback: buat object URL lokal (temporary)
       const objectUrl = URL.createObjectURL(file);
