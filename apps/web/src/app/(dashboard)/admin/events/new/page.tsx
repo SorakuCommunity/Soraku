@@ -21,6 +21,7 @@ export default function AdminEventNewPage() {
   const [location,    setLocation]    = useState("");
   const [tagInput,    setTagInput]    = useState("");
   const [tags,        setTags]        = useState<string[]>([]);
+  const [regUrl,      setRegUrl]      = useState("");
 
   const handleTitle = (v: string) => {
     setTitle(v);
@@ -59,6 +60,7 @@ export default function AdminEventNewPage() {
         isonline,
         location:    !isonline ? location.trim() || undefined : undefined,
         tags,
+        registrationurl: regUrl.trim() || undefined,
         ispublished: publish,
       }),
     });
@@ -172,6 +174,23 @@ export default function AdminEventNewPage() {
               <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Nama lokasi / alamat..." className="w-full rounded-xl border border-border bg-background/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
             )}
           </div>
+        </div>
+
+        {/* Link Pendaftaran */}
+        <div className="glass-card p-5">
+          <label className="mb-1.5 block text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            Link Pendaftaran Eksternal <span className="font-normal normal-case text-muted-foreground/40">(opsional)</span>
+          </label>
+          <input
+            type="url"
+            value={regUrl}
+            onChange={e => setRegUrl(e.target.value)}
+            placeholder="https://forms.gle/... atau link pendaftaran lain"
+            className="w-full rounded-xl border border-border bg-background/50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <p className="mt-1.5 text-[11px] text-muted-foreground/40">
+            Kosongkan jika menggunakan form pendaftaran bawaan Soraku · <code className="text-primary/60">/events/[slug]/daftar</code>
+          </p>
         </div>
 
         {/* Cover + Tags */}

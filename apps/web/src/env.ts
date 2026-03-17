@@ -36,10 +36,11 @@ export const env = createEnv({
 
     // Bot + internal
     SORAKU_API_SECRET:   z.string().optional(),
-    BOT_WEBHOOK_URL:     z.string().optional(),
-    BOT_WEBHOOK_SECRET:  z.string().optional(),
-    OWNER_DISCORD_IDS:   z.string().optional(),
-    DISCORD_INVITE_CODE: z.string().optional(),
+    BOT_WEBHOOK_URL:          z.string().optional(),
+    BOT_WEBHOOK_SECRET:       z.string().optional(),
+    OWNER_DISCORD_IDS:        z.string().optional(),
+    DISCORD_INVITE_CODE:      z.string().optional(),
+    DISCORD_EVENT_WEBHOOK_URL: z.string().optional(), // Discord webhook untuk announce event
   },
 
   client: {
@@ -61,8 +62,9 @@ export const env = createEnv({
     SORAKU_API_SECRET:          process.env.SORAKU_API_SECRET,
     BOT_WEBHOOK_URL:            process.env.BOT_WEBHOOK_URL,
     BOT_WEBHOOK_SECRET:         process.env.BOT_WEBHOOK_SECRET,
-    OWNER_DISCORD_IDS:          process.env.OWNER_DISCORD_IDS,
-    DISCORD_INVITE_CODE:        process.env.DISCORD_INVITE_CODE,
+    OWNER_DISCORD_IDS:           process.env.OWNER_DISCORD_IDS,
+    DISCORD_INVITE_CODE:         process.env.DISCORD_INVITE_CODE,
+    DISCORD_EVENT_WEBHOOK_URL:   process.env.DISCORD_EVENT_WEBHOOK_URL,
 
     NEXT_PUBLIC_SUPABASE_URL:      process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
