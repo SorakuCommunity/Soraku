@@ -236,3 +236,38 @@ https://discord.com/oauth2/authorize?...&redirect_uri=https://jrgknsxqwuygcoocnn
 ```
 Ini seharusnya redirect ke Railway bot endpoint, BUKAN ke Supabase callback.
 Koordinasi dengan Kaizo untuk pisahkan URL bot invite dari URL login user.
+
+
+---
+
+## 📋 LAPORAN — 2026-03-17 #5 (Bubu — commit 8501288)
+
+### ✅ Fitur: Pendaftaran Event ML
+
+**DB (sudah applied):**
+- `soraku.events` → `registrationurl TEXT`, `discordchannelid TEXT`
+- Tabel baru `soraku.eventregistrations`: teamname, teamlogourl, activeplayers (jsonb), reserveplayers (jsonb), contactname, contactdiscord, status, notes
+
+**API:**
+- `GET/POST /api/events/[slug]` — public
+- `POST /api/events/[slug]/register` — daftar tim
+- `GET  /api/events/[slug]/register` — admin: list pendaftar
+
+**Pages:**
+- `/events/[slug]/daftar` — form 3 langkah (info tim → pemain → konfirmasi)
+- `/events/[slug]` — tombol "Daftar Sekarang" baru
+
+### ❌ SORA — Perlu Dikerjakan
+
+**1. ENV Vercel — wajib set:**
+```
+DISCORD_EVENT_WEBHOOK_URL = https://discord.com/api/webhooks/CHANNEL_ID/TOKEN
+```
+Buat webhook di: Server Discord `1116971049045729302` → channel yang diinginkan → Edit Channel → Integrations → Webhooks → New Webhook → Copy URL
+
+**2. Admin list pendaftaran** — belum ada UI untuk lihat daftar tim yang masuk.
+Bubu bisa bantu buat kalau ada waktu, atau Sora buat sendiri via:
+`GET /api/events/[slug]/register` (perlu session staff).
+
+**3. Approve/Reject pendaftaran** — `status` kolom sudah ada, API belum.
+Perlu `PATCH /api/events/[slug]/register/[id]` untuk update status.
