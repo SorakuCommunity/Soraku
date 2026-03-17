@@ -23,6 +23,7 @@ const PatchSchema = z.object({
   price:            z.number().int().min(0).optional(),
   priceinfo:        z.string().optional(),
   tags:             z.array(z.string()).optional(),
+  paymentmethods:   z.array(z.any()).optional(),
 })
 
 // GET /api/admin/events/[id] — prefill form edit

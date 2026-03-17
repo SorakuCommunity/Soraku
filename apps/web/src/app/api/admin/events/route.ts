@@ -24,6 +24,7 @@ const EventSchema = z.object({
   ispaid:           z.boolean().default(false),
   price:            z.number().int().min(0).default(0).optional(),
   priceinfo:        z.string().max(500).optional(),
+  paymentmethods:   z.array(z.any()).default([]).optional(),
 })
 
 /** Kirim Discord embed event baru */
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(Number(new URL(req.url).searchParams.get('limit') ?? '100'), 200)
     const { data, error } = await adminDb()
       .from('events')
-      .select('id,slug,title,startdate,enddate,isonline,ispublished,tags,registrationurl,gametype,ispaid,price,createdat')
+      .select('id,slug,title,startdate,enddate,isonline,ispublished,tags,registrationurl,gametype,ispaid,price,paymentmethods,registrationopen,createdat')
       .order('startdate', { ascending: false })
       .limit(limit)
     if (error) return SERVER_ERROR()

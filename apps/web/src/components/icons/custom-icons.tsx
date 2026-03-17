@@ -124,6 +124,82 @@ export const SunoIcon: React.FC<IconProps> = (props) => (
   </svg>
 );
 
+// ── Payment / Bank ─────────────────────────────────────────────────────────────
+
+export const BCAIcon: React.FC<IconProps> = (props) => (
+  <svg viewBox="0 0 64 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="64" height="24" rx="4" fill="#005BAB"/>
+    <text x="32" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#FFFFFF" letterSpacing="1">BCA</text>
+  </svg>
+);
+
+export const BRIIcon: React.FC<IconProps> = (props) => (
+  <svg viewBox="0 0 64 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="64" height="24" rx="4" fill="#003D7A"/>
+    <text x="32" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#F5A623" letterSpacing="1">BRI</text>
+  </svg>
+);
+
+export const BTNIcon: React.FC<IconProps> = (props) => (
+  <svg viewBox="0 0 64 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="64" height="24" rx="4" fill="#1B5E20"/>
+    <text x="32" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#FFFFFF" letterSpacing="1">BTN</text>
+  </svg>
+);
+
+export const SeabankIcon: React.FC<IconProps> = (props) => (
+  <svg viewBox="0 0 80 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="80" height="24" rx="4" fill="#0B4EAB"/>
+    <text x="40" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="10" fill="#FFFFFF" letterSpacing="0.5">SEABANK</text>
+  </svg>
+);
+
+export const DanaIcon: React.FC<IconProps> = (props) => (
+  <svg viewBox="0 0 60 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="60" height="24" rx="12" fill="#118EEA"/>
+    <text x="30" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#FFFFFF" letterSpacing="1">DANA</text>
+  </svg>
+);
+
+export const QRISIcon: React.FC<IconProps> = (props) => (
+  <svg viewBox="0 0 120 40" fill="none" aria-hidden="true" {...props}>
+    {/* White background card */}
+    <rect width="120" height="40" rx="6" fill="white"/>
+    {/* Red QRIS stripe */}
+    <rect width="120" height="14" rx="0" fill="#E30613"/>
+    <rect width="120" height="14" y="0" rx="6" fill="#E30613"/>
+    <rect width="120" height="8" y="6" fill="#E30613"/>
+    <text x="60" y="11" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="900" fontSize="9" fill="white" letterSpacing="2">QRIS</text>
+    {/* Bottom section */}
+    <text x="60" y="31" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="700" fontSize="8" fill="#E30613" letterSpacing="0.5">QUICK RESPONSE</text>
+    {/* Small QR grid hint */}
+    <rect x="8" y="16" width="5" height="5" rx="0.5" fill="#333"/>
+    <rect x="9" y="17" width="3" height="3" rx="0" fill="white"/>
+    <rect x="9.5" y="17.5" width="2" height="2" rx="0" fill="#333"/>
+    <rect x="8" y="22" width="2" height="2" rx="0" fill="#333"/>
+    <rect x="11" y="22" width="2" height="2" rx="0" fill="#333"/>
+    <rect x="8" y="25" width="5" height="5" rx="0.5" fill="#333"/>
+    <rect x="9" y="26" width="3" height="3" rx="0" fill="white"/>
+    <rect x="9.5" y="26.5" width="2" height="2" rx="0" fill="#333"/>
+    <rect x="14" y="16" width="2" height="2" rx="0" fill="#333"/>
+    <rect x="17" y="16" width="2" height="2" rx="0" fill="#333"/>
+    <rect x="14" y="19" width="5" height="2" rx="0" fill="#333"/>
+    <rect x="14" y="22" width="2" height="2" rx="0" fill="#333"/>
+    <rect x="17" y="22" width="5" height="5" rx="0.5" fill="#333"/>
+    <rect x="18" y="23" width="3" height="3" rx="0" fill="white"/>
+    <rect x="18.5" y="23.5" width="2" height="2" rx="0" fill="#333"/>
+  </svg>
+);
+
+export const GopayIcon: React.FC<IconProps> = (props) => (
+  <svg viewBox="0 0 80 24" fill="none" aria-hidden="true" {...props}>
+    <rect width="80" height="24" rx="12" fill="#00AED6"/>
+    <circle cx="12" cy="12" r="7" fill="white" opacity="0.2"/>
+    <circle cx="12" cy="12" r="4" fill="white"/>
+    <text x="46" y="17" textAnchor="middle" fontFamily="Arial,sans-serif" fontWeight="800" fontSize="11" fill="#FFFFFF" letterSpacing="0.5">GoPay</text>
+  </svg>
+);
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // REGISTRY
 // Semua sosial media & link resmi Soraku
@@ -187,6 +263,13 @@ export const CUSTOM_ICONS: CustomIconEntry[] = [
   { name: "Google",   slug: "google",   category: "platform", icon: GoogleIcon   },
   { name: "Trakteer", slug: "trakteer", category: "platform", icon: TrakteerIcon },
   { name: "Suno",     slug: "suno",     category: "platform", icon: SunoIcon     },
+  { name: "BCA",      slug: "bca",      category: "brand",    icon: BCAIcon      },
+  { name: "BRI",      slug: "bri",      category: "brand",    icon: BRIIcon      },
+  { name: "BTN",      slug: "btn",      category: "brand",    icon: BTNIcon      },
+  { name: "Seabank",  slug: "seabank",  category: "brand",    icon: SeabankIcon  },
+  { name: "Dana",     slug: "dana",     category: "brand",    icon: DanaIcon     },
+  { name: "QRIS",     slug: "qris",     category: "brand",    icon: QRISIcon     },
+  { name: "GoPay",    slug: "gopay",    category: "brand",    icon: GopayIcon    },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
