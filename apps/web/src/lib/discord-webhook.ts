@@ -28,9 +28,18 @@ export async function getWebhookUrl(
       .maybeSingle()
 
     if (data?.value) {
-      const url = typeof data.value === 'string' ? data.value : String(data.value)
-      // Skip placeholder
-      if (url && !url.includes('PASTE_DISCORD') && url.startsWith('https://discord')) {
+      // value bisa berupa string langsung atau JSONB — handle keduanya
+      let url: string
+      if (typeof data.value === 'string') {
+        url = data.value
+      } else if (typeof data.value === 'object' && data.value !== null) {
+        // Jika JSONB object dengan field url/value, atau string tersimpan sebagai JSON
+        url = (data.value as any).url ?? (data.value as any).value ?? String(data.value)
+      } else {
+        url = String(data.value)
+      }
+      // Skip placeholder atau nilai tidak valid
+      if (url && !url.includes('PASTE_DISCORD') && (url.includes('discord.com/api/webhooks') || url.includes('discordapp.com/api/webhooks'))) {
         _cache[key] = { url, ts: now }
         return url
       }

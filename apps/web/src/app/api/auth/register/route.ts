@@ -4,6 +4,7 @@ import { ok, err, SERVER_ERROR } from '@/lib/api'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { env } from '@/env'
+import { sendDiscordWebhook } from '@/lib/discord-webhook'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,29 +57,21 @@ export async function POST(req: NextRequest) {
     if (dbErr) return err(dbErr.message)
 
 
-    // Kirim notif pendaftaran ke Discord webhook channel
-    const regWebhookUrl = env.DISCORD_REGISTRATION_WEBHOOK_URL
-    if (regWebhookUrl) {
-      fetch(regWebhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: 'Soraku Community',
-          avatar_url: 'https://soraku.vercel.app/favicon.ico',
-          embeds: [{
-            title: '🌸 Anggota Baru Mendaftar!',
-            color: 8142077,
-            fields: [
-              { name: '👤 Username', value: `\`@${username}\``, inline: true },
-              { name: '📧 Email', value: authData.user.email?.replace(/(?<=.{2}).(?=.*@)/g, '*') ?? '-', inline: true },
-              { name: '📅 Waktu', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: false },
-            ],
-            footer: { text: 'Soraku Community • Sistem Pendaftaran' },
-            timestamp: new Date().toISOString(),
-          }],
-        }),
-      }).catch((e) => console.error('[register webhook]', e))
-    }
+    // Kirim notif pendaftaran ke Discord channel
+    await sendDiscordWebhook('discord_registration_webhook_url', {
+      username: 'Soraku Community',
+      embeds: [{
+        title: '🌸 Anggota Baru Mendaftar!',
+        color: 8142077,
+        fields: [
+          { name: '👤 Username', value: `@${username}`, inline: true },
+          { name: '📧 Email',    value: authData.user.email ?? '-', inline: true },
+          { name: '📅 Waktu',   value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: false },
+        ],
+        footer:    { text: 'Soraku Community • Sistem Pendaftaran' },
+        timestamp: new Date().toISOString(),
+      }],
+    })
     return ok({
       id:       authData.user.id,
       email:    authData.user.email,

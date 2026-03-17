@@ -250,8 +250,7 @@ async function _parseCommand(message, client) {
     }
 
     if (commandText === null) {
-      const guildPrefix = db
-        .getPrefixes(message.guild.id)
+      const guildPrefix = (await db.getPrefixes(message.guild.id))
         .find((p) => content.startsWith(p));
       if (guildPrefix) {
         commandText = content.slice(guildPrefix.length).trim();
