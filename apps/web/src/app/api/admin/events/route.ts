@@ -1,5 +1,6 @@
-import { env } from '@/env'
 export const dynamic = 'force-dynamic'
+import { env } from '@/env'
+import { sendDiscordWebhook } from '@/lib/discord-webhook'
 
 import { adminDb } from '@/lib/supabase/admin'
 import { getSession, isStaff } from '@/lib/auth'
@@ -22,15 +23,12 @@ const EventSchema = z.object({
   gametype:         z.enum(['ml','valorant','freefire','pubg','chess','other']).optional(),
 })
 
-/** Kirim Discord embed ke webhook */
+/** Kirim Discord embed event baru */
 async function sendDiscordEventEmbed(event: {
   title: string; description?: string; slug: string; startdate: string
   enddate?: string; location?: string; isonline: boolean; tags: string[]
   coverurl?: string; registrationurl?: string
 }) {
-  const webhookUrl = env.DISCORD_EVENT_WEBHOOK_URL
-  if (!webhookUrl) return
-
   const siteUrl   = env.NEXT_PUBLIC_SITE_URL ?? 'https://soraku.vercel.app'
   const eventUrl  = `${siteUrl}/events/${event.slug}`
   const daftarUrl = `${siteUrl}/events/${event.slug}/daftar`
@@ -40,7 +38,7 @@ async function sendDiscordEventEmbed(event: {
   }) + ' WIB'
 
   const fields: { name: string; value: string; inline?: boolean }[] = [
-    { name: '📅 Tanggal Mulai',  value: dateStr,                            inline: false },
+    { name: '📅 Tanggal Mulai',  value: dateStr, inline: false },
     { name: '🗺️ Tipe',           value: event.isonline ? '🌐 Online' : '📍 Offline', inline: true },
     { name: '🏷️ Tags',           value: event.tags?.length ? event.tags.map(t => `\`${t}\``).join(' ') : '—', inline: true },
   ]
@@ -54,25 +52,19 @@ async function sendDiscordEventEmbed(event: {
     ? `[📝 Daftar Eksternal](${event.registrationurl})`
     : `[⚔️ Daftar Sekarang](${daftarUrl})`
 
-  try {
-    await fetch(webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: 'Soraku Events', avatar_url: `${siteUrl}/logo.png`,
-        content: `@everyone 🎉 **Event baru!** Segera daftarkan tim kamu!`,
-        embeds: [{
-          title:       `⚔️ ${event.title}`,
-          description: (event.description?.slice(0, 280) ?? 'Event baru dari Soraku Community!') + `\n\n[🔗 Lihat Event](${eventUrl})  •  ${regLink}`,
-          color:       0x4FA3D1,
-          fields,
-          footer:      { text: 'Soraku Community · soraku.id' },
-          timestamp:   new Date().toISOString(),
-          ...(event.coverurl ? { image: { url: event.coverurl } } : {}),
-        }],
-      }),
-    })
-  } catch { /* webhook gagal — tidak block */ }
+  await sendDiscordWebhook('discord_event_webhook_url', {
+    username: 'Soraku Events', avatar_url: `${siteUrl}/logo.png`,
+    content: `@everyone 🎉 **Event baru!** Segera daftarkan tim kamu!`,
+    embeds: [{
+      title:       `⚔️ ${event.title}`,
+      description: (event.description?.slice(0, 280) ?? 'Event baru dari Soraku Community!') + `\n\n[🔗 Lihat Event](${eventUrl})  •  ${regLink}`,
+      color:       0x4FA3D1,
+      fields,
+      footer:      { text: 'Soraku Community · soraku.id' },
+      timestamp:   new Date().toISOString(),
+      ...(event.coverurl ? { image: { url: event.coverurl } } : {}),
+    }],
+  })
 }
 
 // GET /api/admin/events
