@@ -26,7 +26,7 @@ export interface Notification {
 
 export const NOTIF_CONFIG: Record<
   NotifType,
-  { emoji: string; bg: string; color: string }
+{ emoji: string; bg: string; color: string; icon?: React.FC<any> }
 > = {
   event:   { emoji: "🎌", bg: "bg-blue-500/10",   color: "text-blue-400"   },
   blog:    { emoji: "📝", bg: "bg-primary/10",    color: "text-primary"    },
