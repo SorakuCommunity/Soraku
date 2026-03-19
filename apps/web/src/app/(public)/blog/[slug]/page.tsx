@@ -109,7 +109,6 @@ export default async function BlogDetailPage({ params }: Props) {
         slug={post.slug}
         content={post.content ?? ""}
         likecount={post.likecount ?? 0}
-        commentcount={0}
         siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? "https://soraku.vercel.app"}
         title={post.title}
         tags={post.tags}
