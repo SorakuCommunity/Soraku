@@ -26,31 +26,24 @@ export async function GET(
       .from('postcomments')
       .select('id,parentid,userid,guestname,content,createdat')
       .eq('postid', post.id)
-      .eq('isdeleted', false)
       .order('createdat', { ascending: true })
 
-    // Fetch user info for comments
     const userIds = [...new Set((comments ?? []).filter(c => c.userid).map(c => c.userid!))]
     let usersMap: Record<string, { username: string | null; displayname: string | null; avatarurl: string | null }> = {}
 
     if (userIds.length > 0) {
       const { data: users } = await adminDb()
         .from('users').select('id,username,displayname,avatarurl').in('id', userIds)
-      if (users) {
-        usersMap = Object.fromEntries(users.map(u => [u.id, u]))
-      }
+      if (users) usersMap = Object.fromEntries(users.map(u => [u.id, u]))
     }
 
-    // Attach author info
     const enriched = (comments ?? []).map(c => ({
       ...c,
       author: c.userid ? usersMap[c.userid] ?? null : null,
     }))
 
-    // Build threaded structure: top-level + replies
     const top     = enriched.filter(c => !c.parentid)
     const replies = enriched.filter(c =>  c.parentid)
-
     const threaded = top.map(c => ({
       ...c,
       replies: replies.filter(r => r.parentid === c.id),
@@ -76,23 +69,50 @@ export async function POST(
       .from('posts').select('id').eq('slug', slug).eq('ispublished', true).maybeSingle()
     if (!post) return NOT_FOUND()
 
+    // Require name for guest
     if (!session && !parsed.data.guestname?.trim()) {
       return err('Nama wajib diisi untuk komentar tamu.')
     }
 
+    const insertPayload: Record<string, unknown> = {
+      postid:   post.id,
+      parentid: parsed.data.parentid ?? null,
+      userid:   session?.id ?? null,
+      content:  parsed.data.content.trim(),
+    }
+
+    // Only add guestname if not logged in (column may exist)
+    if (!session) {
+      insertPayload.guestname = parsed.data.guestname?.trim() ?? 'Anonim'
+    }
+
     const { data, error } = await adminDb()
       .from('postcomments')
-      .insert({
-        postid:    post.id,
-        parentid:  parsed.data.parentid ?? null,
-        userid:    session?.id ?? null,
-        guestname: session ? null : (parsed.data.guestname?.trim() ?? 'Anonim'),
-        content:   parsed.data.content.trim(),
-      })
+      .insert(insertPayload)
       .select('id,parentid,userid,guestname,content,createdat')
       .single()
 
-    if (error) return err(error.message)
+    if (error) {
+      // If guestname column doesn't exist yet, retry without it
+      if (error.message?.includes('guestname')) {
+        delete insertPayload.guestname
+        const { data: data2, error: error2 } = await adminDb()
+          .from('postcomments')
+          .insert(insertPayload)
+          .select('id,parentid,userid,content,createdat')
+          .single()
+        if (error2) return err(error2.message)
+        const name = parsed.data.guestname?.trim() ?? 'Anonim'
+        let author2 = null
+        if (session?.id) {
+          const { data: u } = await adminDb()
+            .from('users').select('username,displayname,avatarurl').eq('id', session.id).maybeSingle()
+          author2 = u
+        }
+        return ok({ ...data2, guestname: session ? null : name, author: author2, replies: [] }, 201)
+      }
+      return err(error.message)
+    }
 
     let author = null
     if (session?.id) {

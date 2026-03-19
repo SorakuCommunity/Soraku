@@ -34,19 +34,44 @@ export async function POST(
       return err('Nama wajib diisi untuk komentar tamu.')
     }
 
+    const insertPayload: Record<string, unknown> = {
+      postid:   post.id,
+      parentid: commentId,
+      userid:   session?.id ?? null,
+      content:  parsed.data.content.trim(),
+    }
+
+    if (!session) {
+      insertPayload.guestname = parsed.data.guestname?.trim() ?? 'Anonim'
+    }
+
     const { data, error } = await adminDb()
       .from('postcomments')
-      .insert({
-        postid:    post.id,
-        parentid:  commentId,
-        userid:    session?.id ?? null,
-        guestname: session ? null : (parsed.data.guestname?.trim() ?? 'Anonim'),
-        content:   parsed.data.content.trim(),
-      })
+      .insert(insertPayload)
       .select('id,parentid,userid,guestname,content,createdat')
       .single()
 
-    if (error) return err(error.message)
+    if (error) {
+      // Fallback: retry without guestname if column missing
+      if (error.message?.includes('guestname')) {
+        delete insertPayload.guestname
+        const { data: data2, error: error2 } = await adminDb()
+          .from('postcomments')
+          .insert(insertPayload)
+          .select('id,parentid,userid,content,createdat')
+          .single()
+        if (error2) return err(error2.message)
+        const name = parsed.data.guestname?.trim() ?? 'Anonim'
+        let author2 = null
+        if (session?.id) {
+          const { data: u } = await adminDb()
+            .from('users').select('username,displayname,avatarurl').eq('id', session.id).maybeSingle()
+          author2 = u
+        }
+        return ok({ ...data2, guestname: session ? null : name, author: author2 }, 201)
+      }
+      return err(error.message)
+    }
 
     let author = null
     if (session?.id) {
