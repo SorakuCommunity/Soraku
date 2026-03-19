@@ -6,10 +6,21 @@ import { ok, err, NOT_FOUND, SERVER_ERROR } from '@/lib/api'
 import { z } from 'zod'
 
 const CommentSchema = z.object({
-  content:   z.string().min(1).max(2000),
-  parentid:  z.string().uuid().optional(),
-  guestname: z.string().max(50).optional(),
+  content:  z.string().min(1).max(2000),
 })
+
+function normalizeComment(c: any) {
+  return {
+    id:        c.id ?? '',
+    parentid:  c.parentid ?? null,
+    userid:    c.userid ?? c.authorid ?? null,
+    guestname: c.guestname ?? c.username ?? null,
+    content:   c.content ?? '',
+    createdat: c.createdat ?? c.createdat ?? new Date().toISOString(),
+    author:    null,
+    replies:   [],
+  }
+}
 
 // GET /api/blog/[slug]/comments
 export async function GET(
@@ -22,22 +33,30 @@ export async function GET(
       .from('posts').select('id').eq('slug', slug).eq('ispublished', true).maybeSingle()
     if (!post) return NOT_FOUND()
 
-    const { data: comments } = await adminDb()
+    // Use * to get all columns regardless of schema
+    const { data: rawComments, error: ce } = await adminDb()
       .from('postcomments')
-      .select('id,parentid,userid,guestname,content,createdat')
+      .select('*')
       .eq('postid', post.id)
       .order('createdat', { ascending: true })
 
-    const userIds = [...new Set((comments ?? []).filter(c => c.userid).map(c => c.userid!))]
-    let usersMap: Record<string, { username: string | null; displayname: string | null; avatarurl: string | null }> = {}
+    if (ce) {
+      console.error('[comments GET]', ce.message)
+      return ok({ comments: [], total: 0 })
+    }
 
+    const comments = (rawComments ?? []).map(normalizeComment)
+
+    // Fetch user info
+    const userIds = [...new Set(comments.filter(c => c.userid).map(c => c.userid!))]
+    let usersMap: Record<string, any> = {}
     if (userIds.length > 0) {
       const { data: users } = await adminDb()
         .from('users').select('id,username,displayname,avatarurl').in('id', userIds)
       if (users) usersMap = Object.fromEntries(users.map(u => [u.id, u]))
     }
 
-    const enriched = (comments ?? []).map(c => ({
+    const enriched = comments.map(c => ({
       ...c,
       author: c.userid ? usersMap[c.userid] ?? null : null,
     }))
@@ -50,10 +69,13 @@ export async function GET(
     }))
 
     return ok({ comments: threaded, total: enriched.length })
-  } catch { return SERVER_ERROR() }
+  } catch (e: any) {
+    console.error('[comments GET exception]', e)
+    return ok({ comments: [], total: 0 })
+  }
 }
 
-// POST /api/blog/[slug]/comments
+// POST /api/blog/[slug]/comments — requires login
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -61,6 +83,9 @@ export async function POST(
   try {
     const { slug } = await params
     const session  = await getSession()
+
+    if (!session?.id) return err('Harus login untuk berkomentar.', 401)
+
     const body     = await req.json()
     const parsed   = CommentSchema.safeParse(body)
     if (!parsed.success) return err(parsed.error.issues[0]?.message ?? 'Input tidak valid')
@@ -69,58 +94,24 @@ export async function POST(
       .from('posts').select('id').eq('slug', slug).eq('ispublished', true).maybeSingle()
     if (!post) return NOT_FOUND()
 
-    // Require name for guest
-    if (!session && !parsed.data.guestname?.trim()) {
-      return err('Nama wajib diisi untuk komentar tamu.')
-    }
-
-    const insertPayload: Record<string, unknown> = {
-      postid:   post.id,
-      parentid: parsed.data.parentid ?? null,
-      userid:   session?.id ?? null,
-      content:  parsed.data.content.trim(),
-    }
-
-    // Only add guestname if not logged in (column may exist)
-    if (!session) {
-      insertPayload.guestname = parsed.data.guestname?.trim() ?? 'Anonim'
-    }
-
+    // Try with minimal columns first
     const { data, error } = await adminDb()
       .from('postcomments')
-      .insert(insertPayload)
-      .select('id,parentid,userid,guestname,content,createdat')
+      .insert({ postid: post.id, userid: session.id, content: parsed.data.content.trim() })
+      .select('*')
       .single()
 
     if (error) {
-      // If guestname column doesn't exist yet, retry without it
-      if (error.message?.includes('guestname')) {
-        delete insertPayload.guestname
-        const { data: data2, error: error2 } = await adminDb()
-          .from('postcomments')
-          .insert(insertPayload)
-          .select('id,parentid,userid,content,createdat')
-          .single()
-        if (error2) return err(error2.message)
-        const name = parsed.data.guestname?.trim() ?? 'Anonim'
-        let author2 = null
-        if (session?.id) {
-          const { data: u } = await adminDb()
-            .from('users').select('username,displayname,avatarurl').eq('id', session.id).maybeSingle()
-          author2 = u
-        }
-        return ok({ ...data2, guestname: session ? null : name, author: author2, replies: [] }, 201)
-      }
+      console.error('[comments POST]', error.message)
       return err(error.message)
     }
 
-    let author = null
-    if (session?.id) {
-      const { data: u } = await adminDb()
-        .from('users').select('username,displayname,avatarurl').eq('id', session.id).maybeSingle()
-      author = u
-    }
+    const { data: u } = await adminDb()
+      .from('users').select('username,displayname,avatarurl').eq('id', session.id).maybeSingle()
 
-    return ok({ ...data, author, replies: [] }, 201)
-  } catch { return SERVER_ERROR() }
+    return ok({ ...normalizeComment(data), author: u ?? null, replies: [] }, 201)
+  } catch (e: any) {
+    console.error('[comments POST exception]', e)
+    return SERVER_ERROR()
+  }
 }

@@ -71,13 +71,14 @@ function CommentItem({ comment, slug, isLoggedIn, onReplyPosted, onToast, depth 
         method: "POST", headers: { "Content-Type": "application/json" },
         body:   JSON.stringify({ content: replyText.trim() }),
       });
-      const data = await res.json();
-      if (res.ok && data.data) {
+      let data: any = {};
+      try { data = await res.json(); } catch {}
+      if (res.ok && data?.data?.id) {
         onReplyPosted(data.data, comment.id);
         setReplyText(""); setShowReply(false);
         onToast("Balasan terkirim!", "success");
       } else {
-        onToast(data?.error?.message ?? "Gagal mengirim.", "error");
+        onToast(data?.error?.message ?? "Gagal mengirim balasan.", "error");
       }
     } catch { onToast("Koneksi gagal.", "error"); }
     finally { setSending(false); }
@@ -227,7 +228,10 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
     setCommLoading(true);
     fetch(`/api/blog/${slug}/comments`)
       .then(r => r.json())
-      .then(d => { if (d.data) setComments(d.data.comments ?? []); })
+      .then(d => {
+        const list = d?.data?.comments;
+        if (Array.isArray(list)) setComments(list);
+      })
       .catch(() => {})
       .finally(() => setCommLoading(false));
   }, [slug]);
@@ -259,20 +263,24 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
         method: "POST", headers: { "Content-Type": "application/json" },
         body:   JSON.stringify({ content: newComment.trim() }),
       });
-      const data = await res.json();
-      if (res.ok && data.data) {
+      let data: any = {};
+      try { data = await res.json(); } catch {}
+      if (res.ok && data?.data?.id) {
         setComments(prev => [data.data, ...prev]);
         setNewComment("");
         showToast("Komentar berhasil dikirim!", "success");
       } else {
-        showToast(data?.error?.message ?? "Gagal mengirim.", "error");
+        showToast(data?.error?.message ?? "Gagal mengirim komentar.", "error");
       }
     } catch { showToast("Koneksi gagal.", "error"); }
     finally { setSubmitting(false); }
   };
 
   const handleReplyPosted = useCallback((reply: Comment, parentId: string) => {
-    setComments(prev => prev.map(c => c.id === parentId ? { ...c, replies: [...c.replies, reply] } : c));
+    if (!reply?.id) return;
+    setComments(prev => prev.map(c =>
+      c.id === parentId ? { ...c, replies: [...(c.replies ?? []), reply] } : c
+    ));
   }, []);
 
   const totalComments = comments.reduce((acc, c) => acc + 1 + c.replies.length, 0);
