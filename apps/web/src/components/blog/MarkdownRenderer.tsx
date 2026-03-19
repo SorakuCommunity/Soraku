@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -117,7 +118,7 @@ function parseBlocks(content: string): React.ReactNode[] {
         "text-sm font-bold text-foreground/80 mt-4 mb-1",
         "text-xs font-bold text-foreground/60 mt-3 mb-1",
       ][level - 1];
-      const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+      const Tag = `h${level}` as keyof React.JSX.IntrinsicElements;
       nodes.push(<Tag key={i} className={cls}>{parseInline(text)}</Tag>);
       i++; continue;
     }
