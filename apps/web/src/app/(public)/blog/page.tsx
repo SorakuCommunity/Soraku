@@ -36,7 +36,7 @@ function PostCard({ post, featured }: { post: PostItem; featured?: boolean }) {
   if (featured) {
     return (
       <Link href={`/blog/${post.slug}`}
-        className="group glass-card col-span-3 md:col-span-2 lg:col-span-3 flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-border/50 hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-300">
+        className="group glass-card col-span-3 sm:col-span-4 lg:col-span-3 flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-border/50 hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-300">
         {/* Cover */}
         <div className="relative h-48 sm:h-auto sm:w-72 lg:w-96 flex-shrink-0 overflow-hidden bg-gradient-to-br from-primary/20 via-accent/10 to-violet-500/15">
           {post.coverurl ? (
@@ -205,7 +205,7 @@ export default async function BlogPage({ searchParams }: { searchParams?: Promis
           <p className="text-muted-foreground">Belum ada artikel dengan tag ini.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 lg:grid-cols-6">
+        <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-6">
           {/* Featured — span 3 cols mobile, full width */}
           {featured && <PostCard post={featured} featured />}
           {/* Regular grid — 3 col mobile, 3 col on sm, 6 col on lg (3 per row = 2 articles) */}

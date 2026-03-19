@@ -43,7 +43,7 @@ export default async function BlogDetailPage({ params }: Props) {
     .order("publishedat", { ascending: false })
     .limit(3);
 
-  const related = relatedRaw ?? [];
+  const related    = relatedRaw ?? [];
   const authorName = author?.displayname ?? author?.username ?? "Soraku Team";
   const readMins   = Math.max(1, Math.ceil(((post.content ?? "").split(" ").length) / 200));
 
@@ -63,30 +63,16 @@ export default async function BlogDetailPage({ params }: Props) {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-        {/* View count overlay */}
         <div className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1.5 backdrop-blur-sm text-xs text-white/80">
           <Eye className="h-3.5 w-3.5" />
           <span>{(post.viewcount ?? 0).toLocaleString()} views</span>
         </div>
-        {/* Read time overlay */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1.5 backdrop-blur-sm text-xs text-white/80">
           {readMins} min baca
         </div>
       </div>
 
-      {/* Tags */}
-      {post.tags.length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-1.5">
-          {post.tags.map((t: string) => (
-            <Link key={t} href={`/blog?tag=${t}`}
-              className="rounded-full border border-primary/20 bg-primary/8 px-2.5 py-0.5 text-xs font-semibold text-primary/80 capitalize hover:bg-primary/15 transition-colors">
-              #{t}
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {/* Title */}
+      {/* Title — NO tags here */}
       <h1 className="text-3xl font-black leading-tight tracking-tight sm:text-4xl">{post.title}</h1>
 
       {/* Author + date */}
@@ -104,7 +90,7 @@ export default async function BlogDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Client part: content, likes, share, comments + real-time view increment */}
+      {/* Tags ONLY after article content — passed to client */}
       <BlogDetailClient
         slug={post.slug}
         content={post.content ?? ""}

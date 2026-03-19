@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   ArrowLeft, Save, Eye, Loader2, Plus, X, Bold, Italic,
   Heading1, Heading2, Heading3, List, ListOrdered, Quote,
-  Code, Link2, Image as ImageIcon, Minus, Upload, AlertCircle,
+  Code, Link2, Image as ImageIcon, Minus, Upload, AlertCircle, RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import MarkdownRenderer from "@/components/blog/MarkdownRenderer";
@@ -43,7 +43,8 @@ export default function AdminBlogEditPage() {
   const [error,      setError]      = useState<string | null>(null);
   const [activeTab,  setActiveTab]  = useState<"write" | "preview">("write");
   const [uploading,  setUploading]  = useState(false);
-  const [ispublished, setIspublished] = useState(false);
+  const [ispublished,  setIspublished]  = useState(false);
+  const [replacing,    setReplacing]    = useState(false);
 
   const [title,    setTitle]    = useState("");
   const [slug,     setSlug]     = useState("");
@@ -82,6 +83,27 @@ export default function AdminBlogEditPage() {
 
   const ins = useCallback((before: string, after = "", ph = "teks") => insertMarkdown(taRef, setContent, before, after, ph), []);
 
+
+  const handleReplace = async () => {
+    if (!confirm("Yakin ingin mengganti isi artikel? Perubahan tidak bisa dibatalkan.")) return;
+    setReplacing(true); setSaveError(null);
+    const res = await fetch(`/api/admin/blog/${id}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: title.trim(), slug: slug.trim(),
+        excerpt: excerpt.trim() || undefined,
+        content: content.trim() || undefined,
+        coverurl: coverurl.trim() || "",
+        tags, ispublished,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) { setSaveError(data?.error?.message ?? "Gagal mengganti artikel."); setReplacing(false); return; }
+    setReplacing(false);
+    setSaveError("✅ Artikel berhasil diperbarui!");
+    setTimeout(() => setSaveError(null), 3000);
+  };
+
   const handleSubmit = async (publish: boolean) => {
     if (!title.trim() || !slug.trim()) { setError("Judul dan slug wajib diisi."); return; }
     setLoading(true); setError(null);
@@ -119,6 +141,10 @@ export default function AdminBlogEditPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={handleReplace} disabled={replacing || loading}
+            className="flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm font-bold text-amber-400 hover:bg-amber-500/20 transition-colors disabled:opacity-40">
+            {replacing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />} Ganti
+          </button>
           <button onClick={() => handleSubmit(false)} disabled={loading}
             className="flex items-center gap-1.5 rounded-xl border border-border px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40">
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} {ispublished ? "Unpublish" : "Draft"}
