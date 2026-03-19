@@ -7,11 +7,7 @@ import Link from "next/link";
 import {
   ArrowLeft, Save, Eye, Loader2, Plus, X, Bold, Italic,
   Heading1, Heading2, Heading3, List, ListOrdered, Quote,
-<<<<<<< HEAD
   Code, Link2, Image as ImageIcon, Minus, Upload, AlertCircle, RotateCcw,
-=======
-  Code, Link2, Image as ImageIcon, Minus, Upload, AlertCircle,
->>>>>>> 1170e9e (feat(blog): full overhaul - grid, markdown, likes, comments, share, views, Discord, services/api)
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import MarkdownRenderer from "@/components/blog/MarkdownRenderer";
@@ -26,19 +22,7 @@ function ToolbarBtn({ icon: Icon, label, onClick }: { icon: any; label: string; 
   );
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 function insertMarkdown(ref: React.RefObject<HTMLTextAreaElement | null>, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
-=======
-function insertMarkdown(ref: React.RefObject<HTMLTextAreaElement>, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
->>>>>>> 1170e9e (feat(blog): full overhaul - grid, markdown, likes, comments, share, views, Discord, services/api)
-=======
-function insertMarkdown(ref: React.RefObject<HTMLTextAreaElement | null>, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
->>>>>>> 383fdef (fix(blog): RefObject<HTMLTextAreaElement | null> compat React 19 strict mode)
-=======
-function insertMarkdown(ref: { current: HTMLTextAreaElement | null }, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
->>>>>>> 68bcabc (fix(blog): RefObject duck type - kompatibel React 18 & 19)
   const el = ref.current;
   if (!el) return;
   const start = el.selectionStart, end = el.selectionEnd;
@@ -59,7 +43,6 @@ export default function AdminBlogEditPage() {
   const [error,      setError]      = useState<string | null>(null);
   const [activeTab,  setActiveTab]  = useState<"write" | "preview">("write");
   const [uploading,  setUploading]  = useState(false);
-<<<<<<< HEAD
   const [ispublished,  setIspublished]  = useState(false);
   const [replacing,    setReplacing]    = useState(false);
 
@@ -71,18 +54,6 @@ export default function AdminBlogEditPage() {
   const [tagInput, setTagInput] = useState("");
   const [tags,     setTags]     = useState<string[]>([]);
 
-=======
-  const [ispublished, setIspublished] = useState(false);
-
-  const [title,    setTitle]    = useState("");
-  const [slug,     setSlug]     = useState("");
-  const [excerpt,  setExcerpt]  = useState("");
-  const [content,  setContent]  = useState("");
-  const [coverurl, setCoverurl] = useState("");
-  const [tagInput, setTagInput] = useState("");
-  const [tags,     setTags]     = useState<string[]>([]);
-
->>>>>>> 1170e9e (feat(blog): full overhaul - grid, markdown, likes, comments, share, views, Discord, services/api)
   useEffect(() => {
     if (!id) return;
     (async () => {
@@ -112,7 +83,6 @@ export default function AdminBlogEditPage() {
 
   const ins = useCallback((before: string, after = "", ph = "teks") => insertMarkdown(taRef, setContent, before, after, ph), []);
 
-<<<<<<< HEAD
 
   const handleReplace = async () => {
     if (!confirm("Yakin ingin mengganti isi artikel? Perubahan tidak bisa dibatalkan.")) return;
@@ -142,16 +112,6 @@ export default function AdminBlogEditPage() {
       body: JSON.stringify({ title: title.trim(), slug: slug.trim(), excerpt: excerpt.trim() || undefined, content: content.trim() || undefined, coverurl: coverurl.trim() || "", tags, ispublished: publish }),
     });
     const data = await res.json();
-=======
-  const handleSubmit = async (publish: boolean) => {
-    if (!title.trim() || !slug.trim()) { setError("Judul dan slug wajib diisi."); return; }
-    setLoading(true); setError(null);
-    const res = await fetch(`/api/admin/blog/${id}`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: title.trim(), slug: slug.trim(), excerpt: excerpt.trim() || undefined, content: content.trim() || undefined, coverurl: coverurl.trim() || "", tags, ispublished: publish }),
-    });
-    const data = await res.json();
->>>>>>> 1170e9e (feat(blog): full overhaul - grid, markdown, likes, comments, share, views, Discord, services/api)
     if (!res.ok) { setError(data?.error?.message ?? "Gagal menyimpan."); setLoading(false); return; }
     router.push("/admin/blog");
   };
@@ -282,11 +242,7 @@ export default function AdminBlogEditPage() {
               </button>
             </div>
             <div className="flex flex-wrap gap-1.5 min-h-[24px]">
-<<<<<<< HEAD
               {tags.map((t: string) => (
-=======
-              {tags.map(t => (
->>>>>>> 1170e9e (feat(blog): full overhaul - grid, markdown, likes, comments, share, views, Discord, services/api)
                 <span key={t} className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">
                   #{t}<button onClick={() => setTags(tags.filter(x => x !== t))}><X className="h-2.5 w-2.5" /></button>
                 </span>
