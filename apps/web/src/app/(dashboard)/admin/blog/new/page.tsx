@@ -22,7 +22,7 @@ function ToolbarBtn({ icon: Icon, label, onClick }: { icon: any; label: string; 
   );
 }
 
-function insertMarkdown(ref: React.RefObject<HTMLTextAreaElement>, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
+function insertMarkdown(ref: React.RefObject<HTMLTextAreaElement | null>, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
   const el = ref.current;
   if (!el) return;
   const start = el.selectionStart;

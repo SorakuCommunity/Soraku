@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, Eye, Heart, Clock } from "lucide-react";
+import { BookOpen, Eye, Heart, Clock, Search, X } from "lucide-react";
 import { db } from "@/lib/supabase/server";
 import { formatRelativeTime } from "@/lib/utils";
 
@@ -132,13 +132,16 @@ function PostCard({ post, featured }: { post: PostItem; featured?: boolean }) {
 export default async function BlogPage({ searchParams }: { searchParams?: Promise<{ tag?: string; q?: string }> }) {
   const params    = await searchParams;
   const activeTag = params?.tag ?? "Semua";
+  const searchQ   = params?.q ?? "";
   const query     = (await db())
     .from("posts")
     .select("id,slug,title,excerpt,tags,publishedat,coverurl,viewcount,likecount,authorid")
     .eq("ispublished", true)
     .order("publishedat", { ascending: false });
 
-  const { data: rawPosts } = await (activeTag === "Semua" ? query : query.contains("tags", [activeTag]));
+  let filteredQuery = activeTag === "Semua" ? query : query.contains("tags", [activeTag]);
+  if (searchQ) filteredQuery = filteredQuery.ilike("title", `%${searchQ}%`);
+  const { data: rawPosts } = await filteredQuery;
 
   // Fetch authors
   const authorIds = [...new Set((rawPosts ?? []).filter(p => p.authorid).map(p => p.authorid!))];
@@ -164,6 +167,22 @@ export default async function BlogPage({ searchParams }: { searchParams?: Promis
         <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary/70">Komunitas</p>
         <h1 className="text-4xl font-black tracking-tight sm:text-5xl">Blog <span className="text-gradient">Soraku</span></h1>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">Artikel, review anime, tips cosplay, dan cerita dari komunitas Soraku Indonesia.</p>
+      </div>
+
+      {/* Search bar */}
+      <div className="mb-4 relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
+        <form action="/blog" method="GET">
+          {activeTag !== "Semua" && <input type="hidden" name="tag" value={activeTag} />}
+          <input name="q" defaultValue={searchQ} placeholder="Cari artikel..."
+            className="w-full rounded-xl border border-border/50 bg-card/30 py-2 pl-9 pr-4 text-sm outline-none placeholder:text-muted-foreground/30 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" />
+        </form>
+        {searchQ && (
+          <a href={activeTag !== "Semua" ? `/blog?tag=${activeTag}` : "/blog"}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-foreground transition-colors">
+            <X className="h-3.5 w-3.5" />
+          </a>
+        )}
       </div>
 
       {/* Tag filters */}
