@@ -129,7 +129,7 @@ export default function AdminBlogPage() {
                     <span>{date}</span>
                     <span>·</span>
                     <span>{post.ispublished ? "Published" : "Draft"}</span>
-                    {post.tags.slice(0, 2).map(t => <span key={t} className="hidden sm:inline">#{t}</span>)}
+                    {post.tags.slice(0, 2).map((t: string) => <span key={t} className="hidden sm:inline">#{t}</span>)}
                   </div>
                 </div>
 

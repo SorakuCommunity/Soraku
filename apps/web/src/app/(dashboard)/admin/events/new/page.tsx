@@ -516,7 +516,7 @@ export default function AdminEventNewPage() {
               </button>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {tags.map(t => (
+              {tags.map((t: string) => (
                 <span key={t} className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">
                   {t}<button onClick={() => setTags(tags.filter(x => x !== t))}><X className="h-2.5 w-2.5" /></button>
                 </span>

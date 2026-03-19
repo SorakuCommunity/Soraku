@@ -249,7 +249,7 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
       {/* Hashtags */}
       {tags.length > 0 && (
         <div className="mt-8 flex flex-wrap gap-1.5 border-t border-border/30 pt-5">
-          {tags.map(t => (
+          {tags.map((t: string) => (
             <Link key={t} href={`/blog?tag=${t}`}
               className="rounded-full border border-border/50 bg-muted/20 px-3 py-1 text-xs text-muted-foreground/60 capitalize hover:border-primary/40 hover:text-primary transition-colors">
               #{t}
@@ -375,7 +375,7 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
                   <p className="text-xs font-bold line-clamp-2 group-hover:text-primary transition-colors">{p.title}</p>
                   {p.tags.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">
-                      {p.tags.slice(0, 2).map(t => <span key={t} className="text-[9px] text-muted-foreground/40">#{t}</span>)}
+                      {p.tags.slice(0, 2).map((t: string) => <span key={t} className="text-[9px] text-muted-foreground/40">#{t}</span>)}
                     </div>
                   )}
                 </div>

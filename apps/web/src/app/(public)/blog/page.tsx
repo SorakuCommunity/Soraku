@@ -54,7 +54,7 @@ function PostCard({ post, featured }: { post: PostItem; featured?: boolean }) {
         {/* Content */}
         <div className="flex flex-1 flex-col p-5 sm:p-6">
           <div className="mb-3 flex flex-wrap gap-1.5">
-            {post.tags.slice(0, 3).map(t => (
+            {post.tags.slice(0, 3).map((t: string) => (
               <span key={t} className="rounded-full border border-primary/25 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary/80 capitalize">{t}</span>
             ))}
           </div>
@@ -119,7 +119,7 @@ function PostCard({ post, featured }: { post: PostItem; featured?: boolean }) {
         {/* Hashtags di bawah */}
         {post.tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
-            {post.tags.slice(0, 3).map(t => (
+            {post.tags.slice(0, 3).map((t: string) => (
               <span key={t} className="rounded-full bg-muted/30 px-1.5 py-0.5 text-[9px] text-muted-foreground/50 capitalize">#{t}</span>
             ))}
           </div>

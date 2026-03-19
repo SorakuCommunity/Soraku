@@ -77,7 +77,7 @@ export default async function BlogDetailPage({ params }: Props) {
       {/* Tags */}
       {post.tags.length > 0 && (
         <div className="mb-4 flex flex-wrap gap-1.5">
-          {post.tags.map(t => (
+          {post.tags.map((t: string) => (
             <Link key={t} href={`/blog?tag=${t}`}
               className="rounded-full border border-primary/20 bg-primary/8 px-2.5 py-0.5 text-xs font-semibold text-primary/80 capitalize hover:bg-primary/15 transition-colors">
               #{t}
