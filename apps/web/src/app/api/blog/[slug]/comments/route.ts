@@ -23,7 +23,7 @@ export async function GET(
     if (!post) return NOT_FOUND()
 
     const { data: comments } = await adminDb()
-      .from('post_comments')
+      .from('postcomments')
       .select('id,parentid,userid,guestname,content,createdat')
       .eq('postid', post.id)
       .eq('isdeleted', false)
@@ -81,7 +81,7 @@ export async function POST(
     }
 
     const { data, error } = await adminDb()
-      .from('post_comments')
+      .from('postcomments')
       .insert({
         postid:    post.id,
         parentid:  parsed.data.parentid ?? null,

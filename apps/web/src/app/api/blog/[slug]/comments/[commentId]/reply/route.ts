@@ -27,7 +27,7 @@ export async function POST(
     if (!post) return NOT_FOUND()
 
     const { data: parent } = await adminDb()
-      .from('post_comments').select('id').eq('id', commentId).eq('postid', post.id).maybeSingle()
+      .from('postcomments').select('id').eq('id', commentId).eq('postid', post.id).maybeSingle()
     if (!parent) return NOT_FOUND()
 
     if (!session && !parsed.data.guestname?.trim()) {
@@ -35,7 +35,7 @@ export async function POST(
     }
 
     const { data, error } = await adminDb()
-      .from('post_comments')
+      .from('postcomments')
       .insert({
         postid:    post.id,
         parentid:  commentId,

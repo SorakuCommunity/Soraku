@@ -17,15 +17,15 @@ export async function GET(
       .from('posts').select('id,likecount').eq('slug', slug).eq('ispublished', true).maybeSingle()
     if (!post) return NOT_FOUND()
 
-    // Get dislike count from post_likes where type='dislike'
+    // Get dislike count from postlikes where type='dislike'
     const { count: dislikeCount } = await adminDb()
-      .from('post_likes').select('*', { count: 'exact', head: true })
+      .from('postlikes').select('*', { count: 'exact', head: true })
       .eq('postid', post.id).eq('ipaddr', 'dislike') // repurpose ipaddr as type flag
 
     let reaction: 'like' | 'dislike' | null = null
     if (session?.id) {
       const { data: lk } = await adminDb()
-        .from('post_likes').select('ipaddr').eq('postid', post.id).eq('userid', session.id).maybeSingle()
+        .from('postlikes').select('ipaddr').eq('postid', post.id).eq('userid', session.id).maybeSingle()
       if (lk) reaction = lk.ipaddr === 'dislike' ? 'dislike' : 'like'
     }
 
@@ -51,38 +51,38 @@ export async function POST(
 
     if (session?.id) {
       const { data: existing } = await adminDb()
-        .from('post_likes').select('id,ipaddr').eq('postid', post.id).eq('userid', session.id).maybeSingle()
+        .from('postlikes').select('id,ipaddr').eq('postid', post.id).eq('userid', session.id).maybeSingle()
 
       if (existing) {
         if (existing.ipaddr === type) {
           // Same reaction → remove (toggle off)
-          await adminDb().from('post_likes').delete().eq('id', existing.id)
+          await adminDb().from('postlikes').delete().eq('id', existing.id)
           if (type === 'like') {
             const newCount = Math.max(0, (post.likecount ?? 0) - 1)
             await adminDb().from('posts').update({ likecount: newCount }).eq('id', post.id)
-            const { count: dc } = await adminDb().from('post_likes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
+            const { count: dc } = await adminDb().from('postlikes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
             return ok({ likecount: newCount, dislikecount: dc ?? 0, reaction: null })
           } else {
-            const { count: dc } = await adminDb().from('post_likes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
+            const { count: dc } = await adminDb().from('postlikes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
             return ok({ likecount: post.likecount ?? 0, dislikecount: Math.max(0, (dc ?? 0) - 1), reaction: null })
           }
         } else {
           // Switch reaction
-          await adminDb().from('post_likes').update({ ipaddr: type }).eq('id', existing.id)
+          await adminDb().from('postlikes').update({ ipaddr: type }).eq('id', existing.id)
           let newLike = post.likecount ?? 0
           if (type === 'like') newLike = newLike + 1
           else newLike = Math.max(0, newLike - 1)
           await adminDb().from('posts').update({ likecount: newLike }).eq('id', post.id)
-          const { count: dc } = await adminDb().from('post_likes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
+          const { count: dc } = await adminDb().from('postlikes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
           return ok({ likecount: newLike, dislikecount: dc ?? 0, reaction: type })
         }
       } else {
         // New reaction
-        await adminDb().from('post_likes').insert({ postid: post.id, userid: session.id, ipaddr: type })
+        await adminDb().from('postlikes').insert({ postid: post.id, userid: session.id, ipaddr: type })
         let newLike = post.likecount ?? 0
         if (type === 'like') newLike = newLike + 1
         await adminDb().from('posts').update({ likecount: newLike }).eq('id', post.id)
-        const { count: dc } = await adminDb().from('post_likes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
+        const { count: dc } = await adminDb().from('postlikes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
         return ok({ likecount: newLike, dislikecount: dc ?? 0, reaction: type })
       }
     } else {
