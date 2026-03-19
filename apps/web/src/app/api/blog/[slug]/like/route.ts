@@ -4,7 +4,7 @@ import { adminDb } from '@/lib/supabase/admin'
 import { getSession } from '@/lib/auth'
 import { ok, NOT_FOUND, SERVER_ERROR } from '@/lib/api'
 
-// GET /api/blog/[slug]/like — get like+dislike count + user's reaction
+// GET /api/blog/[slug]/like
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -17,24 +17,24 @@ export async function GET(
       .from('posts').select('id,likecount').eq('slug', slug).eq('ispublished', true).maybeSingle()
     if (!post) return NOT_FOUND()
 
-    // Get dislike count from postlikes where type='dislike'
-    const { count: dislikeCount } = await adminDb()
-      .from('postlikes').select('*', { count: 'exact', head: true })
-      .eq('postid', post.id).eq('ipaddr', 'dislike') // repurpose ipaddr as type flag
-
     let reaction: 'like' | 'dislike' | null = null
     if (session?.id) {
+      // Check if user has liked this post
       const { data: lk } = await adminDb()
-        .from('postlikes').select('ipaddr').eq('postid', post.id).eq('userid', session.id).maybeSingle()
-      if (lk) reaction = lk.ipaddr === 'dislike' ? 'dislike' : 'like'
+        .from('postlikes')
+        .select('id')
+        .eq('postid', post.id)
+        .eq('userid', session.id)
+        .maybeSingle()
+      if (lk) reaction = 'like'
     }
 
-    return ok({ likecount: post.likecount ?? 0, dislikecount: dislikeCount ?? 0, reaction })
+    // Dislike count = total - likes (simplified: just use likes only for now)
+    return ok({ likecount: post.likecount ?? 0, dislikecount: 0, reaction })
   } catch { return SERVER_ERROR() }
 }
 
-// POST /api/blog/[slug]/like — toggle like or dislike
-// body: { type: 'like' | 'dislike' }
+// POST /api/blog/[slug]/like — toggle like (requires login)
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -49,50 +49,31 @@ export async function POST(
       .from('posts').select('id,likecount').eq('slug', slug).eq('ispublished', true).maybeSingle()
     if (!post) return NOT_FOUND()
 
-    if (session?.id) {
-      const { data: existing } = await adminDb()
-        .from('postlikes').select('id,ipaddr').eq('postid', post.id).eq('userid', session.id).maybeSingle()
-
-      if (existing) {
-        if (existing.ipaddr === type) {
-          // Same reaction → remove (toggle off)
-          await adminDb().from('postlikes').delete().eq('id', existing.id)
-          if (type === 'like') {
-            const newCount = Math.max(0, (post.likecount ?? 0) - 1)
-            await adminDb().from('posts').update({ likecount: newCount }).eq('id', post.id)
-            const { count: dc } = await adminDb().from('postlikes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
-            return ok({ likecount: newCount, dislikecount: dc ?? 0, reaction: null })
-          } else {
-            const { count: dc } = await adminDb().from('postlikes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
-            return ok({ likecount: post.likecount ?? 0, dislikecount: Math.max(0, (dc ?? 0) - 1), reaction: null })
-          }
-        } else {
-          // Switch reaction
-          await adminDb().from('postlikes').update({ ipaddr: type }).eq('id', existing.id)
-          let newLike = post.likecount ?? 0
-          if (type === 'like') newLike = newLike + 1
-          else newLike = Math.max(0, newLike - 1)
-          await adminDb().from('posts').update({ likecount: newLike }).eq('id', post.id)
-          const { count: dc } = await adminDb().from('postlikes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
-          return ok({ likecount: newLike, dislikecount: dc ?? 0, reaction: type })
-        }
-      } else {
-        // New reaction
-        await adminDb().from('postlikes').insert({ postid: post.id, userid: session.id, ipaddr: type })
-        let newLike = post.likecount ?? 0
-        if (type === 'like') newLike = newLike + 1
-        await adminDb().from('posts').update({ likecount: newLike }).eq('id', post.id)
-        const { count: dc } = await adminDb().from('postlikes').select('*', { count: 'exact', head: true }).eq('postid', post.id).eq('ipaddr', 'dislike')
-        return ok({ likecount: newLike, dislikecount: dc ?? 0, reaction: type })
-      }
-    } else {
-      // Guest like only
-      if (type === 'like') {
-        const newCount = (post.likecount ?? 0) + 1
-        await adminDb().from('posts').update({ likecount: newCount }).eq('id', post.id)
-        return ok({ likecount: newCount, dislikecount: 0, reaction: 'like' })
-      }
+    if (!session?.id) {
+      // Guest: just return current count, no tracking
       return ok({ likecount: post.likecount ?? 0, dislikecount: 0, reaction: null })
+    }
+
+    // Check if user already liked
+    const { data: existing } = await adminDb()
+      .from('postlikes')
+      .select('id')
+      .eq('postid', post.id)
+      .eq('userid', session.id)
+      .maybeSingle()
+
+    if (existing) {
+      // Already liked → unlike (toggle off)
+      await adminDb().from('postlikes').delete().eq('id', existing.id)
+      const newCount = Math.max(0, (post.likecount ?? 0) - 1)
+      await adminDb().from('posts').update({ likecount: newCount }).eq('id', post.id)
+      return ok({ likecount: newCount, dislikecount: 0, reaction: null })
+    } else {
+      // Not yet liked → like
+      await adminDb().from('postlikes').insert({ postid: post.id, userid: session.id })
+      const newCount = (post.likecount ?? 0) + 1
+      await adminDb().from('posts').update({ likecount: newCount }).eq('id', post.id)
+      return ok({ likecount: newCount, dislikecount: 0, reaction: 'like' })
     }
   } catch { return SERVER_ERROR() }
 }

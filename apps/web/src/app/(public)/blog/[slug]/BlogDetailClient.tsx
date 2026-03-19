@@ -3,9 +3,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Heart, ThumbsDown, MessageCircle, Share2, Copy, Check,
-  Send, User, ChevronDown, ChevronUp, BookOpen,
+  Heart, MessageCircle, Share2, Copy, Check,
+  Send, ChevronDown, ChevronUp, BookOpen,
   Twitter, Facebook, X, CheckCircle2, AlertCircle,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import MarkdownRenderer from "@/components/blog/MarkdownRenderer";
@@ -30,30 +31,25 @@ function Toast({ message, type, onClose }: { message: string; type: "success" | 
   useEffect(() => { const t = setTimeout(onClose, 3500); return () => clearTimeout(t); }, [onClose]);
   return (
     <div className={cn(
-      "fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 rounded-2xl border px-5 py-3 text-sm font-semibold shadow-xl backdrop-blur-sm transition-all animate-in slide-in-from-bottom-4",
-      type === "success"
-        ? "border-green-500/30 bg-green-500/15 text-green-400"
-        : "border-red-500/30 bg-red-500/15 text-red-400"
+      "fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 rounded-2xl border px-5 py-3 text-sm font-semibold shadow-xl backdrop-blur-sm",
+      type === "success" ? "border-green-500/30 bg-green-500/15 text-green-400" : "border-red-500/30 bg-red-500/15 text-red-400"
     )}>
       {type === "success" ? <CheckCircle2 className="h-4 w-4 flex-shrink-0" /> : <AlertCircle className="h-4 w-4 flex-shrink-0" />}
       <span>{message}</span>
-      <button onClick={onClose} className="ml-1 opacity-60 hover:opacity-100 transition-opacity">
-        <X className="h-3.5 w-3.5" />
-      </button>
+      <button onClick={onClose} className="ml-1 opacity-60 hover:opacity-100"><X className="h-3.5 w-3.5" /></button>
     </div>
   );
 }
 
 // ─── Comment Item ─────────────────────────────────────────────────────────
-function CommentItem({ comment, slug, onReplyPosted, onToast, depth = 0 }: {
-  comment: Comment; slug: string; depth?: number;
+function CommentItem({ comment, slug, isLoggedIn, onReplyPosted, onToast, depth = 0 }: {
+  comment: Comment; slug: string; isLoggedIn: boolean; depth?: number;
   onReplyPosted: (c: Comment, parentId: string) => void;
   onToast: (msg: string, type: "success" | "error") => void;
 }) {
   const [showReply,   setShowReply]   = useState(false);
   const [showReplies, setShowReplies] = useState(true);
   const [replyText,   setReplyText]   = useState("");
-  const [guestName,   setGuestName]   = useState("");
   const [sending,     setSending]     = useState(false);
 
   const name    = comment.author?.displayname ?? comment.author?.username ?? comment.guestname ?? "Anonim";
@@ -62,28 +58,28 @@ function CommentItem({ comment, slug, onReplyPosted, onToast, depth = 0 }: {
   const timeAgo = (iso: string) => {
     const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
     if (diff < 60)    return "baru saja";
-    if (diff < 3600)  return `${Math.floor(diff / 60)} menit lalu`;
+    if (diff < 3600)  return `${Math.floor(diff / 60)} mnt lalu`;
     if (diff < 86400) return `${Math.floor(diff / 3600)} jam lalu`;
     return `${Math.floor(diff / 86400)} hari lalu`;
   };
 
   const submitReply = async () => {
-    if (!replyText.trim()) return;
+    if (!replyText.trim() || !isLoggedIn) return;
     setSending(true);
     try {
       const res  = await fetch(`/api/blog/${slug}/comments/${comment.id}/reply`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body:   JSON.stringify({ content: replyText.trim(), guestname: guestName.trim() || undefined }),
+        body:   JSON.stringify({ content: replyText.trim() }),
       });
       const data = await res.json();
       if (res.ok && data.data) {
         onReplyPosted(data.data, comment.id);
-        setReplyText(""); setGuestName(""); setShowReply(false);
+        setReplyText(""); setShowReply(false);
         onToast("Balasan terkirim!", "success");
       } else {
-        onToast(data?.error?.message ?? "Gagal mengirim balasan.", "error");
+        onToast(data?.error?.message ?? "Gagal mengirim.", "error");
       }
-    } catch { onToast("Koneksi gagal. Coba lagi.", "error"); }
+    } catch { onToast("Koneksi gagal.", "error"); }
     finally { setSending(false); }
   };
 
@@ -105,10 +101,16 @@ function CommentItem({ comment, slug, onReplyPosted, onToast, depth = 0 }: {
         </div>
         {depth === 0 && (
           <div className="mt-1.5 flex items-center gap-3 px-1">
-            <button onClick={() => setShowReply(!showReply)}
-              className="flex items-center gap-1.5 text-[11px] text-muted-foreground/50 hover:text-primary transition-colors">
-              <MessageCircle className="h-3 w-3" /> Balas
-            </button>
+            {isLoggedIn ? (
+              <button onClick={() => setShowReply(!showReply)}
+                className="flex items-center gap-1.5 text-[11px] text-muted-foreground/50 hover:text-primary transition-colors">
+                <MessageCircle className="h-3 w-3" /> Balas
+              </button>
+            ) : (
+              <Link href="/login" className="flex items-center gap-1.5 text-[11px] text-muted-foreground/40 hover:text-primary transition-colors">
+                <Lock className="h-3 w-3" /> Login untuk balas
+              </Link>
+            )}
             {comment.replies.length > 0 && (
               <button onClick={() => setShowReplies(!showReplies)}
                 className="flex items-center gap-1.5 text-[11px] text-muted-foreground/40 hover:text-foreground transition-colors">
@@ -118,26 +120,22 @@ function CommentItem({ comment, slug, onReplyPosted, onToast, depth = 0 }: {
             )}
           </div>
         )}
-        {showReply && (
-          <div className="mt-2 space-y-2">
-            <input value={guestName} onChange={e => setGuestName(e.target.value)}
-              placeholder="Nama kamu (opsional)"
-              className="w-full rounded-xl border border-border/50 bg-card/30 px-3 py-2 text-xs outline-none focus:border-primary/40 transition-all" />
-            <div className="flex gap-2">
-              <textarea value={replyText} onChange={e => setReplyText(e.target.value)} rows={2}
-                placeholder="Tulis balasan..."
-                className="flex-1 resize-none rounded-xl border border-border/50 bg-card/30 px-3 py-2 text-sm outline-none focus:border-primary/40 transition-all" />
-              <button onClick={submitReply} disabled={sending || !replyText.trim()}
-                className="flex items-center justify-center rounded-xl bg-primary/80 px-3 text-white hover:bg-primary transition-colors disabled:opacity-40">
-                {sending ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <Send className="h-4 w-4" />}
-              </button>
-            </div>
+        {showReply && isLoggedIn && (
+          <div className="mt-2 flex gap-2">
+            <textarea value={replyText} onChange={e => setReplyText(e.target.value)} rows={2}
+              placeholder="Tulis balasan..."
+              className="flex-1 resize-none rounded-xl border border-border/50 bg-card/30 px-3 py-2 text-sm outline-none focus:border-primary/40 transition-all" />
+            <button onClick={submitReply} disabled={sending || !replyText.trim()}
+              className="flex items-center justify-center rounded-xl bg-primary/80 px-3 text-white hover:bg-primary transition-colors disabled:opacity-40">
+              {sending ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <Send className="h-4 w-4" />}
+            </button>
           </div>
         )}
         {showReplies && comment.replies.length > 0 && (
           <div className="mt-1">
             {comment.replies.map(r => (
-              <CommentItem key={r.id} comment={r} slug={slug} onReplyPosted={onReplyPosted} onToast={onToast} depth={depth + 1} />
+              <CommentItem key={r.id} comment={r} slug={slug} isLoggedIn={isLoggedIn}
+                onReplyPosted={onReplyPosted} onToast={onToast} depth={depth + 1} />
             ))}
           </div>
         )}
@@ -150,10 +148,7 @@ function CommentItem({ comment, slug, onReplyPosted, onToast, depth = 0 }: {
 function ShareModal({ url, title, onClose }: { url: string; title: string; onClose: () => void }) {
   const [copied, setCopied] = useState(false);
   const enc = encodeURIComponent;
-  const copy = async () => {
-    await navigator.clipboard.writeText(url);
-    setCopied(true); setTimeout(() => setCopied(false), 2000);
-  };
+  const copy = async () => { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2000); };
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="w-full max-w-sm rounded-2xl border border-border/60 bg-card p-5 space-y-4" onClick={e => e.stopPropagation()}>
@@ -166,8 +161,7 @@ function ShareModal({ url, title, onClose }: { url: string; title: string; onClo
           ].map(({ label, icon, href }) => (
             <a key={label} href={href} target="_blank" rel="noopener noreferrer"
               className="flex flex-col items-center gap-1.5 rounded-xl border border-border/40 p-3 hover:border-primary/40 hover:bg-primary/5 transition-all">
-              {icon}
-              <span className="text-[10px] text-muted-foreground/60">{label}</span>
+              {icon}<span className="text-[10px] text-muted-foreground/60">{label}</span>
             </a>
           ))}
         </div>
@@ -186,23 +180,27 @@ function ShareModal({ url, title, onClose }: { url: string; title: string; onClo
 
 // ─── Main ─────────────────────────────────────────────────────────────────
 export default function BlogDetailClient({ slug, content, likecount, siteUrl, title, tags, related }: Props) {
-  const [likes,        setLikes]        = useState(likecount);
-  const [dislikes,     setDislikes]     = useState(0);
-  const [reaction,     setReaction]     = useState<"like" | "dislike" | null>(null);
-  const [comments,     setComments]     = useState<Comment[]>([]);
-  const [commLoading,  setCommLoading]  = useState(true);
-  const [commOpen,     setCommOpen]     = useState(true);
-  const [newComment,   setNewComment]   = useState("");
-  const [guestName,    setGuestName]    = useState("");
-  const [submitting,   setSubmitting]   = useState(false);
-  const [preview,      setPreview]      = useState(false);
-  const [showShare,    setShowShare]    = useState(false);
-  const [toast,        setToast]        = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [likes,       setLikes]       = useState(likecount);
+  const [liked,       setLiked]       = useState(false);
+  const [isLoggedIn,  setIsLoggedIn]  = useState(false);
+  const [comments,    setComments]    = useState<Comment[]>([]);
+  const [commLoading, setCommLoading] = useState(true);
+  const [commOpen,    setCommOpen]    = useState(true);
+  const [newComment,  setNewComment]  = useState("");
+  const [preview,     setPreview]     = useState(false);
+  const [submitting,  setSubmitting]  = useState(false);
+  const [showShare,   setShowShare]   = useState(false);
+  const [toast,       setToast]       = useState<{ message: string; type: "success" | "error" } | null>(null);
   const viewCounted = useRef(false);
   const postUrl = `${siteUrl}/blog/${slug}`;
 
-  const showToast = useCallback((message: string, type: "success" | "error") => {
-    setToast({ message, type });
+  const showToast = useCallback((message: string, type: "success" | "error") => setToast({ message, type }), []);
+
+  // Check login status
+  useEffect(() => {
+    fetch("/api/auth/me").then(r => r.json()).then(d => {
+      if (d.data?.id) setIsLoggedIn(true);
+    }).catch(() => {});
   }, []);
 
   // Increment view once
@@ -212,14 +210,17 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
     fetch(`/api/blog/${slug}/views`, { method: "POST" }).catch(() => {});
   }, [slug]);
 
-  // Load reaction
+  // Load like status — only if logged in (to persist per user)
   useEffect(() => {
     fetch(`/api/blog/${slug}/like`)
       .then(r => r.json())
       .then(d => {
-        if (d.data) { setLikes(d.data.likecount); setDislikes(d.data.dislikecount ?? 0); setReaction(d.data.reaction); }
+        if (d.data) {
+          setLikes(d.data.likecount ?? likecount);
+          setLiked(d.data.reaction === "like");
+        }
       }).catch(() => {});
-  }, [slug]);
+  }, [slug, likecount]);
 
   // Load comments
   useEffect(() => {
@@ -231,47 +232,43 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
       .finally(() => setCommLoading(false));
   }, [slug]);
 
-  const sendReaction = async (type: "like" | "dislike") => {
-    const prev = reaction;
-    if (type === "like") {
-      if (prev === "like") { setLikes(l => Math.max(0, l - 1)); setReaction(null); }
-      else { setLikes(l => l + 1); if (prev === "dislike") setDislikes(d => Math.max(0, d - 1)); setReaction("like"); }
-    } else {
-      if (prev === "dislike") { setDislikes(d => Math.max(0, d - 1)); setReaction(null); }
-      else { setDislikes(d => d + 1); if (prev === "like") setLikes(l => Math.max(0, l - 1)); setReaction("dislike"); }
+  const toggleLike = async () => {
+    if (!isLoggedIn) {
+      showToast("Login dulu untuk memberikan like!", "error");
+      return;
     }
+    const prevLiked = liked;
+    setLiked(!prevLiked);
+    setLikes(l => prevLiked ? Math.max(0, l - 1) : l + 1);
     try {
       const res = await fetch(`/api/blog/${slug}/like`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body:   JSON.stringify({ type }),
+        body:   JSON.stringify({ type: "like" }),
       });
       const d = await res.json();
-      if (d.data) { setLikes(d.data.likecount); setDislikes(d.data.dislikecount ?? 0); setReaction(d.data.reaction); }
-    } catch {}
+      if (d.data) { setLikes(d.data.likecount); setLiked(d.data.reaction === "like"); }
+    } catch { setLiked(prevLiked); setLikes(l => prevLiked ? l + 1 : Math.max(0, l - 1)); }
   };
 
   const submitComment = async () => {
     if (!newComment.trim()) return;
+    if (!isLoggedIn) { showToast("Harus login untuk berkomentar!", "error"); return; }
     setSubmitting(true);
     try {
       const res  = await fetch(`/api/blog/${slug}/comments`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body:   JSON.stringify({
-          content:   newComment.trim(),
-          guestname: guestName.trim() || undefined,
-        }),
+        body:   JSON.stringify({ content: newComment.trim() }),
       });
       const data = await res.json();
       if (res.ok && data.data) {
         setComments(prev => [data.data, ...prev]);
-        setNewComment(""); setGuestName("");
+        setNewComment("");
         showToast("Komentar berhasil dikirim!", "success");
       } else {
-        showToast(data?.error?.message ?? "Gagal mengirim komentar.", "error");
+        showToast(data?.error?.message ?? "Gagal mengirim.", "error");
       }
-    } catch {
-      showToast("Koneksi gagal. Coba lagi.", "error");
-    } finally { setSubmitting(false); }
+    } catch { showToast("Koneksi gagal.", "error"); }
+    finally { setSubmitting(false); }
   };
 
   const handleReplyPosted = useCallback((reply: Comment, parentId: string) => {
@@ -282,10 +279,9 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
 
   return (
     <>
-      {/* Article Content */}
       <div className="mt-6"><MarkdownRenderer content={content} /></div>
 
-      {/* Tags — AFTER article content only */}
+      {/* Tags after article */}
       {tags.length > 0 && (
         <div className="mt-8 flex flex-wrap gap-1.5 border-t border-border/30 pt-5">
           {tags.map((t: string) => (
@@ -297,27 +293,16 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
         </div>
       )}
 
-      {/* Action Bar */}
+      {/* Action bar */}
       <div className="mt-6 flex items-center gap-2 rounded-2xl border border-border/40 bg-card/30 px-4 py-3">
-        <button onClick={() => sendReaction("like")}
+        <button onClick={toggleLike}
           className={cn("flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all",
-            reaction === "like"
-              ? "bg-green-500/15 border border-green-500/30 text-green-400"
-              : "border border-border/50 text-muted-foreground hover:border-green-400/30 hover:text-green-400")}>
-          <Heart className={cn("h-4 w-4", reaction === "like" && "fill-current scale-110")} />
+            liked ? "bg-red-500/15 border border-red-500/30 text-red-400" : "border border-border/50 text-muted-foreground hover:border-red-400/30 hover:text-red-400")}>
+          <Heart className={cn("h-4 w-4", liked && "fill-current scale-110")} />
           <span>{likes}</span>
         </button>
 
-        <button onClick={() => sendReaction("dislike")}
-          className={cn("flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all",
-            reaction === "dislike"
-              ? "bg-red-500/15 border border-red-500/30 text-red-400"
-              : "border border-border/50 text-muted-foreground hover:border-red-400/30 hover:text-red-400")}>
-          <ThumbsDown className={cn("h-4 w-4", reaction === "dislike" && "fill-current scale-110")} />
-          {dislikes > 0 && <span>{dislikes}</span>}
-        </button>
-
-        <button onClick={() => { setCommOpen(o => !o); document.getElementById("comments-section")?.scrollIntoView({ behavior: "smooth" }); }}
+        <button onClick={() => setCommOpen(o => !o)}
           className="flex items-center gap-2 rounded-xl border border-border/50 px-4 py-2 text-sm font-semibold text-muted-foreground hover:border-primary/30 hover:text-foreground transition-all">
           <MessageCircle className="h-4 w-4" />
           <span>{totalComments}</span>
@@ -331,9 +316,8 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
         </div>
       </div>
 
-      {/* Comments Section — collapsible */}
-      <div id="comments-section" className="mt-8 space-y-5">
-        {/* Header with toggle */}
+      {/* Comments — collapsible */}
+      <div className="mt-8 space-y-4">
         <button onClick={() => setCommOpen(o => !o)}
           className="flex w-full items-center justify-between rounded-2xl border border-border/40 bg-card/30 px-5 py-3.5 hover:border-primary/30 transition-all">
           <h3 className="text-base font-black flex items-center gap-2">
@@ -341,63 +325,66 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
             Komentar
             {totalComments > 0 && <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-sm text-primary">{totalComments}</span>}
           </h3>
-          <div className={cn("transition-transform duration-200", commOpen ? "" : "rotate-180")}>
-            <ChevronDown className="h-4 w-4 text-muted-foreground/50" />
-          </div>
+          <ChevronDown className={cn("h-4 w-4 text-muted-foreground/50 transition-transform duration-200", commOpen && "rotate-180")} />
         </button>
 
         {commOpen && (
           <div className="space-y-4">
-            {/* Comment form */}
-            <div className="glass-card rounded-2xl p-4 space-y-3">
-              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground/50">
-                <User className="h-3.5 w-3.5" /> Tulis Komentar
-              </div>
-              <input value={guestName} onChange={e => setGuestName(e.target.value)}
-                placeholder="Nama kamu (opsional jika sudah login)"
-                className="w-full rounded-xl border border-border/50 bg-black/20 px-3 py-2 text-sm outline-none placeholder:text-foreground/20 focus:border-primary/40 transition-all" />
-              <div className="flex gap-1 rounded-xl border border-border/40 bg-muted/10 p-1 w-fit">
-                {(["Tulis", "Preview"] as const).map(tab => (
-                  <button key={tab} onClick={() => setPreview(tab === "Preview")}
-                    className={cn("rounded-lg px-3 py-1 text-xs font-semibold transition-all",
-                      preview === (tab === "Preview") ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground")}>
-                    {tab}
-                  </button>
-                ))}
-              </div>
-              {preview ? (
-                <div className="min-h-[80px] rounded-xl border border-border/40 bg-black/10 px-4 py-3">
-                  {newComment.trim() ? <MarkdownRenderer content={newComment} compact /> : <p className="text-xs text-muted-foreground/30 italic">Belum ada teks...</p>}
+            {/* Form — require login */}
+            {isLoggedIn ? (
+              <div className="glass-card rounded-2xl p-4 space-y-3">
+                <div className="flex gap-1 rounded-xl border border-border/40 bg-muted/10 p-1 w-fit">
+                  {(["Tulis", "Preview"] as const).map(tab => (
+                    <button key={tab} onClick={() => setPreview(tab === "Preview")}
+                      className={cn("rounded-lg px-3 py-1 text-xs font-semibold transition-all",
+                        preview === (tab === "Preview") ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground")}>
+                      {tab}
+                    </button>
+                  ))}
                 </div>
-              ) : (
-                <textarea value={newComment} onChange={e => setNewComment(e.target.value)} rows={4}
-                  placeholder="Tulis komentar... Mendukung **bold**, *italic*, `code`"
-                  className="w-full resize-none rounded-xl border border-border/50 bg-black/20 px-3 py-2.5 text-sm outline-none placeholder:text-foreground/15 focus:border-primary/40 transition-all font-mono" />
-              )}
-              <div className="flex items-center justify-between">
-                <p className="text-[10px] text-muted-foreground/30">Mendukung **bold**, *italic*, `code`, [link](url)</p>
-                <button onClick={submitComment} disabled={submitting || !newComment.trim()}
-                  className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90 transition-colors disabled:opacity-40">
-                  {submitting ? <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <Send className="h-3.5 w-3.5" />}
-                  Kirim
-                </button>
+                {preview ? (
+                  <div className="min-h-[80px] rounded-xl border border-border/40 bg-black/10 px-4 py-3">
+                    {newComment.trim() ? <MarkdownRenderer content={newComment} compact /> : <p className="text-xs text-muted-foreground/30 italic">Belum ada teks...</p>}
+                  </div>
+                ) : (
+                  <textarea value={newComment} onChange={e => setNewComment(e.target.value)} rows={4}
+                    placeholder="Tulis komentar... Mendukung **bold**, *italic*, `code`"
+                    className="w-full resize-none rounded-xl border border-border/50 bg-black/20 px-3 py-2.5 text-sm outline-none placeholder:text-foreground/15 focus:border-primary/40 transition-all font-mono" />
+                )}
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] text-muted-foreground/30">Mendukung **bold**, *italic*, `code`</p>
+                  <button onClick={submitComment} disabled={submitting || !newComment.trim()}
+                    className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90 transition-colors disabled:opacity-40">
+                    {submitting ? <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <Send className="h-3.5 w-3.5" />}
+                    Kirim
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="glass-card rounded-2xl p-5 text-center space-y-3">
+                <Lock className="mx-auto h-8 w-8 text-muted-foreground/30" />
+                <p className="text-sm text-muted-foreground/60">Login untuk berkomentar</p>
+                <Link href="/login"
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white hover:bg-primary/90 transition-colors">
+                  Login / Daftar
+                </Link>
+              </div>
+            )}
 
-            {/* Comments list */}
             {commLoading ? (
               <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground/40 text-sm">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" /> Memuat...
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
               </div>
             ) : comments.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border/30 py-10 text-center">
                 <MessageCircle className="mx-auto h-8 w-8 text-muted-foreground/20 mb-2" />
-                <p className="text-sm text-muted-foreground/40">Jadilah yang pertama berkomentar!</p>
+                <p className="text-sm text-muted-foreground/40">Belum ada komentar</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {comments.map(c => (
-                  <CommentItem key={c.id} comment={c} slug={slug} onReplyPosted={handleReplyPosted} onToast={showToast} />
+                  <CommentItem key={c.id} comment={c} slug={slug} isLoggedIn={isLoggedIn}
+                    onReplyPosted={handleReplyPosted} onToast={showToast} />
                 ))}
               </div>
             )}
@@ -405,7 +392,7 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
         )}
       </div>
 
-      {/* Related Posts */}
+      {/* Related */}
       {related.length > 0 && (
         <div className="mt-12 border-t border-border/40 pt-8">
           <h3 className="mb-5 text-lg font-black">Artikel Lainnya</h3>
@@ -421,9 +408,9 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
                 </div>
                 <div className="p-3">
                   <p className="text-xs font-bold line-clamp-2 group-hover:text-primary transition-colors">{p.title}</p>
-                  {p.tags.length > 0 && (
+                  {(p.tags ?? []).length > 0 && (
                     <div className="mt-1.5 flex flex-wrap gap-1">
-                      {p.tags.slice(0, 2).map((t: string) => <span key={t} className="text-[9px] text-muted-foreground/40">#{t}</span>)}
+                      {(p.tags ?? []).slice(0, 2).map((t: string) => <span key={t} className="text-[9px] text-muted-foreground/40">#{t}</span>)}
                     </div>
                   )}
                 </div>
