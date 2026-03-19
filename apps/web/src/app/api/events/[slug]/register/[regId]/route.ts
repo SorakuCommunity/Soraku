@@ -49,7 +49,7 @@ export async function PATCH(
 
     if (error) return err(error.message)
 
-    const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://soraku.vercel.app'
+    const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.soraku.id'
     const eventTitle = (reg.events as any)?.title ?? 'Event Soraku'
     const eventSlug  = (reg.events as any)?.slug  ?? slug
     const isApproved = parsed.data.status === 'approved'

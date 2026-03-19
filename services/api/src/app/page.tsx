@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic"
 
 const DISCORD_INVITE = "https://discord.gg/qm3XJvRa6B"
-const WEB_URL        = "https://soraku.vercel.app"
+const WEB_URL        = "https://www.soraku.id"
 const API_VERSION    = "0.1.0"
 
 const ENDPOINTS = [

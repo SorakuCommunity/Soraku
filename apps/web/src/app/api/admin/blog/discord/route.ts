@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const siteUrl  = env.NEXT_PUBLIC_SITE_URL ?? 'https://soraku.vercel.app'
+    const siteUrl  = env.NEXT_PUBLIC_SITE_URL ?? 'https://www.soraku.id'
     const postUrl  = `${siteUrl}/blog/${post.slug}`
     const dateStr  = new Date(post.publishedat ?? new Date()).toLocaleDateString('id-ID', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',

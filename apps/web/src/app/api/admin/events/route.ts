@@ -33,7 +33,7 @@ async function sendDiscordEventEmbed(event: {
   enddate?: string; location?: string; isonline: boolean; tags: string[]
   coverurl?: string; registrationurl?: string; ispaid?: boolean; price?: number
 }) {
-  const siteUrl   = env.NEXT_PUBLIC_SITE_URL ?? 'https://soraku.vercel.app'
+  const siteUrl   = env.NEXT_PUBLIC_SITE_URL ?? 'https://www.soraku.id'
   const eventUrl  = `${siteUrl}/events/${event.slug}`
   const daftarUrl = `${siteUrl}/events/${event.slug}/daftar`
 

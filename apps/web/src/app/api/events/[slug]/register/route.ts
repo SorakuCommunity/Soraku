@@ -71,7 +71,7 @@ export async function POST(
       .select('*', { count: 'exact', head: true })
       .eq('eventid', event.id)
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://soraku.vercel.app'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.soraku.id'
     const regId   = data.id.slice(0, 8).toUpperCase()
     const d       = parsed.data
 

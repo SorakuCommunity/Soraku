@@ -22,7 +22,19 @@ function ToolbarBtn({ icon: Icon, label, onClick }: { icon: any; label: string; 
   );
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 function insertMarkdown(ref: React.RefObject<HTMLTextAreaElement | null>, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
+=======
+function insertMarkdown(ref: React.RefObject<HTMLTextAreaElement>, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
+>>>>>>> 1170e9e (feat(blog): full overhaul - grid, markdown, likes, comments, share, views, Discord, services/api)
+=======
+function insertMarkdown(ref: React.RefObject<HTMLTextAreaElement | null>, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
+>>>>>>> 383fdef (fix(blog): RefObject<HTMLTextAreaElement | null> compat React 19 strict mode)
+=======
+function insertMarkdown(ref: { current: HTMLTextAreaElement | null }, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
+>>>>>>> 68bcabc (fix(blog): RefObject duck type - kompatibel React 18 & 19)
   const el = ref.current;
   if (!el) return;
   const start = el.selectionStart;
@@ -209,7 +221,11 @@ export default function AdminBlogNewPage() {
               </button>
             </div>
             <div className="flex flex-wrap gap-1.5 min-h-[24px]">
+<<<<<<< HEAD
               {tags.map((t: string) => (
+=======
+              {tags.map(t => (
+>>>>>>> 1170e9e (feat(blog): full overhaul - grid, markdown, likes, comments, share, views, Discord, services/api)
                 <span key={t} className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">
                   #{t}<button onClick={() => setTags(tags.filter(x => x !== t))}><X className="h-2.5 w-2.5" /></button>
                 </span>

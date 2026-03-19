@@ -29,9 +29,7 @@ export default async function VTuberPage() {
         <p className="mt-4 text-muted-foreground max-w-lg mx-auto">
           Kenalan dengan VTuber dari Soraku Community — kreator virtual yang menghibur dan menginspirasi.
         </p>
-        <Link href="/agensi" className="mt-4 inline-block text-sm text-primary hover:underline">
-          ← Lihat semua talent
-        </Link>
+
       </div>
 
       {/* VTuber cards */}

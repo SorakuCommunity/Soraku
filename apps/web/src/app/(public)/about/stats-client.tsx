@@ -53,7 +53,7 @@ const STAT_DEFS = [
     icon:   "🧩",
     label:  "Member Platform",
     suffix: "+",
-    desc:   "Terdaftar di soraku.vercel.app",
+    desc:   "Terdaftar di www.soraku.id",
   },
 ];
 

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import type { MetadataRoute } from "next";
 import { adminDb } from "@/lib/supabase/admin";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://soraku.vercel.app";
+const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.soraku.id";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Providers } from "@/components/providers";
 import "@/styles/globals.css";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://soraku.vercel.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.soraku.id";
 
 export const metadata: Metadata = {
   title: { default: "Soraku Community", template: "%s — Soraku Community" },

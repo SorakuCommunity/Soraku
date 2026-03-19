@@ -45,5 +45,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withMDX(nextConfig);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default withMDX(nextConfig as any);
 

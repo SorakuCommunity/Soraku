@@ -25,7 +25,7 @@ async function notifyDiscordBlog(post: {
   slug: string; title: string; excerpt?: string | null;
   coverurl?: string | null; tags: string[]; authorid?: string | null;
 }) {
-  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? 'https://soraku.vercel.app'
+  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? 'https://www.soraku.id'
   const postUrl = `${siteUrl}/blog/${post.slug}`
   let authorName = 'Soraku Team', authorAvatar = `${siteUrl}/logo.png`
   if (post.authorid) {

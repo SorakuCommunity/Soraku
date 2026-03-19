@@ -6,7 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Save, Eye, Loader2, Plus, X, Wifi, MapPin,
-  AlertCircle, CreditCard, Upload, Trash2,
+  AlertCircle, CreditCard, Upload, Trash2, Gamepad2, Lock, Unlock, Swords, Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ImageUrlInput } from "@/components/ui/image-url-input";
@@ -144,6 +144,10 @@ export default function AdminEventEditPage() {
   const [price,          setPrice]          = useState("");
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [addingType,     setAddingType]     = useState<"bank" | "ewallet" | "qris" | null>(null);
+  const [gametype,       setGametype]       = useState<string>("");
+  const [regOpen,        setRegOpen]        = useState(false);
+  const [regUrl,         setRegUrl]         = useState("");
+  const [priceinfo,      setPriceinfo]      = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -165,6 +169,10 @@ export default function AdminEventEditPage() {
       setIspaid(d.ispaid ?? false);
       setPrice(d.price ? String(d.price) : "");
       setPaymentMethods((d.paymentmethods ?? []).map((m: any) => m.type === 'qris' ? { ...m, qrisUrl: m.qrisUrl ?? '' } : m));
+      setGametype(d.gametype ?? "");
+      setRegOpen(d.registrationopen ?? false);
+      setRegUrl(d.registrationurl ?? "");
+      setPriceinfo(d.priceinfo ?? "");
       setFetching(false);
     })();
   }, [id]);
@@ -213,7 +221,11 @@ export default function AdminEventEditPage() {
         isonline, location: !isonline ? location.trim() || undefined : undefined,
         tags, ispublished: publish,
         ispaid, price: ispaid && price ? parseInt(price) : 0,
+        priceinfo: ispaid ? priceinfo.trim() || undefined : undefined,
         paymentmethods: ispaid ? paymentMethods : [],
+        gametype: gametype || undefined,
+        registrationopen: regOpen,
+        registrationurl: regUrl.trim() || undefined,
       }),
     });
     const data = await res.json();
@@ -301,6 +313,129 @@ export default function AdminEventEditPage() {
             placeholder="Deskripsi event..." className={cn(fieldCls, "resize-none")} />
         </div>
 
+        {/* Game Type */}
+        <div className="glass-card p-5 space-y-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Gamepad2 className="h-4 w-4 text-primary" />
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              Tipe Game / Event
+            </label>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <button type="button" onClick={() => setGametype(gametype === "ml" ? "" : "ml")}
+                className={cn(
+                  "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-all",
+                  gametype === "ml"
+                    ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
+                    : "border-border text-muted-foreground hover:border-border hover:bg-muted/30"
+                )}>
+                <span>{"⚔️"}</span> Mobile Legends
+              </button>
+              <button type="button" onClick={() => setGametype(gametype === "valorant" ? "" : "valorant")}
+                className={cn(
+                  "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-all",
+                  gametype === "valorant"
+                    ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
+                    : "border-border text-muted-foreground hover:border-border hover:bg-muted/30"
+                )}>
+                <span>{"🔫"}</span> Valorant
+              </button>
+              <button type="button" onClick={() => setGametype(gametype === "freefire" ? "" : "freefire")}
+                className={cn(
+                  "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-all",
+                  gametype === "freefire"
+                    ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
+                    : "border-border text-muted-foreground hover:border-border hover:bg-muted/30"
+                )}>
+                <span>{"🔥"}</span> Free Fire
+              </button>
+              <button type="button" onClick={() => setGametype(gametype === "pubg" ? "" : "pubg")}
+                className={cn(
+                  "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-all",
+                  gametype === "pubg"
+                    ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
+                    : "border-border text-muted-foreground hover:border-border hover:bg-muted/30"
+                )}>
+                <span>{"🪖"}</span> PUBG Mobile
+              </button>
+              <button type="button" onClick={() => setGametype(gametype === "chess" ? "" : "chess")}
+                className={cn(
+                  "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-all",
+                  gametype === "chess"
+                    ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
+                    : "border-border text-muted-foreground hover:border-border hover:bg-muted/30"
+                )}>
+                <span>{"♟️"}</span> Catur
+              </button>
+              <button type="button" onClick={() => setGametype(gametype === "other" ? "" : "other")}
+                className={cn(
+                  "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-all",
+                  gametype === "other"
+                    ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
+                    : "border-border text-muted-foreground hover:border-border hover:bg-muted/30"
+                )}>
+                <span>{"🎲"}</span> Lainnya
+              </button>
+          </div>
+          {gametype === "ml" && (
+            <div className="flex items-center gap-2.5 rounded-xl border border-primary/25 bg-primary/8 px-3.5 py-3">
+              <Swords className="h-4 w-4 text-primary flex-shrink-0" />
+              <div>
+                <p className="text-xs font-bold text-primary">Form Pendaftaran Tim ML Aktif</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-0.5">
+                  Peserta daftar lewat <code className="text-primary/70">/events/{slug}/daftar</code>
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Buka / Tutup Pendaftaran + Link Eksternal */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="glass-card p-5 space-y-3">
+            <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              Status Pendaftaran
+            </label>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setRegOpen(false)}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-medium transition-colors",
+                  !regOpen ? "border-red-500/40 bg-red-500/10 text-red-400" : "border-border text-muted-foreground hover:bg-muted/20"
+                )}>
+                <Lock className="h-4 w-4" /> Tutup
+              </button>
+              <button type="button" onClick={() => setRegOpen(true)}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-medium transition-colors",
+                  regOpen ? "border-green-500/40 bg-green-500/10 text-green-400" : "border-border text-muted-foreground hover:bg-green-500/5"
+                )}>
+                <Unlock className="h-4 w-4" /> Buka
+              </button>
+            </div>
+            <p className={cn(
+              "rounded-xl px-3 py-2 text-[11px] font-medium text-center",
+              regOpen ? "bg-green-500/8 text-green-400/80 border border-green-500/15" : "bg-red-500/5 text-red-400/60 border border-red-500/10"
+            )}>
+              {regOpen ? "🟢 Tombol Daftar tampil di halaman publik" : "🔴 Halaman publik arahkan ke Discord"}
+            </p>
+          </div>
+
+          <div className="glass-card p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Link2 className="h-4 w-4 text-primary/60" />
+              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                Link Pendaftaran Eksternal
+                <span className="ml-1.5 font-normal normal-case text-muted-foreground/40">(opsional)</span>
+              </label>
+            </div>
+            <input type="text" value={regUrl} onChange={e => setRegUrl(e.target.value)}
+              placeholder="https://forms.gle/..." className={fieldCls} />
+            <p className="text-[11px] text-muted-foreground/40">
+              {gametype === "ml" ? "Kosongkan untuk pakai form bawaan ML Soraku." : "Isi jika ada form pendaftaran eksternal."}
+            </p>
+          </div>
+        </div>
+
         {/* Tanggal & Tipe */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="glass-card p-5 space-y-3">
@@ -352,9 +487,17 @@ export default function AdminEventEditPage() {
 
           {ispaid && (
             <div className="space-y-4 pt-1">
-              <div>
-                <label className="mb-1 block text-xs text-muted-foreground/60">Harga (Rupiah)</label>
-                <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="50000" min="0" className={fieldCls} />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-xs text-muted-foreground/60">Harga (Rupiah)</label>
+                  <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="50000" min="0" className={fieldCls} />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs text-muted-foreground/60">Info Rekening / Cara Bayar</label>
+                  <textarea value={priceinfo} onChange={e => setPriceinfo(e.target.value)} rows={3}
+                    placeholder="BCA 1234567890 a/n Soraku&#10;Konfirmasi via Discord setelah transfer"
+                    className={cn(fieldCls, "resize-none")} />
+                </div>
               </div>
 
               <div className="space-y-3">

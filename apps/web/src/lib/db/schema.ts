@@ -59,3 +59,10 @@ export const userbadges = soraku.table('userbadges', {
   badgecls:  text('badgecls'),
   createdat: timestamp('createdat', { withTimezone: true }).defaultNow(),
 })
+
+export const follows = soraku.table('follows', {
+  id:          uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  followerid:  uuid('followerid').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  followingid: uuid('followingid').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  created_at:  timestamp('created_at', { withTimezone: true }).defaultNow(),
+})

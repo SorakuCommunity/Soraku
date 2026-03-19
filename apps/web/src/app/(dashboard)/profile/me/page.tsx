@@ -175,11 +175,14 @@ function Skeleton() {
 
 function ProfileTab({
   profile, rm, sm, joinDate, displayname, username, bio, avatarurl, coverurl, isprivate, socials, onGoSettings,
+  followers = 0, following = 0,
 }: {
   profile: Profile; rm: typeof ROLE_META[string]; sm: typeof SUPPORT_META[string] | null;
   joinDate: string; displayname: string; username: string; bio: string;
   avatarurl: string; coverurl: string; isprivate: boolean; socials: Record<string, string>;
   onGoSettings: () => void;
+  followers?: number;
+  following?: number;
 }) {
   const name  = displayname || profile.username || "Pengguna";
   const init  = name.charAt(0).toUpperCase();
@@ -574,6 +577,8 @@ export default function ProfilePage() {
   const [dirty,    setDirty]    = useState(false);
   const [toast,    setToast]    = useState<{ msg: string; type: "ok" | "err" } | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("profile");
+  const [followers, setFollowers] = useState(0);
+  const [following, setFollowing] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [direction, setDirection] = useState<"left" | "right">("left");
 
@@ -601,6 +606,12 @@ export default function ProfilePage() {
       if (!d.data) throw new Error();
       const p: Profile = d.data;
       setProfile(p);
+      // Load follow counts
+      if (p.username) {
+        fetch(`/api/users/${p.username}/follow`).then(r => r.json())
+          .then(d => { if (d.data) { setFollowers(d.data.followers ?? 0); setFollowing(d.data.following ?? 0); } })
+          .catch(() => {});
+      }
       setDisplayname(p.displayname ?? "");
       setUsername(p.username ?? "");
       setBio(p.bio ?? "");

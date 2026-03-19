@@ -1,5 +1,12 @@
 "use client";
+<<<<<<< HEAD
+<<<<<<< HEAD
 import React from "react";
+=======
+>>>>>>> 1170e9e (feat(blog): full overhaul - grid, markdown, likes, comments, share, views, Discord, services/api)
+=======
+import type React from "react";
+>>>>>>> 326dd16 (fix(build): 3 pre-existing TS errors + sitemap resilience)
 import { cn } from "@/lib/utils";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -118,7 +125,15 @@ function parseBlocks(content: string): React.ReactNode[] {
         "text-sm font-bold text-foreground/80 mt-4 mb-1",
         "text-xs font-bold text-foreground/60 mt-3 mb-1",
       ][level - 1];
+<<<<<<< HEAD
+<<<<<<< HEAD
       const Tag = `h${level}` as keyof React.JSX.IntrinsicElements;
+=======
+      const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+>>>>>>> 1170e9e (feat(blog): full overhaul - grid, markdown, likes, comments, share, views, Discord, services/api)
+=======
+      const Tag = `h${level}` as keyof React.JSX.IntrinsicElements;
+>>>>>>> 326dd16 (fix(build): 3 pre-existing TS errors + sitemap resilience)
       nodes.push(<Tag key={i} className={cls}>{parseInline(text)}</Tag>);
       i++; continue;
     }
