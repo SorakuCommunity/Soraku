@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { posts } from "@/lib/db/schema"
+import { posts, users } from "@/lib/db/schema"
 import { BlogQuerySchema } from "@/lib/validators"
-import { eq, and, ilike, desc, sql } from "drizzle-orm"
+import { eq, and, ilike, desc, sql, inArray } from "drizzle-orm"
 
 export const dynamic = "force-dynamic"
 
@@ -17,9 +17,16 @@ export async function GET(req: NextRequest) {
 
   const rows = await db
     .select({
-      id: posts.id, slug: posts.slug, title: posts.title,
-      excerpt: posts.excerpt, coverurl: posts.coverurl,
-      tags: posts.tags, publishedat: posts.publishedat, authorid: posts.authorid,
+      id:          posts.id,
+      slug:        posts.slug,
+      title:       posts.title,
+      excerpt:     posts.excerpt,
+      coverurl:    posts.coverurl,
+      tags:        posts.tags,
+      publishedat: posts.publishedat,
+      authorid:    posts.authorid,
+      viewcount:   posts.viewcount,
+      likecount:   posts.likecount,
     })
     .from(posts)
     .where(and(
@@ -31,5 +38,21 @@ export async function GET(req: NextRequest) {
     .limit(limit)
     .offset(offset)
 
-  return NextResponse.json({ data: rows, error: null })
+  // Fetch authors
+  const authorIds = [...new Set(rows.filter(r => r.authorid).map(r => r.authorid!))]
+  let authorsMap: Record<string, { username: string | null; displayname: string | null; avatarurl: string | null }> = {}
+  if (authorIds.length > 0) {
+    const authors = await db
+      .select({ id: users.id, username: users.username, displayname: users.displayname, avatarurl: users.avatarurl })
+      .from(users)
+      .where(inArray(users.id, authorIds))
+    authorsMap = Object.fromEntries(authors.map(u => [u.id, u]))
+  }
+
+  const result = rows.map(r => ({
+    ...r,
+    author: r.authorid ? authorsMap[r.authorid] ?? null : null,
+  }))
+
+  return NextResponse.json({ data: result, error: null })
 }

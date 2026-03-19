@@ -63,3 +63,10 @@ export const AnimeSearchQuerySchema = z.object({
   source: z.enum(["gogoanime", "hianime", "animekai", "anibaru", "samehadaku"]).default("hianime"),
   page:   z.coerce.number().min(1).default(1),
 })
+
+// ── Blog Comments ────────────────────────────────────────────
+export const CommentSchema = z.object({
+  content:   z.string().min(1).max(2000),
+  parentid:  z.string().uuid().optional(),
+  guestname: z.string().max(50).optional(),
+})

@@ -107,7 +107,7 @@ function EventCard({ event }: { event: EventItem }) {
       className="glass-card group flex flex-col overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:border-primary/30">
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted/20">
         {event.coverurl ? (
-          <Image src={event.coverurl} alt={event.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+          <Image src={event.coverurl} alt={event.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" unoptimized />
         ) : (
           <div className="flex h-full items-center justify-center text-muted-foreground/20"><Calendar className="h-10 w-10" /></div>
         )}
@@ -131,7 +131,7 @@ function BlogCard({ blog }: { blog: BlogItem }) {
       className="glass-card group flex flex-col overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:border-primary/30">
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted/20">
         {blog.coverurl ? (
-          <Image src={blog.coverurl} alt={blog.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+          <Image src={blog.coverurl} alt={blog.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" unoptimized />
         ) : (
           <div className="flex h-full items-center justify-center text-muted-foreground/20"><BookOpen className="h-10 w-10" /></div>
         )}

@@ -51,6 +51,8 @@ export const posts = soraku.table("posts", {
   ispublished: boolean("ispublished").default(false),
   publishedat: timestamp("publishedat", { withTimezone: true }),
   authorid:    uuid("authorid"),
+  viewcount:   integer("viewcount").notNull().default(0),
+  likecount:   integer("likecount").notNull().default(0),
   createdat:   timestamp("createdat", { withTimezone: true }).defaultNow(),
   updatedat:   timestamp("updatedat", { withTimezone: true }).defaultNow(),
 })
@@ -128,4 +130,24 @@ export const apikeys = soraku.table("apikeys", {
   expiresat:   timestamp("expiresat", { withTimezone: true }),
   isactive:    boolean("isactive").notNull().default(true),
   createdat:   timestamp("createdat", { withTimezone: true }).defaultNow(),
+})
+
+export const post_likes = soraku.table("post_likes", {
+  id:        uuid("id").primaryKey().defaultRandom(),
+  postid:    uuid("postid").notNull(),
+  userid:    uuid("userid"),
+  ipaddr:    text("ipaddr"),
+  createdat: timestamp("createdat", { withTimezone: true }).defaultNow(),
+})
+
+export const post_comments = soraku.table("post_comments", {
+  id:        uuid("id").primaryKey().defaultRandom(),
+  postid:    uuid("postid").notNull(),
+  parentid:  uuid("parentid"),
+  userid:    uuid("userid"),
+  guestname: text("guestname"),
+  content:   text("content").notNull(),
+  isdeleted: boolean("isdeleted").default(false),
+  createdat: timestamp("createdat", { withTimezone: true }).defaultNow(),
+  updatedat: timestamp("updatedat", { withTimezone: true }).defaultNow(),
 })
