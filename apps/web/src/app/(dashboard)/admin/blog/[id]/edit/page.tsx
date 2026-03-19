@@ -86,7 +86,7 @@ export default function AdminBlogEditPage() {
 
   const handleReplace = async () => {
     if (!confirm("Yakin ingin mengganti isi artikel? Perubahan tidak bisa dibatalkan.")) return;
-    setReplacing(true); setSaveError(null);
+    setReplacing(true); setError(null);
     const res = await fetch(`/api/admin/blog/${id}`, {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -98,10 +98,10 @@ export default function AdminBlogEditPage() {
       }),
     });
     const data = await res.json();
-    if (!res.ok) { setSaveError(data?.error?.message ?? "Gagal mengganti artikel."); setReplacing(false); return; }
+    if (!res.ok) { setError(data?.error?.message ?? "Gagal mengganti artikel."); setReplacing(false); return; }
     setReplacing(false);
-    setSaveError("✅ Artikel berhasil diperbarui!");
-    setTimeout(() => setSaveError(null), 3000);
+    setError("✅ Artikel berhasil diperbarui!");
+    setTimeout(() => setError(null), 3000);
   };
 
   const handleSubmit = async (publish: boolean) => {
