@@ -6,21 +6,23 @@ import { useEffect, Suspense } from "react";
 
 const PIXEL_ID = "D6UQBU3C77UFTE0HO0R0";
 
-// Track pageview on route change
+// ─── SPA page tracker ─────────────────────────────────────────────────────────
 function TikTokPageTracker() {
   const pathname     = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
     const ttq = (window as any).ttq;
     if (!ttq) return;
     ttq.page();
+    // Juga kirim ke server-side untuk deduplicate
+    sendS2S("PageView");
   }, [pathname, searchParams]);
 
   return null;
 }
 
+// ─── Root component — inject ke layout ───────────────────────────────────────
 export function TikTokPixel() {
   return (
     <>
@@ -44,8 +46,6 @@ export function TikTokPixel() {
 }(window,document,'ttq');
         `}
       </Script>
-
-      {/* Track page views on SPA navigation */}
       <Suspense fallback={null}>
         <TikTokPageTracker />
       </Suspense>
@@ -53,39 +53,75 @@ export function TikTokPixel() {
   );
 }
 
-// ─── Helper functions untuk tracking events ──────────────────────────────────
-// Bisa dipanggil dari komponen manapun
+// ─── Server-side (S2S) sender ─────────────────────────────────────────────────
+// Kirim event ke /api/analytics/tiktok yang akan forward ke TikTok Events API
+// Dual tracking: pixel (client) + S2S (server) → lebih akurat, deduplicate via event_id
 
-/** Track event pendaftaran — dipanggil saat user submit form daftar */
-export function trackTikTokRegistration(params?: { email?: string; phone?: string }) {
-  const ttq = (window as any).ttq;
-  if (!ttq) return;
-  ttq.track("CompleteRegistration", {
-    ...(params?.email && { email: params.email }),
-    ...(params?.phone && { phone_number: params.phone }),
-  });
+async function sendS2S(
+  event: string,
+  properties?: {
+    content_id?:   string;
+    content_name?: string;
+    content_type?: string;
+    query?:        string;
+    value?:        number;
+    currency?:     string;
+  },
+  eventId?: string
+) {
+  try {
+    await fetch("/api/analytics/tiktok", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event, event_id: eventId, properties }),
+    });
+  } catch {
+    // silent fail — jangan ganggu UX
+  }
 }
 
-/** Track event view konten (blog, event page) */
-export function trackTikTokViewContent(params: { content_id: string; content_name: string; content_type?: string }) {
+// ─── Public tracking helpers ──────────────────────────────────────────────────
+
+/** Track register — dipanggil setelah register berhasil */
+export function trackRegistration() {
+  const eventId = `register-${Date.now()}`;
   const ttq = (window as any).ttq;
-  if (!ttq) return;
-  ttq.track("ViewContent", {
+  if (ttq) ttq.track("CompleteRegistration", {}, { event_id: eventId });
+  sendS2S("CompleteRegistration", undefined, eventId);
+}
+
+/** Track view konten (event page / blog) */
+export function trackViewContent(params: {
+  content_id: string;
+  content_name: string;
+  content_type?: string;
+}) {
+  const eventId = `view-${params.content_id}-${Date.now()}`;
+  const ttq = (window as any).ttq;
+  if (ttq) ttq.track("ViewContent", {
     contents: [{ content_id: params.content_id, content_name: params.content_name }],
     content_type: params.content_type ?? "article",
-  });
+  }, { event_id: eventId });
+  sendS2S("ViewContent", { ...params }, eventId);
 }
 
-/** Track event search */
-export function trackTikTokSearch(query: string) {
+/** Track subscribe / donasi */
+export function trackSubscribe(value?: number) {
+  const eventId = `subscribe-${Date.now()}`;
   const ttq = (window as any).ttq;
-  if (!ttq) return;
-  ttq.track("Search", { query });
+  if (ttq) ttq.track("Subscribe", { value: value ?? 0, currency: "IDR" }, { event_id: eventId });
+  sendS2S("Subscribe", { value, currency: "IDR" }, eventId);
 }
 
-/** Track subscribe/donasi */
-export function trackTikTokSubscribe(value?: number) {
+/** Track search */
+export function trackSearch(query: string) {
   const ttq = (window as any).ttq;
-  if (!ttq) return;
-  ttq.track("Subscribe", { value: value ?? 0, currency: "IDR" });
+  if (ttq) ttq.track("Search", { query });
+  sendS2S("Search", { query });
 }
+
+// Alias untuk backward compatibility
+export const trackTikTokRegistration  = trackRegistration;
+export const trackTikTokViewContent   = trackViewContent;
+export const trackTikTokSubscribe     = trackSubscribe;
+export const trackTikTokSearch        = trackSearch;

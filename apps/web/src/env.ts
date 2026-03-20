@@ -28,6 +28,7 @@ export const env = createEnv({
     // Central API (services/api)
     // Contoh: https://apisoraku-git-master-www.soraku.id
     API_URL: z.string().optional().default('http://localhost:4000'),
+    TIKTOK_ACCESS_TOKEN: z.string().optional(),
 
     // Payment (opsional)
     XENDIT_SECRET_KEY:       z.string().optional(),
@@ -58,6 +59,7 @@ export const env = createEnv({
     SUPABASE_SERVICE_ROLE_KEY:  process.env.SUPABASE_SERVICE_ROLE_KEY,
     SUPABASE_SERVICE_KEY:       process.env.SUPABASE_SERVICE_KEY,
     API_URL:                    process.env.API_URL,
+    TIKTOK_ACCESS_TOKEN:        process.env.TIKTOK_ACCESS_TOKEN,
     XENDIT_SECRET_KEY:          process.env.XENDIT_SECRET_KEY,
     XENDIT_WEBHOOK_TOKEN:       process.env.XENDIT_WEBHOOK_TOKEN,
     TRAKTEER_WEBHOOK_SECRET:    process.env.TRAKTEER_WEBHOOK_SECRET,
