@@ -1,0 +1,120 @@
+SORAKU COMMUNITY SOURCE LICENSE
+Versi 1.0, berlaku sejak 10 Februari 2026
+
+Hak Cipta (c) 2023–2026 Soraku Community
+Semua hak dilindungi undang-undang.
+
+Pemilik dan Pemegang Hak Cipta:
+  Riu (Koordinator dan Pengembang Utama)
+  Soraku Community — Indonesia
+
+Kontak resmi: echo.soraku@gmail.com
+Platform:     https://www.soraku.id
+
+
+BAGIAN I — DEFINISI
+
+"Perangkat lunak" mengacu pada seluruh kode sumber, aset digital, konfigurasi,
+dokumentasi, dan materi terkait yang terdapat dalam repositori ini.
+
+"Kontributor" adalah setiap individu atau entitas yang berkontribusi pada
+pengembangan perangkat lunak ini atas seizin pemilik.
+
+"Penggunaan" mencakup akses, salinan, modifikasi, distribusi, sublisensing,
+dan penggunaan dalam sistem produksi maupun pengembangan.
+
+"Platform Soraku" merujuk pada layanan komunitas yang dioperasikan di domain
+www.soraku.id beserta seluruh subdomain dan API terkait.
+
+
+BAGIAN II — HAK YANG DIBERIKAN
+
+Dengan tunduk pada syarat dan ketentuan lisensi ini, pemilik memberikan izin
+terbatas, tidak eksklusif, dan tidak dapat dialihkan kepada kontributor resmi
+yang terdaftar untuk:
+
+1. Membaca dan mempelajari kode sumber untuk keperluan kontribusi pada
+   Platform Soraku.
+
+2. Memodifikasi kode sumber dalam lingkup pekerjaan yang ditugaskan oleh
+   koordinator proyek.
+
+3. Menjalankan salinan lokal perangkat lunak untuk keperluan pengembangan
+   dan pengujian.
+
+
+BAGIAN III — PEMBATASAN
+
+Tanpa izin tertulis eksplisit dari pemilik, dilarang keras untuk:
+
+1. Mendistribusikan, menjual, menyewakan, atau memberikan perangkat lunak
+   ini kepada pihak ketiga mana pun.
+
+2. Menggunakan perangkat lunak ini sebagai dasar produk atau layanan
+   komersial lain.
+
+3. Menghapus, mengubah, atau menyembunyikan atribusi hak cipta, nama merek
+   "Soraku", atau identitas tim dalam kode maupun antarmuka pengguna.
+
+4. Mendeploy instansi terpisah dari perangkat lunak ini yang dapat
+   menyerupai atau bersaing dengan Platform Soraku.
+
+5. Menggunakan nama, logo, maskot, atau identitas visual Soraku untuk
+   tujuan apa pun di luar kontribusi resmi pada repositori ini.
+
+
+BAGIAN IV — KONTRIBUSI
+
+Setiap kontribusi yang dikirimkan ke repositori ini dianggap sebagai karya
+yang diserahkan sepenuhnya kepada proyek Soraku Community. Kontributor
+dengan ini menyatakan bahwa:
+
+1. Kontributor memiliki hak penuh atas karya yang dikontribusikan.
+
+2. Kontribusi tersebut tidak melanggar hak pihak ketiga mana pun.
+
+3. Kontributor setuju bahwa pemilik dapat menggunakan kontribusi tersebut
+   tanpa kompensasi tambahan dalam konteks Platform Soraku.
+
+Kontributor tetap mendapatkan atribusi nama dalam catatan kontribusi proyek.
+
+
+BAGIAN V — PENOLAKAN GARANSI
+
+Perangkat lunak ini disediakan "sebagaimana adanya" tanpa garansi dalam
+bentuk apa pun, baik tersurat maupun tersirat, termasuk namun tidak terbatas
+pada garansi kelayakan untuk tujuan tertentu atau tidak adanya pelanggaran
+hak pihak ketiga.
+
+Pemilik tidak bertanggung jawab atas kerusakan, kerugian data, gangguan
+layanan, atau dampak lain yang timbul dari penggunaan perangkat lunak ini
+di luar konteks Platform Soraku yang resmi.
+
+
+BAGIAN VI — PEMUTUSAN LISENSI
+
+Hak yang diberikan oleh lisensi ini akan berakhir secara otomatis apabila:
+
+1. Kontributor melanggar ketentuan mana pun dalam lisensi ini.
+
+2. Kontributor tidak lagi menjadi bagian aktif dari tim pengembang Soraku.
+
+3. Pemilik menerbitkan pemberitahuan tertulis mengenai pemutusan tersebut.
+
+Setelah pemutusan, kontributor wajib menghentikan semua penggunaan dan
+menghapus salinan perangkat lunak yang dimiliki.
+
+
+BAGIAN VII — HUKUM YANG BERLAKU
+
+Lisensi ini diatur dan ditafsirkan berdasarkan hukum Republik Indonesia.
+Setiap perselisihan yang timbul sehubungan dengan lisensi ini diselesaikan
+melalui musyawarah mufakat terlebih dahulu sebelum ditempuh jalur hukum.
+
+
+BAGIAN VIII — KONTAK
+
+Untuk pertanyaan lisensi, izin khusus, atau kerjasama:
+  Surel:    echo.soraku@gmail.com
+  Platform: https://www.soraku.id
+  Discord:  https://discord.gg/qm3XJvRa6B
