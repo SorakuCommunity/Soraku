@@ -222,12 +222,12 @@ export function Navbar() {
                             "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-primary/5",
                             !n.isread && "bg-primary/5"
                           )}>
-                          <div className={cn("mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border", cfg.bg, cfg.border)}>
+                          <div className={cn("mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border", cfg.bg)}>
                             <Icon className={cn("h-3.5 w-3.5", cfg.color)} />
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-semibold">{n.title}</p>
-                            {n.message && <p className="mt-0.5 text-[11px] text-muted-foreground/60 line-clamp-2">{n.message}</p>}
+                            {n.body && <p className="mt-0.5 text-[11px] text-muted-foreground/60 line-clamp-2">{n.body}</p>}
                           </div>
                           {!n.isread && <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />}
                         </button>

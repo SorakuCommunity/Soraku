@@ -113,7 +113,7 @@ export default function NotificationsPage() {
                 )}>
                 <div className={cn(
                   "mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border",
-                  cfg.bg, cfg.border
+                  cfg.bg
                 )}>
                   <Icon className={cn("h-4 w-4", cfg.color)} />
                 </div>
@@ -122,8 +122,8 @@ export default function NotificationsPage() {
                     <p className="text-sm font-semibold text-foreground leading-snug">{n.title}</p>
                     <span className="flex-shrink-0 text-[10px] text-muted-foreground/40 mt-0.5">{timeAgo}</span>
                   </div>
-                  {n.message && (
-                    <p className="mt-1 text-sm text-muted-foreground/60 leading-relaxed">{n.message}</p>
+                  {n.body && (
+                    <p className="mt-1 text-sm text-muted-foreground/60 leading-relaxed">{n.body}</p>
                   )}
                 </div>
                 {!n.isread && (
