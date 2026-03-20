@@ -4,7 +4,11 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, Calendar, ImageIcon, Users, Loader2, ArrowRight, Plus, Clock, CheckCircle, RefreshCw, Eye } from "lucide-react";
+import {
+  BookOpen, Calendar, ImageIcon, Users, Plus,
+  Clock, CheckCircle, Eye, TrendingUp, RefreshCw,
+  ArrowUpRight, Pencil,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AdminStats {
@@ -15,20 +19,6 @@ interface AdminStats {
   recent_posts:    { id: string; title: string; slug: string; ispublished: boolean }[];
   pending_gallery: { id: string; title: string | null; imageurl: string; tags: string[] }[];
 }
-
-const STAT_CARDS = [
-  { key: "blog_count",      label: "Total Blog",     icon: BookOpen,  href: "/admin/blog",    cls: "text-blue-400  bg-blue-500/10"  },
-  { key: "event_count",     label: "Total Event",    icon: Calendar,  href: "/admin/events",  cls: "text-green-400 bg-green-500/10" },
-  { key: "gallery_pending", label: "Pending Galeri", icon: ImageIcon, href: "/admin/gallery", cls: "text-amber-400 bg-amber-500/10" },
-  { key: "member_count",    label: "Total Member",   icon: Users,     href: "/admin/users",   cls: "text-primary   bg-primary/10"   },
-] as const;
-
-const QUICK_ACTIONS = [
-  { label: "Buat Artikel",  href: "/admin/blog/new",   icon: BookOpen,  cls: "text-blue-400  bg-blue-500/10  border-blue-500/20  hover:bg-blue-500/15"  },
-  { label: "Buat Event",    href: "/admin/events/new", icon: Calendar,  cls: "text-green-400 bg-green-500/10 border-green-500/20 hover:bg-green-500/15" },
-  { label: "Review Galeri", href: "/admin/gallery",    icon: ImageIcon, cls: "text-amber-400 bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/15" },
-  { label: "Kelola Users",  href: "/admin/users",      icon: Users,     cls: "text-primary   bg-primary/10   border-primary/20   hover:bg-primary/15"   },
-] as const;
 
 export default function AdminDashboardPage() {
   const [stats,   setStats]   = useState<AdminStats | null>(null);
@@ -45,158 +35,179 @@ export default function AdminDashboardPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  const METRICS = [
+    { key: "blog_count",      label: "Artikel",       icon: BookOpen,  href: "/admin/blog",    color: "text-blue-400",  glow: "bg-blue-500/6"   },
+    { key: "event_count",     label: "Event",         icon: Calendar,  href: "/admin/events",  color: "text-emerald-400", glow: "bg-emerald-500/6" },
+    { key: "gallery_pending", label: "Review Galeri", icon: ImageIcon, href: "/admin/gallery", color: "text-amber-400", glow: "bg-amber-500/6"  },
+    { key: "member_count",    label: "Member",        icon: Users,     href: "/admin/users",   color: "text-primary",   glow: "bg-primary/6"    },
+  ] as const;
+
+  const QUICK = [
+    { label: "Artikel Baru",  href: "/admin/blog/new",   icon: BookOpen,  color: "text-blue-400",   bg: "hover:bg-blue-500/8"    },
+    { label: "Event Baru",    href: "/admin/events/new", icon: Calendar,  color: "text-emerald-400", bg: "hover:bg-emerald-500/8" },
+    { label: "Review Galeri", href: "/admin/gallery",    icon: ImageIcon, color: "text-amber-400",  bg: "hover:bg-amber-500/8"   },
+    { label: "Kelola Users",  href: "/admin/users",      icon: Users,     color: "text-primary",    bg: "hover:bg-primary/8"     },
+  ];
+
   return (
-    <div className="space-y-7 pb-8">
+    <div className="space-y-10">
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-primary/60 mb-1">Admin Panel</p>
-          <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
-          <p className="text-sm text-muted-foreground/60 mt-1">Ringkasan aktivitas platform Soraku</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.25em] text-primary/40 mb-1">Admin Panel</p>
+          <h1 className="text-2xl font-black tracking-tight">Dashboard</h1>
         </div>
         <button onClick={load} disabled={loading}
-          className="flex items-center gap-1.5 rounded-xl border border-border/60 px-3 py-2 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all disabled:opacity-40">
-          <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} /> Refresh
+          className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs text-muted-foreground/50 hover:text-foreground hover:bg-muted/20 transition-all disabled:opacity-30">
+          <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
+          Refresh
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {STAT_CARDS.map(({ key, label, icon: Icon, href, cls }) => (
+      {/* Separator */}
+      <div className="h-px bg-gradient-to-r from-primary/20 via-border/25 to-transparent -mt-4" />
+
+      {/* Metrics — no cards, number-forward */}
+      <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+        {METRICS.map(({ key, label, icon: Icon, href, color, glow }) => (
           <Link key={key} href={href}
-            className="glass-card group flex flex-col gap-3 p-5 hover:-translate-y-0.5 hover:border-primary/20 transition-all">
-            <div className={cn("inline-flex h-9 w-9 items-center justify-center rounded-xl", cls)}>
-              <Icon className="h-4 w-4" />
-            </div>
-            {loading
-              ? <div className="h-7 w-12 animate-pulse rounded-lg bg-muted/30" />
-              : <p className="text-2xl font-black tabular-nums">{(stats?.[key] ?? 0).toLocaleString("id-ID")}</p>
-            }
+            className="group relative flex flex-col gap-3 rounded-2xl p-4 transition-all duration-300 hover:bg-muted/15">
+            <div className={cn("absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 blur-lg -z-10", glow)} />
             <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground/60">{label}</p>
-              <ArrowRight className="h-3 w-3 text-muted-foreground/20 group-hover:text-primary/50 transition-colors" />
+              <Icon className={cn("h-4 w-4", color, "opacity-60 group-hover:opacity-100 transition-opacity")} />
+              <ArrowUpRight className="h-3 w-3 text-muted-foreground/20 group-hover:text-muted-foreground/50 transition-colors" />
+            </div>
+            <div>
+              <div className={cn("text-3xl font-black tracking-tighter", loading ? "text-muted-foreground/20 animate-pulse" : "text-foreground")}>
+                {loading ? "—" : ((stats as any)?.[key] ?? 0).toLocaleString("id-ID")}
+              </div>
+              <p className="text-[11px] text-muted-foreground/40 mt-0.5 font-semibold">{label}</p>
             </div>
           </Link>
         ))}
       </div>
 
+      <div className="h-px bg-gradient-to-r from-border/25 to-transparent" />
+
       {/* Quick Actions */}
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 mb-3">Aksi Cepat</p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {QUICK_ACTIONS.map(({ label, href, icon: Icon, cls }) => (
+        <p className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/30 mb-4">Aksi Cepat</p>
+        <div className="flex flex-wrap gap-2">
+          {QUICK.map(({ label, href, icon: Icon, color, bg }) => (
             <Link key={href} href={href}
-              className={cn("flex items-center gap-2.5 rounded-xl border px-4 py-3 text-sm font-semibold transition-all hover:-translate-y-0.5", cls)}>
-              <Plus className="h-3.5 w-3.5 flex-shrink-0" /> {label}
+              className={cn(
+                "group flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition-all duration-200",
+                "text-muted-foreground/60 hover:text-foreground border border-border/20 hover:border-border/40",
+                bg
+              )}>
+              <Icon className={cn("h-3.5 w-3.5 transition-colors", color)} />
+              {label}
+              <Plus className="h-3 w-3 opacity-0 group-hover:opacity-40 transition-opacity" />
             </Link>
           ))}
         </div>
       </div>
 
-      {/* Content Row */}
-      <div className="grid gap-5 lg:grid-cols-2">
+      {/* Recent content — 2 columns */}
+      <div className="grid gap-10 lg:grid-cols-2">
 
-        {/* Recent Posts */}
-        <div className="glass-card rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-blue-400" />
-              <p className="text-sm font-bold">Artikel Terbaru</p>
-            </div>
-            <Link href="/admin/blog" className="flex items-center gap-1 text-xs text-primary/70 hover:text-primary transition-colors">
-              Semua <ArrowRight className="h-3 w-3" />
+        {/* Recent blog posts */}
+        <div>
+          <div className="mb-5 flex items-center justify-between">
+            <p className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/30">Artikel Terbaru</p>
+            <Link href="/admin/blog" className="text-[11px] text-muted-foreground/35 hover:text-primary transition-colors">
+              Semua →
             </Link>
           </div>
-
-          {loading ? (
-            <div className="p-4 space-y-3">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="flex items-center gap-3 animate-pulse">
-                  <div className="h-2 w-2 rounded-full bg-muted/30" />
-                  <div className="flex-1 h-4 rounded bg-muted/20" />
-                  <div className="h-5 w-12 rounded-full bg-muted/20" />
+          <div className="space-y-0">
+            {loading ? (
+              [1,2,3].map(i => (
+                <div key={i} className="flex items-center gap-3 py-3 border-b border-border/10 last:border-0 animate-pulse">
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3 w-3/4 rounded bg-muted/12" />
+                    <div className="h-2.5 w-1/3 rounded bg-muted/8" />
+                  </div>
                 </div>
-              ))}
-            </div>
-          ) : !stats?.recent_posts?.length ? (
-            <div className="py-10 text-center text-xs text-muted-foreground/40">Belum ada artikel</div>
-          ) : (
-            <div className="divide-y divide-border/30">
-              {stats.recent_posts.map(p => (
-                <div key={p.id} className="flex items-center gap-3 px-5 py-3 hover:bg-primary/3 transition-colors">
-                  <div className={cn("h-2 w-2 flex-shrink-0 rounded-full", p.ispublished ? "bg-green-400" : "bg-amber-400/50")} />
-                  <p className="flex-1 min-w-0 text-sm truncate">{p.title}</p>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                      p.ispublished ? "bg-green-500/10 text-green-400" : "bg-amber-500/10 text-amber-400")}>
-                      {p.ispublished ? "Publik" : "Draft"}
-                    </span>
-                    <Link href={`/blog/${p.slug}`} target="_blank" className="text-muted-foreground/30 hover:text-primary transition-colors">
+              ))
+            ) : !stats?.recent_posts?.length ? (
+              <p className="py-8 text-sm text-muted-foreground/25 text-center">Belum ada artikel</p>
+            ) : (
+              stats.recent_posts.map(post => (
+                <div key={post.id} className="group flex items-center gap-3 py-3 border-b border-border/10 last:border-0">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate text-foreground/80 group-hover:text-foreground transition-colors">{post.title}</p>
+                    <div className="mt-1 flex items-center gap-2">
+                      {post.ispublished
+                        ? <span className="flex items-center gap-1 text-[10px] text-emerald-400/70"><CheckCircle className="h-2.5 w-2.5" />Publik</span>
+                        : <span className="flex items-center gap-1 text-[10px] text-muted-foreground/30"><Clock className="h-2.5 w-2.5" />Draft</span>
+                      }
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Link href={`/blog/${post.slug}`}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-muted/20 transition-colors">
                       <Eye className="h-3.5 w-3.5" />
+                    </Link>
+                    <Link href={`/admin/blog/${post.id}/edit`}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground/40 hover:text-foreground hover:bg-muted/20 transition-colors">
+                      <Pencil className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-          <div className="px-5 py-3 border-t border-border/30">
-            <Link href="/admin/blog/new"
-              className="flex items-center justify-center gap-1.5 w-full rounded-xl border border-dashed border-border/50 py-2 text-xs text-muted-foreground/50 hover:border-primary/30 hover:text-primary transition-all">
-              <Plus className="h-3 w-3" /> Buat Artikel Baru
-            </Link>
+              ))
+            )}
           </div>
         </div>
 
-        {/* Pending Gallery */}
-        <div className="glass-card rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="h-4 w-4 text-amber-400" />
-              <p className="text-sm font-bold">Galeri Pending</p>
-              {(stats?.gallery_pending ?? 0) > 0 && (
-                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500/20 px-1 text-[10px] font-black text-amber-400">
-                  {stats!.gallery_pending}
-                </span>
-              )}
-            </div>
-            <Link href="/admin/gallery" className="flex items-center gap-1 text-xs text-primary/70 hover:text-primary transition-colors">
-              Moderasi <ArrowRight className="h-3 w-3" />
+        {/* Pending gallery */}
+        <div>
+          <div className="mb-5 flex items-center justify-between">
+            <p className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/30">Galeri Pending</p>
+            <Link href="/admin/gallery" className="text-[11px] text-muted-foreground/35 hover:text-primary transition-colors">
+              Review →
             </Link>
           </div>
-
-          {loading ? (
-            <div className="grid grid-cols-3 gap-2 p-4">
-              {[...Array(6)].map((_, i) => <div key={i} className="aspect-square rounded-xl bg-muted/20 animate-pulse" />)}
-            </div>
-          ) : !stats?.pending_gallery?.length ? (
-            <div className="flex flex-col items-center gap-2 py-10 text-center">
-              <CheckCircle className="h-8 w-8 text-green-400/30" />
-              <p className="text-xs text-muted-foreground/40">Semua galeri sudah dimoderasi</p>
-            </div>
-          ) : (
-            <div className="p-4 grid grid-cols-3 gap-2">
-              {stats.pending_gallery.slice(0, 6).map(img => (
-                <Link key={img.id} href="/admin/gallery"
-                  className="relative aspect-square overflow-hidden rounded-xl bg-muted/20 group">
-                  <Image src={img.imageurl} alt={img.title ?? ""} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <div className="absolute top-1.5 right-1.5">
-                    <Clock className="h-3 w-3 text-amber-400 drop-shadow" />
+          <div className="space-y-0">
+            {loading ? (
+              [1,2,3].map(i => (
+                <div key={i} className="flex items-center gap-3 py-3 border-b border-border/10 last:border-0 animate-pulse">
+                  <div className="h-10 w-10 rounded-xl bg-muted/12 flex-shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3 w-1/2 rounded bg-muted/12" />
+                    <div className="h-2.5 w-1/3 rounded bg-muted/8" />
                   </div>
+                </div>
+              ))
+            ) : !stats?.pending_gallery?.length ? (
+              <div className="py-8 text-center">
+                <CheckCircle className="mx-auto h-6 w-6 text-emerald-400/30 mb-2" />
+                <p className="text-sm text-muted-foreground/25">Semua galeri sudah diproses</p>
+              </div>
+            ) : (
+              stats.pending_gallery.map(item => (
+                <Link key={item.id} href="/admin/gallery"
+                  className="group flex items-center gap-3 py-3 border-b border-border/10 last:border-0 hover:border-amber-500/15 transition-colors -mx-2 px-2 rounded-xl">
+                  <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl bg-muted/15">
+                    <Image src={item.imageurl} alt="" fill className="object-cover" unoptimized />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate text-foreground/70 group-hover:text-foreground transition-colors">
+                      {item.title || "Tanpa judul"}
+                    </p>
+                    {item.tags.length > 0 && (
+                      <p className="text-[10px] text-muted-foreground/30 mt-0.5">{item.tags.slice(0, 3).join(", ")}</p>
+                    )}
+                  </div>
+                  <span className="text-[9px] font-black text-amber-400/70 bg-amber-500/8 border border-amber-500/15 rounded-full px-2 py-0.5">
+                    Pending
+                  </span>
                 </Link>
-              ))}
-            </div>
-          )}
-
-          {(stats?.gallery_pending ?? 0) > 0 && (
-            <div className="px-5 py-3 border-t border-border/30">
-              <Link href="/admin/gallery"
-                className="flex items-center justify-center gap-1.5 w-full rounded-xl bg-amber-500/10 border border-amber-500/20 py-2 text-xs font-semibold text-amber-400 hover:bg-amber-500/15 transition-all">
-                <Clock className="h-3 w-3" /> Review {stats!.gallery_pending} upload pending
-              </Link>
-            </div>
-          )}
+              ))
+            )}
+          </div>
         </div>
+
       </div>
     </div>
   );
