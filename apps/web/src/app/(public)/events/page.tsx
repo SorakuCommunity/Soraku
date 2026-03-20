@@ -90,7 +90,7 @@ function EventCard({ event }: { event: EventRow }) {
   const methods    = event.paymentmethods ?? [];
 
   const daysUntil = isUpcoming
-    ? Math.ceil((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    ? Math.ceil((startMs - nowMs) / (1000 * 60 * 60 * 24))
     : null;
 
   return (
