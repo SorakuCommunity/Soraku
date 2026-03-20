@@ -1,4 +1,5 @@
 "use client";
+import { trackTikTokRegistration } from "@/components/analytics/TikTokPixel";
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
@@ -254,6 +255,7 @@ export default function RegisterPage() {
       const data = await res.json();
       if (!res.ok || data.error) { setFormError(data.error ?? "Pendaftaran gagal. Coba lagi."); return; }
 
+      trackTikTokRegistration();
       // Auto-login setelah register
       const loginRes = await fetch("/api/auth/login", {
         method: "POST", headers: { "Content-Type": "application/json" },

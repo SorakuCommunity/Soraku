@@ -8,6 +8,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { EventPaymentSection } from "./EventPaymentSection";
+import { EventTracker } from "./EventTracker";
 import { db } from "@/lib/supabase/server";
 import { BCAIcon, BRIIcon, BTNIcon, SeabankIcon, DanaIcon, QRISIcon, GopayIcon } from "@/components/icons/custom-icons";
 
@@ -103,7 +104,9 @@ export default async function EventDetailPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
 
-      {/* Breadcrumb */}
+      <EventTracker id={event.id} title={event.title} />
+
+      {/* Breadcrumb */
       <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground/50">
         <Link href="/" className="flex items-center gap-1 hover:text-muted-foreground transition-colors">
           <Home className="h-3.5 w-3.5" /> Beranda

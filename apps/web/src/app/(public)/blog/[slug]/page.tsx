@@ -6,6 +6,7 @@ import { ArrowLeft, BookOpen, Eye } from "lucide-react";
 import { db } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import BlogDetailClient from "./BlogDetailClient";
+import { BlogTracker } from "./BlogTracker";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ slug: string }> };
@@ -106,6 +107,7 @@ export default async function BlogDetailPage({ params }: Props) {
         </div>
       </div>
 
+      <BlogTracker id={post.id} title={post.title} />
       <BlogDetailClient
         slug={post.slug}
         content={post.content ?? ""}

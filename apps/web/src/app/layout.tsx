@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Providers } from "@/components/providers";
+import { TikTokPixel } from "@/components/analytics/TikTokPixel";
 import "@/styles/globals.css";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.soraku.id";
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id" suppressHydrationWarning>
       <body className="min-h-screen bg-background font-body antialiased">
         <Providers>{children}</Providers>
+        <TikTokPixel />
       </body>
     </html>
   );
