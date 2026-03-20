@@ -217,7 +217,7 @@ export function Navbar() {
                       const cfg  = NOTIF_CONFIG[n.type] ?? NOTIF_CONFIG.info;
                       const Icon = cfg.icon;
                       return (
-                        <button key={n.id} onClick={() => { markRead(n.id); setNotifOpen(false); }}
+                        <button key={n.id} onClick={() => { markRead([n.id]); setNotifOpen(false); }}
                           className={cn(
                             "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-primary/5",
                             !n.isread && "bg-primary/5"

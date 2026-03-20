@@ -96,6 +96,7 @@ export default function NotificationsPage() {
         <div className="space-y-1.5">
           {notifications.map((n) => {
             const cfg  = NOTIF_CONFIG[n.type] ?? NOTIF_CONFIG.info;
+            const Icon = cfg.icon;
             const timeAgo = (() => {
               const diff = Date.now() - new Date(n.createdat).getTime();
               if (diff < 60_000)   return "Baru saja";
@@ -112,17 +113,17 @@ export default function NotificationsPage() {
                 )}>
                 <div className={cn(
                   "mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border",
-                  cfg.bg
+                  cfg.bg, cfg.border
                 )}>
-                  <span className="text-base leading-none">{cfg.emoji}</span>
+                  <Icon className={cn("h-4 w-4", cfg.color)} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-sm font-semibold text-foreground leading-snug">{n.title}</p>
                     <span className="flex-shrink-0 text-[10px] text-muted-foreground/40 mt-0.5">{timeAgo}</span>
                   </div>
-                  {n.body && (
-                    <p className="mt-1 text-sm text-muted-foreground/60 leading-relaxed">{n.body}</p>
+                  {n.message && (
+                    <p className="mt-1 text-sm text-muted-foreground/60 leading-relaxed">{n.message}</p>
                   )}
                 </div>
                 {!n.isread && (
