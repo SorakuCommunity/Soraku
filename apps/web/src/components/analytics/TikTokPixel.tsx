@@ -100,7 +100,7 @@ export function trackViewContent(params: {
   const ttq = (window as any).ttq;
   if (ttq) ttq.track("ViewContent", {
     contents: [{ content_id: params.content_id, content_name: params.content_name }],
-    content_type: params.content_type ?? "article",
+    content_type: params.content_type ?? "product",
   }, { event_id: eventId });
   sendS2S("ViewContent", { ...params }, eventId);
 }

@@ -5,7 +5,7 @@ import { trackTikTokViewContent } from "@/components/analytics/TikTokPixel";
 
 export function BlogTracker({ id, title }: { id: string; title: string }) {
   useEffect(() => {
-    trackTikTokViewContent({ content_id: id, content_name: title, content_type: "article" });
+    trackTikTokViewContent({ content_id: id, content_name: title, content_type: "product" });
   }, [id, title]);
   return null;
 }
