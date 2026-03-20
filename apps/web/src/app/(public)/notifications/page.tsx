@@ -96,7 +96,7 @@ export default function NotificationsPage() {
         <div className="space-y-1.5">
           {notifications.map((n) => {
             const cfg  = NOTIF_CONFIG[n.type] ?? NOTIF_CONFIG.info;
-            const Icon = cfg.icon;
+            const Icon = cfg.icon as React.ElementType | undefined;
             const timeAgo = (() => {
               const diff = Date.now() - new Date(n.createdat).getTime();
               if (diff < 60_000)   return "Baru saja";
@@ -115,7 +115,7 @@ export default function NotificationsPage() {
                   "mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border",
                   cfg.bg
                 )}>
-                  <Icon className={cn("h-4 w-4", cfg.color)} />
+                  {Icon ? <Icon className={cn("h-4 w-4", cfg.color)} /> : <span className={cn("text-sm", cfg.color)}>{cfg.emoji}</span>}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">

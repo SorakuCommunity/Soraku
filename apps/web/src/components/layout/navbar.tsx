@@ -215,7 +215,7 @@ export function Navbar() {
                       </div>
                     ) : notifications.slice(0, 6).map((n) => {
                       const cfg  = NOTIF_CONFIG[n.type] ?? NOTIF_CONFIG.info;
-                      const Icon = cfg.icon;
+                      const Icon = cfg.icon as React.ElementType | undefined;
                       return (
                         <button key={n.id} onClick={() => { markRead([n.id]); setNotifOpen(false); }}
                           className={cn(
@@ -223,7 +223,7 @@ export function Navbar() {
                             !n.isread && "bg-primary/5"
                           )}>
                           <div className={cn("mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border", cfg.bg)}>
-                            <Icon className={cn("h-3.5 w-3.5", cfg.color)} />
+                            {Icon ? <Icon className={cn("h-3.5 w-3.5", cfg.color)} /> : <span className={cfg.color}>{cfg.emoji}</span>}
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-semibold">{n.title}</p>
