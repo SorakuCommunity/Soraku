@@ -40,6 +40,10 @@
   ],
   "exclude": [
     "node_modules",
-    "commitlint.config.ts"
+    "commitlint.config.ts",
+    "drizzle.config.ts",
+    "jest.config.ts",
+    "playwright.config.ts",
+    "e2e"
   ]
 }
