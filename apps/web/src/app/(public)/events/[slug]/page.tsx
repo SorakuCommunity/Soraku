@@ -5,7 +5,9 @@ import Image from "next/image";
 import {
   ArrowLeft, Calendar, MapPin, Wifi, ExternalLink, Swords,
   DollarSign, Tag, Download, QrCode, Clock, Users, Zap, Home,
+  ChevronDown,
 } from "lucide-react";
+import { EventPaymentSection } from "./EventPaymentSection";
 import { db } from "@/lib/supabase/server";
 import { BCAIcon, BRIIcon, BTNIcon, SeabankIcon, DanaIcon, QRISIcon, GopayIcon } from "@/components/icons/custom-icons";
 
@@ -254,44 +256,7 @@ export default async function EventDetailPage({ params }: Props) {
 
       {/* ── Payment Methods ── */}
       {(event as any).ispaid && methods.length > 0 && (
-        <div className="mt-6 glass-card rounded-2xl overflow-hidden">
-          <div className="border-b border-border/40 px-4 py-3">
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">Metode Pembayaran</p>
-          </div>
-          <div className="p-4 space-y-3">
-            {methods.map((m, i) => {
-              const key     = getPaymentKey(m);
-              const PayIcon = PAYMENT_ICON_MAP[key];
-              if (m.type === "qris") return (
-                <div key={i} className="flex items-start gap-3 rounded-xl border border-border/40 bg-card/50 p-3">
-                  {PayIcon ? <PayIcon className="h-8 w-8 flex-shrink-0" /> : <QrCode className="h-8 w-8 flex-shrink-0 text-primary" />}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold">{m.provider ?? "QRIS"}</p>
-                    {m.qrisUrl && (
-                      <a href={m.qrisUrl} target="_blank" rel="noopener" className="flex items-center gap-1 text-xs text-primary hover:underline mt-0.5">
-                        <ExternalLink className="h-3 w-3" /> Buka QRIS
-                      </a>
-                    )}
-                  </div>
-                  {m.qrisImageUrl && (
-                    <a href={m.qrisImageUrl} download className="flex-shrink-0 rounded-lg border border-border/50 p-1.5 text-muted-foreground hover:text-primary transition-colors">
-                      <Download className="h-4 w-4" />
-                    </a>
-                  )}
-                </div>
-              );
-              return (
-                <div key={i} className="flex items-center gap-3 rounded-xl border border-border/40 bg-card/50 p-3">
-                  {PayIcon ? <PayIcon className="h-8 w-8 flex-shrink-0" /> : <DollarSign className="h-6 w-6 flex-shrink-0 text-primary" />}
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-foreground/80 truncate">{m.account}</p>
-                    {m.name && <p className="text-[11px] text-muted-foreground/50 truncate">a/n {m.name}</p>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <EventPaymentSection methods={methods} />
       )}
 
       {/* ── CTA Daftar ── */}

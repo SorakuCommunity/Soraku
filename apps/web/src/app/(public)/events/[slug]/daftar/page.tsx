@@ -6,9 +6,9 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowLeft, Users, UserPlus, Shield,
+  ArrowLeft, Users, UserPlus, Shield, Home,
   ChevronRight, Loader2, CheckCircle2, AlertCircle,
-  Swords, X, Plus, Star, Trophy, Upload,
+  Swords, X, Plus, Star, Trophy, Upload, Camera,
 } from "lucide-react";
 import { ImageUrlInput } from "@/components/ui/image-url-input";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,6 @@ import {
 } from "@/components/icons/custom-icons";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
-
 interface Player { name: string; role: string; }
 
 type PaymentMethod = {
@@ -32,8 +31,16 @@ interface EventInfo {
   paymentmethods: PaymentMethod[] | null;
 }
 
-const ROLES_ML = ["Goldlaner", "Jungler", "Midlaner", "Roamer", "EXP Laner", "Hyper"] as const;
+const ROLES_ML = [
+  "Goldlaner", "Jungler", "Midlaner", "Roamer", "EXP Laner",
+  "Hyper", "Support", "Assassin", "Marksman", "Tank", "Mage",
+] as const;
+
 const EMPTY_PLAYER = (): Player => ({ name: "", role: "" });
+
+const DEFAULT_ACTIVE = () => [
+  EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER(),
+];
 
 const PAYMENT_ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
   bca: BCAIcon, bri: BRIIcon, btn: BTNIcon, seabank: SeabankIcon,
@@ -46,59 +53,84 @@ function getPaymentKey(m: PaymentMethod): string {
   return (m.provider ?? "").toLowerCase();
 }
 
-// ─── Step indicator ──────────────────────────────────────────────────────────
-
+// ─── Steps ─────────────────────────────────────────────────────────────────
 function Steps({ current }: { current: number }) {
   const steps = [
-    { n: 1, icon: Shield, label: "Info Tim" },
-    { n: 2, icon: Users,  label: "Pemain" },
-    { n: 3, icon: Star,   label: "Preview" },
+    { n: 1, label: "Info Tim" },
+    { n: 2, label: "Pemain" },
+    { n: 3, label: "Preview" },
   ];
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       {steps.map((s, i) => (
-        <div key={s.n} className="flex items-center gap-2">
+        <div key={s.n} className="flex items-center gap-1">
           <div className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-xl transition-all text-[11px] font-black",
-            current === s.n ? "bg-primary text-white shadow-lg shadow-primary/30 scale-110"
+            "flex h-8 w-8 items-center justify-center rounded-xl text-[11px] font-black transition-all",
+            current === s.n ? "bg-primary text-white shadow-md shadow-primary/30 scale-105"
             : current > s.n ? "bg-green-500/20 text-green-400 border border-green-500/30"
-            : "bg-border/20 text-foreground/25"
+            : "bg-muted/20 text-foreground/25 border border-border/30"
           )}>
             {current > s.n ? "✓" : s.n}
           </div>
-          <span className={cn("text-[11px] font-bold hidden sm:block", current === s.n ? "text-primary" : "text-foreground/25")}>
+          <span className={cn(
+            "hidden sm:block text-[11px] font-bold pr-1",
+            current === s.n ? "text-primary" : current > s.n ? "text-green-400/60" : "text-foreground/25"
+          )}>
             {s.label}
           </span>
-          {i < steps.length - 1 && <ChevronRight className="h-3 w-3 text-foreground/15 mx-1" />}
+          {i < steps.length - 1 && (
+            <ChevronRight className="h-3 w-3 text-foreground/15 mx-0.5" />
+          )}
         </div>
       ))}
     </div>
   );
 }
 
-// ─── Player Card ─────────────────────────────────────────────────────────────
+// ─── Field Label ────────────────────────────────────────────────────────────
+function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
+  return (
+    <label className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-foreground/40">
+      {children}
+      {required && <span className="text-red-400 normal-case tracking-normal text-xs">*</span>}
+    </label>
+  );
+}
 
+const inputCls = "w-full rounded-xl border border-border/60 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-foreground/20 focus:border-primary/60 focus:bg-black/40 focus:ring-2 focus:ring-primary/10 transition-all";
+
+// ─── PlayerCard ─────────────────────────────────────────────────────────────
 function PlayerCard({
-  player, index, isReserve, onChange, onRemove, canRemove,
+  player, index, isReserve, onChange, onRemove, canRemove, isML,
 }: {
   player: Player; index: number; isReserve: boolean;
-  onChange: (p: Player) => void; onRemove: () => void; canRemove: boolean;
+  onChange: (p: Player) => void; onRemove: () => void; canRemove: boolean; isML: boolean;
 }) {
+  const filled = player.name.trim().length > 0;
   return (
     <div className={cn(
       "relative rounded-2xl border p-4 space-y-3 transition-all",
-      isReserve ? "border-yellow-500/20 bg-yellow-500/5" : "border-primary/25 bg-primary/5",
+      !filled && !isReserve ? "border-red-500/20 bg-red-500/3"
+        : isReserve ? "border-yellow-500/20 bg-yellow-500/5"
+        : "border-primary/20 bg-primary/4",
     )}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className={cn("flex h-7 w-7 items-center justify-center rounded-lg text-[11px] font-black",
-            isReserve ? "bg-yellow-500/20 text-yellow-400" : "bg-primary/20 text-primary")}>
-            {index + 1}
+          <div className={cn(
+            "flex h-7 w-7 items-center justify-center rounded-lg text-[11px] font-black",
+            isReserve ? "bg-yellow-500/20 text-yellow-400" : "bg-primary/20 text-primary"
+          )}>
+            {isReserve ? `C${index + 1}` : index + 1}
           </div>
-          <span className={cn("text-[10px] font-black uppercase tracking-widest",
-            isReserve ? "text-yellow-400/60" : "text-primary/60")}>
+          <span className={cn(
+            "text-[10px] font-black uppercase tracking-widest",
+            isReserve ? "text-yellow-400/60" : "text-primary/60"
+          )}>
             {isReserve ? "Cadangan" : "Pemain"}
           </span>
+          {!isReserve && !filled && (
+            <span className="text-[9px] text-red-400/70 font-bold">— Wajib diisi</span>
+          )}
         </div>
         {canRemove && (
           <button type="button" onClick={onRemove}
@@ -108,36 +140,47 @@ function PlayerCard({
         )}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className={cn("grid gap-3", isML ? "sm:grid-cols-2" : "")}>
         <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-foreground/30">
-            Nama Lengkap / IGN *
-          </label>
+          <Label required={!isReserve}>
+            {isML ? "IGN Mobile Legends" : "Nama / IGN"}
+          </Label>
           <input
-            value={player.name} onChange={e => onChange({ ...player, name: e.target.value })}
-            placeholder="Nama asli atau IGN"
-            className="w-full rounded-xl border border-border/40 bg-black/30 px-3 py-2.5 text-sm outline-none placeholder:text-foreground/15 focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition-all"
+            value={player.name}
+            onChange={e => onChange({ ...player, name: e.target.value })}
+            placeholder={isML ? "In-game name (sesuai ML)" : "Nama lengkap / IGN"}
+            className={cn(
+              "w-full rounded-xl border bg-black/30 px-3 py-2.5 text-sm outline-none placeholder:text-foreground/15 focus:ring-1 focus:ring-primary/10 transition-all",
+              !filled && !isReserve ? "border-red-500/30 focus:border-red-400/50" : "border-border/40 focus:border-primary/40"
+            )}
           />
+          {isML && (
+            <p className="text-[9px] text-foreground/25">Gunakan IGN persis seperti di Mobile Legends</p>
+          )}
         </div>
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-foreground/30">Role</label>
-          <select value={player.role} onChange={e => onChange({ ...player, role: e.target.value })}
-            className="w-full rounded-xl border border-border/40 bg-[#12141a] px-3 py-2.5 text-sm outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition-all">
-            <option value="">Pilih role…</option>
-            {ROLES_ML.map(r => <option key={r} value={r}>{r}</option>)}
-          </select>
-        </div>
+        {isML && (
+          <div className="space-y-1">
+            <Label>Role</Label>
+            <select
+              value={player.role}
+              onChange={e => onChange({ ...player, role: e.target.value })}
+              className="w-full rounded-xl border border-border/40 bg-[#12141a] px-3 py-2.5 text-sm outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition-all"
+            >
+              <option value="">Pilih role…</option>
+              {ROLES_ML.map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
+// ─── Main ───────────────────────────────────────────────────────────────────
 export default function EventRegisterPage() {
-  const params  = useParams();
-  const router  = useRouter();
-  const slug    = params.slug as string;
+  const params = useParams();
+  const router = useRouter();
+  const slug   = params.slug as string;
 
   const [event,   setEvent]   = useState<EventInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -147,17 +190,19 @@ export default function EventRegisterPage() {
   const [success, setSuccess] = useState(false);
   const [regId,   setRegId]   = useState("");
 
-  // Form state
-  const [teamname,        setTeamname]        = useState("");
-  const [teamlogourl,     setTeamlogourl]     = useState("");
-  const [activeplayers,   setActiveplayers]   = useState<Player[]>([EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER(), EMPTY_PLAYER()]);
-  const [reserveplayers,  setReserveplayers]  = useState<Player[]>([]);
-  const [contactname,     setContactname]     = useState("");
-  const [contactdiscord,  setContactdiscord]  = useState("");
-  const [notes,           setNotes]           = useState("");
-  const [paymentproof,    setPaymentproof]    = useState("");
-  const [uploading,       setUploading]       = useState(false);
-  const [sessionUserId,   setSessionUserId]   = useState<string | null>(null);
+  // Form
+  const [teamname,       setTeamname]       = useState("");
+  const [teamlogourl,    setTeamlogourl]    = useState("");
+  const [contactname,    setContactname]    = useState("");
+  const [contactdiscord, setContactdiscord] = useState("");
+  const [notes,          setNotes]          = useState("");
+  const [paymentproof,   setPaymentproof]   = useState("");
+  const [uploading,      setUploading]      = useState(false);
+  const [activeplayers,  setActiveplayers]  = useState<Player[]>(DEFAULT_ACTIVE());
+  const [reserveplayers, setReserveplayers] = useState<Player[]>([]);
+  const [sessionUserId,  setSessionUserId]  = useState<string | null>(null);
+
+  const isML = event?.gametype === "ml";
 
   useEffect(() => {
     fetch("/api/auth/me").then(r => r.json()).then(d => {
@@ -171,19 +216,33 @@ export default function EventRegisterPage() {
       .then(d => {
         if (!d.data) { router.push("/events"); return; }
         const ev = d.data;
-        if (ev.gametype !== "ml" && ev.registrationurl) { window.location.href = ev.registrationurl; return; }
-        if (ev.gametype !== "ml" && !ev.registrationurl) { router.push(`/events/${slug}`); return; }
+        if (ev.gametype !== "ml" && ev.registrationurl) {
+          window.location.href = ev.registrationurl; return;
+        }
+        if (ev.gametype !== "ml" && !ev.registrationurl) {
+          router.push(`/events/${slug}`); return;
+        }
         setEvent(ev);
       })
       .catch(() => router.push("/events"))
       .finally(() => setLoading(false));
   }, [slug, router]);
 
-  const updateActive  = useCallback((i: number, p: Player) => setActiveplayers(prev => prev.map((v, idx) => idx === i ? p : v)), []);
-  const updateReserve = useCallback((i: number, p: Player) => setReserveplayers(prev => prev.map((v, idx) => idx === i ? p : v)), []);
+  const updateActive  = useCallback((i: number, p: Player) =>
+    setActiveplayers(prev => prev.map((v, idx) => idx === i ? p : v)), []);
+  const updateReserve = useCallback((i: number, p: Player) =>
+    setReserveplayers(prev => prev.map((v, idx) => idx === i ? p : v)), []);
 
-  const canGoStep2 = teamname.trim().length >= 2;
-  const canGoStep3 = activeplayers.every(p => p.name.trim().length > 0);
+  // ── Validasi per step ────────────────────────────────────────────────────
+  const step1Errors: string[] = [];
+  if (!teamname.trim() || teamname.trim().length < 2) step1Errors.push("Nama tim wajib diisi (min 2 karakter).");
+  if (!contactname.trim()) step1Errors.push("Nama Kontak PIC wajib diisi.");
+  if (!contactdiscord.trim()) step1Errors.push("Discord PIC wajib diisi.");
+  if (event?.ispaid && !paymentproof.trim()) step1Errors.push("Screenshot bukti pembayaran wajib diupload.");
+  const canGoStep2 = step1Errors.length === 0;
+
+  const unfilledPlayers = activeplayers.filter(p => !p.name.trim()).length;
+  const canGoStep3 = unfilledPlayers === 0;
 
   const uploadImage = async (file: File): Promise<string | null> => {
     setUploading(true);
@@ -201,10 +260,6 @@ export default function EventRegisterPage() {
   };
 
   const handleSubmit = async () => {
-    if (event?.ispaid && !paymentproof.trim()) {
-      setError("Bukti pembayaran wajib diisi untuk event berbayar.");
-      return;
-    }
     setSaving(true); setError("");
     try {
       const res = await fetch(`/api/events/${slug}/register`, {
@@ -215,8 +270,8 @@ export default function EventRegisterPage() {
           teamlogourl:    teamlogourl.trim() || undefined,
           activeplayers:  activeplayers.filter(p => p.name.trim()),
           reserveplayers: reserveplayers.filter(p => p.name.trim()),
-          contactname:    contactname.trim() || undefined,
-          contactdiscord: contactdiscord.trim() || undefined,
+          contactname:    contactname.trim(),
+          contactdiscord: contactdiscord.trim(),
           notes:          notes.trim() || undefined,
           paymentproof:   paymentproof.trim() || undefined,
         }),
@@ -229,12 +284,14 @@ export default function EventRegisterPage() {
     finally { setSaving(false); }
   };
 
+  // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
     </div>
   );
 
+  // ── Auth gate ────────────────────────────────────────────────────────────
   if (!sessionUserId) return (
     <div className="mx-auto max-w-md px-4 py-20 text-center space-y-5">
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20 mx-auto">
@@ -257,6 +314,7 @@ export default function EventRegisterPage() {
     </div>
   );
 
+  // ── Success ──────────────────────────────────────────────────────────────
   if (success) return (
     <div className="mx-auto max-w-xl px-4 py-16 text-center space-y-6">
       <div className="relative mx-auto h-24 w-24">
@@ -266,13 +324,17 @@ export default function EventRegisterPage() {
         </div>
       </div>
       <div>
-        <h1 className="text-3xl font-black text-green-400">Pendaftaran Berhasil!</h1>
+        <h1 className="text-3xl font-black text-green-400">Pendaftaran Terkirim!</h1>
         <p className="mt-2 text-sm text-foreground/50">Tim <span className="font-bold text-foreground">{teamname}</span> sudah terdaftar.</p>
-        {regId && <p className="mt-2 text-[11px] font-mono text-foreground/25">ID: {regId.slice(0, 8).toUpperCase()}</p>}
+        {regId && <p className="mt-1.5 text-[11px] font-mono text-foreground/25">ID: {regId.slice(0, 8).toUpperCase()}</p>}
       </div>
-      <p className="text-sm text-foreground/40 leading-relaxed max-w-sm mx-auto">
-        Tim kamu sudah tercatat. Pantau pengumuman di Discord atau halaman event untuk info selanjutnya.
-      </p>
+      <div className="mx-auto max-w-sm rounded-2xl border border-yellow-500/25 bg-yellow-500/5 px-5 py-4 text-left space-y-1.5">
+        <p className="text-xs font-black text-yellow-400/80 uppercase tracking-widest">Langkah Selanjutnya</p>
+        <p className="text-sm text-foreground/60 leading-relaxed">
+          Pendaftaranmu berstatus <span className="font-bold text-yellow-400">Pending</span> dan sedang ditinjau panitia.
+          Kamu akan mendapat notifikasi via Discord setelah dikonfirmasi.
+        </p>
+      </div>
       <div className="flex justify-center gap-3 pt-2">
         <Link href={`/events/${slug}`}
           className="flex items-center gap-2 rounded-xl border border-border/50 px-5 py-2.5 text-sm font-semibold text-foreground/70 hover:text-foreground transition-colors">
@@ -287,272 +349,384 @@ export default function EventRegisterPage() {
   );
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12 space-y-6">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12 space-y-5">
 
       {/* Header */}
       <div className="space-y-4">
-        <Link href={`/events/${slug}`}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-foreground/40 hover:text-foreground transition-colors">
-          <ArrowLeft className="h-3.5 w-3.5" /> Kembali
-        </Link>
-        <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-r from-primary/15 via-primary/8 to-transparent">
-          <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(79,163,209,0.03)_10px,rgba(79,163,209,0.03)_11px)]" />
+        <nav className="flex items-center gap-2 text-xs text-muted-foreground/50">
+          <Link href="/" className="flex items-center gap-1 hover:text-muted-foreground transition-colors">
+            <Home className="h-3 w-3" /> Beranda
+          </Link>
+          <span>/</span>
+          <Link href="/events" className="hover:text-muted-foreground transition-colors">Event</Link>
+          <span>/</span>
+          <Link href={`/events/${slug}`} className="truncate max-w-[120px] hover:text-muted-foreground transition-colors">
+            {event?.title ?? slug}
+          </Link>
+          <span>/</span>
+          <span className="text-foreground/60">Daftar</span>
+        </nav>
+
+        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/12 via-primary/6 to-transparent">
           <div className="relative flex items-center gap-4 px-5 py-4">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/20 border border-primary/30">
               <Swords className="h-5 w-5 text-primary" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Pendaftaran Event</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Pendaftaran</p>
               <p className="text-sm font-bold truncate">{event?.title ?? "—"}</p>
             </div>
           </div>
         </div>
+
         <div className="glass-card rounded-2xl px-5 py-3.5">
           <Steps current={step} />
         </div>
       </div>
 
+      {/* Error banner */}
       {error && (
         <div className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
           <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-          <span>{error}</span>
-          <button onClick={() => setError("")} className="ml-auto"><X className="h-3.5 w-3.5" /></button>
+          <span className="flex-1">{error}</span>
+          <button onClick={() => setError("")}><X className="h-3.5 w-3.5 opacity-60 hover:opacity-100" /></button>
         </div>
       )}
 
-      {/* ════════ STEP 1: Info Tim + Bukti Bayar ════════ */}
+      {/* ══════════════════════════════════════
+          STEP 1: Info Tim
+          ══════════════════════════════════════ */}
       {step === 1 && (
-        <div className="glass-card rounded-3xl p-6 space-y-6">
-          <div className="flex items-center gap-3">
+        <div className="glass-card rounded-3xl p-6 space-y-5">
+          <div className="flex items-center gap-3 pb-2 border-b border-border/30">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 border border-primary/25">
               <Shield className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <h2 className="text-sm font-black uppercase tracking-widest">Informasi Tim</h2>
-              <p className="text-[11px] text-foreground/35">Identitas tim yang akan didaftarkan</p>
+              <h2 className="text-sm font-black">Informasi Tim</h2>
+              <p className="text-[11px] text-foreground/35">Isi lengkap semua field yang wajib</p>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-foreground/40">
-                Nama Tim <span className="text-red-400">*</span>
-              </label>
-              <input value={teamname} onChange={e => setTeamname(e.target.value)}
-                placeholder="Contoh: Soraku Esports"
-                className="w-full rounded-xl border border-border/60 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-foreground/20 focus:border-primary/60 focus:bg-black/50 focus:ring-2 focus:ring-primary/10 transition-all" />
-            </div>
-
-            <ImageUrlInput label="Logo Tim" value={teamlogourl} onChange={setTeamlogourl}
-              placeholder="https://cdn.example.com/logo.png"
-              hint="Paste URL, drag & drop, atau Ctrl+V gambar langsung" compact
-              icon={<Shield className="h-3 w-3" />}
-              className="bg-black/30 border-border/40 focus:border-primary/40" />
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Nama Kontak PIC</label>
-                <input value={contactname} onChange={e => setContactname(e.target.value)}
-                  placeholder="Nama kamu"
-                  className="w-full rounded-xl border border-border/60 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-foreground/20 focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Discord PIC</label>
-                <input value={contactdiscord} onChange={e => setContactdiscord(e.target.value)}
-                  placeholder="username#0000"
-                  className="w-full rounded-xl border border-border/60 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-foreground/20 focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all" />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Catatan Tambahan</label>
-              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} maxLength={500}
-                placeholder="Ada yang ingin disampaikan? (opsional)"
-                className="w-full resize-none rounded-xl border border-border/40 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-foreground/15 focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition-all" />
-            </div>
-
-            {/* ─── Upload Bukti Bayar (step 1, jika event berbayar) ─── */}
-            {event?.ispaid && (
-              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/20 border border-amber-500/30">
-                    <Trophy className="h-4 w-4 text-amber-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-widest text-amber-400/80">
-                      Bukti Pembayaran <span className="text-red-400">*</span>
-                    </p>
-                    {event.price && <p className="text-[11px] text-amber-400/50">Rp {event.price.toLocaleString("id-ID")}</p>}
-                  </div>
-                </div>
-
-                {/* Info metode pembayaran dari admin */}
-                {event.paymentmethods && event.paymentmethods.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/50">Bayar ke:</p>
-                    {event.paymentmethods.map((m, i) => {
-                      const key  = getPaymentKey(m);
-                      const Icon = PAYMENT_ICON_MAP[key];
-                      if (m.type === "qris") {
-                        return (
-                          <div key={i} className="flex items-center gap-3 rounded-xl border border-amber-500/15 bg-black/20 px-4 py-3">
-                            {Icon ? <Icon className="h-7 w-auto flex-shrink-0" /> : <span className="text-xs font-bold text-amber-400 uppercase flex-shrink-0">QRIS</span>}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-bold text-foreground/80">{m.provider ? m.provider.charAt(0).toUpperCase() + m.provider.slice(1) : "QRIS"}</p>
-                              <p className="text-[11px] text-muted-foreground/50">Scan QRIS untuk bayar</p>
-                            </div>
-                            <a href={m.qrisImageUrl} download className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-400 hover:bg-amber-500/20 transition-colors flex-shrink-0">
-                              ↓ QRIS
-                            </a>
-                          </div>
-                        );
-                      }
-                      return (
-                        <div key={i} className="flex items-center gap-3 rounded-xl border border-amber-500/15 bg-black/20 px-4 py-3">
-                          {Icon ? <Icon className="h-7 w-auto flex-shrink-0" /> : (
-                            <span className="rounded border border-border/40 bg-muted/20 px-2 py-1 text-[10px] font-bold text-muted-foreground/60 uppercase flex-shrink-0">
-                              {m.bank ?? m.provider ?? m.type}
-                            </span>
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-bold text-foreground/80 truncate">{m.account}</p>
-                            {m.name && <p className="text-[11px] text-muted-foreground/50 truncate">a/n {m.name}</p>}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Upload file */}
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-amber-400/60">
-                    Screenshot Bukti Transfer <span className="text-red-400">*</span>
-                  </label>
-                  <label className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed cursor-pointer transition-all py-6 ${
-                    paymentproof ? "border-green-500/30 bg-green-500/5" : "border-amber-500/25 bg-amber-500/5 hover:border-amber-500/40 hover:bg-amber-500/8"
-                  }`}>
-                    <input type="file" accept="image/*" className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const url = await uploadImage(file);
-                        if (url) setPaymentproof(url);
-                        else setError("Gagal upload gambar. Coba paste URL manual.");
-                      }} />
-                    {uploading ? (
-                      <div className="flex items-center gap-2 text-amber-400/70 text-xs">
-                        <Loader2 className="h-4 w-4 animate-spin" /> Mengupload...
-                      </div>
-                    ) : paymentproof ? (
-                      <div className="flex flex-col items-center gap-1.5">
-                        <CheckCircle2 className="h-6 w-6 text-green-400" />
-                        <p className="text-xs font-bold text-green-400">Bukti terupload!</p>
-                        <p className="text-[10px] text-foreground/30">Klik untuk ganti</p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-1.5">
-                        <Upload className="h-6 w-6 text-amber-400/50" />
-                        <p className="text-xs font-semibold text-amber-400/70">Klik untuk upload gambar</p>
-                        <p className="text-[10px] text-foreground/30">JPG, PNG, WebP — maks 5MB</p>
-                      </div>
-                    )}
-                  </label>
-
-                  {paymentproof && (
-                    <div className="relative rounded-xl overflow-hidden border border-green-500/20">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={paymentproof} alt="Bukti bayar" className="w-full max-h-48 object-contain bg-black/20" />
-                      <button type="button" onClick={() => setPaymentproof("")}
-                        className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-lg bg-background/80 text-xs text-muted-foreground hover:text-destructive transition-colors">
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  )}
-
-                  <div className="space-y-1">
-                    <label className="text-[10px] text-amber-400/40">atau paste URL gambar</label>
-                    <input type="text" value={paymentproof} onChange={e => setPaymentproof(e.target.value)}
-                      placeholder="https://i.imgur.com/..."
-                      className="w-full rounded-xl border border-amber-500/20 bg-black/20 px-3 py-2 text-xs outline-none placeholder:text-foreground/15 focus:border-amber-500/30 transition-all" />
-                  </div>
-                </div>
-              </div>
+          {/* Nama Tim */}
+          <div className="space-y-1.5">
+            <Label required>Nama Tim</Label>
+            <input
+              value={teamname}
+              onChange={e => setTeamname(e.target.value)}
+              placeholder="Contoh: Soraku Esports"
+              className={cn(inputCls, teamname.trim().length > 0 && teamname.trim().length < 2 && "border-red-500/40")}
+            />
+            {teamname.trim().length > 0 && teamname.trim().length < 2 && (
+              <p className="text-[10px] text-red-400/70">Nama tim minimal 2 karakter</p>
             )}
           </div>
 
-          <div className="flex justify-end pt-2">
-            <button onClick={() => { if (!canGoStep2) { setError("Nama tim wajib diisi."); return; } setError(""); setStep(2); }}
-              className={cn("flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all",
-                canGoStep2 ? "bg-primary text-white hover:-translate-y-0.5 shadow-lg shadow-primary/20" : "bg-border/20 text-foreground/25 cursor-not-allowed")}>
+          {/* Logo Tim */}
+          <ImageUrlInput
+            label="Logo Tim"
+            value={teamlogourl}
+            onChange={setTeamlogourl}
+            placeholder="https://cdn.example.com/logo.png"
+            hint="Opsional · Paste URL atau upload gambar"
+            compact
+            icon={<Camera className="h-3 w-3" />}
+            className="bg-black/30 border-border/40 focus:border-primary/40"
+          />
+
+          {/* Kontak PIC */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label required>Nama Kontak PIC</Label>
+              <input
+                value={contactname}
+                onChange={e => setContactname(e.target.value)}
+                placeholder="Nama kamu"
+                className={cn(inputCls, !contactname.trim() && contactname !== "" && "border-red-500/40")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label required>Discord PIC</Label>
+              <input
+                value={contactdiscord}
+                onChange={e => setContactdiscord(e.target.value)}
+                placeholder="username (misal: soraku123)"
+                className={cn(inputCls, !contactdiscord.trim() && contactdiscord !== "" && "border-red-500/40")}
+              />
+            </div>
+          </div>
+
+          {/* Catatan */}
+          <div className="space-y-1.5">
+            <Label>Catatan Tambahan</Label>
+            <textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              rows={2}
+              maxLength={500}
+              placeholder="Opsional — ada yang ingin disampaikan ke panitia?"
+              className="w-full resize-none rounded-xl border border-border/40 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-foreground/15 focus:border-primary/40 focus:ring-1 focus:ring-primary/10 transition-all"
+            />
+          </div>
+
+          {/* ── Bukti Pembayaran (hanya jika event berbayar) ── */}
+          {event?.ispaid && (
+            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/20 border border-amber-500/30">
+                    <Upload className="h-4 w-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-amber-400/90">
+                      Screenshot Bukti Pembayaran <span className="text-red-400">*</span>
+                    </p>
+                    {event.price && (
+                      <p className="text-[11px] text-amber-400/50">
+                        Total: Rp {event.price.toLocaleString("id-ID")}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Metode pembayaran */}
+              {event.paymentmethods && event.paymentmethods.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/50">Bayar ke salah satu:</p>
+                  {event.paymentmethods.map((m, i) => {
+                    const key  = getPaymentKey(m);
+                    const Icon = PAYMENT_ICON_MAP[key] as React.FC<{ className?: string }> | undefined;
+                    if (m.type === "qris") return (
+                      <div key={i} className="flex items-center gap-3 rounded-xl border border-amber-500/15 bg-black/20 px-4 py-3">
+                        {Icon ? <Icon className="h-7 w-auto flex-shrink-0" /> : <span className="text-xs font-bold text-amber-400 flex-shrink-0">QRIS</span>}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-foreground/80">{m.provider ?? "QRIS"}</p>
+                          <p className="text-[11px] text-muted-foreground/50">Scan QRIS untuk bayar</p>
+                        </div>
+                        {m.qrisImageUrl && (
+                          <a href={m.qrisImageUrl} download
+                            className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-400 hover:bg-amber-500/20 transition-colors flex-shrink-0">
+                            ↓ QRIS
+                          </a>
+                        )}
+                      </div>
+                    );
+                    return (
+                      <div key={i} className="flex items-center gap-3 rounded-xl border border-amber-500/15 bg-black/20 px-4 py-3">
+                        {Icon ? <Icon className="h-7 w-auto flex-shrink-0" /> : (
+                          <span className="rounded border border-border/40 bg-muted/20 px-2 py-1 text-[10px] font-bold text-muted-foreground/60 uppercase flex-shrink-0">
+                            {m.bank ?? m.provider ?? m.type}
+                          </span>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-foreground/80 truncate">{m.account}</p>
+                          {m.name && <p className="text-[11px] text-muted-foreground/50 truncate">a/n {m.name}</p>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Upload area */}
+              <div className="space-y-2">
+                <label className={cn(
+                  "flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed cursor-pointer transition-all py-8",
+                  paymentproof
+                    ? "border-green-500/40 bg-green-500/5"
+                    : "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/8"
+                )}>
+                  <input type="file" accept="image/*" className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 5 * 1024 * 1024) { setError("Ukuran file maksimal 5MB."); return; }
+                      const url = await uploadImage(file);
+                      if (url) { setPaymentproof(url); setError(""); }
+                      else setError("Gagal upload. Coba paste URL langsung di bawah.");
+                    }} />
+                  {uploading ? (
+                    <div className="flex items-center gap-2 text-amber-400/70 text-sm">
+                      <Loader2 className="h-5 w-5 animate-spin" /> Mengupload...
+                    </div>
+                  ) : paymentproof ? (
+                    <div className="flex flex-col items-center gap-1.5">
+                      <CheckCircle2 className="h-7 w-7 text-green-400" />
+                      <p className="text-sm font-bold text-green-400">Bukti terupload!</p>
+                      <p className="text-[10px] text-foreground/30">Klik untuk ganti</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-1.5">
+                      <Upload className="h-7 w-7 text-amber-400/50" />
+                      <p className="text-sm font-semibold text-amber-400/80">Klik untuk upload screenshot</p>
+                      <p className="text-[10px] text-foreground/30">JPG, PNG, WebP — maks 5MB</p>
+                    </div>
+                  )}
+                </label>
+
+                {/* Preview gambar */}
+                {paymentproof && (
+                  <div className="relative rounded-xl overflow-hidden border border-green-500/25">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={paymentproof} alt="Bukti bayar" className="w-full max-h-52 object-contain bg-black/30" />
+                    <button type="button" onClick={() => setPaymentproof("")}
+                      className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-lg bg-background/90 text-muted-foreground hover:text-destructive transition-colors shadow-md">
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                {/* URL fallback */}
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-px bg-border/30" />
+                  <span className="text-[10px] text-foreground/25">atau paste URL gambar</span>
+                  <div className="flex-1 h-px bg-border/30" />
+                </div>
+                <input
+                  type="text"
+                  value={paymentproof}
+                  onChange={e => setPaymentproof(e.target.value)}
+                  placeholder="https://i.imgur.com/..."
+                  className="w-full rounded-xl border border-amber-500/20 bg-black/20 px-3 py-2 text-xs outline-none placeholder:text-foreground/15 focus:border-amber-500/30 transition-all"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Validasi errors summary */}
+          {!canGoStep2 && (teamname || contactname || contactdiscord || paymentproof) && (
+            <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 space-y-1">
+              {step1Errors.map((e, i) => (
+                <p key={i} className="text-[11px] text-red-400/80 flex items-center gap-1.5">
+                  <span className="h-1 w-1 rounded-full bg-red-400/60 flex-shrink-0" /> {e}
+                </p>
+              ))}
+            </div>
+          )}
+
+          <div className="flex justify-end pt-1">
+            <button
+              onClick={() => {
+                if (!canGoStep2) { setError(step1Errors[0] ?? "Lengkapi semua field yang wajib."); return; }
+                setError(""); setStep(2);
+              }}
+              className={cn(
+                "flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all",
+                canGoStep2
+                  ? "bg-primary text-white hover:-translate-y-0.5 shadow-lg shadow-primary/20 hover:bg-primary/90"
+                  : "bg-muted/20 text-foreground/30 cursor-not-allowed"
+              )}>
               Lanjut ke Pemain <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
       )}
 
-      {/* ════════ STEP 2: Pemain ════════ */}
+      {/* ══════════════════════════════════════
+          STEP 2: Pemain
+          ══════════════════════════════════════ */}
       {step === 2 && (
         <div className="space-y-5">
+
+          {/* Info ML */}
+          {isML && (
+            <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+              <Swords className="h-4 w-4 text-primary/60 flex-shrink-0 mt-0.5" />
+              <div className="text-xs text-foreground/50 leading-relaxed">
+                <span className="font-bold text-foreground/70">Mobile Legends Tournament: </span>
+                Wajib 5 pemain aktif. Gunakan IGN persis seperti yang tertera di akun Mobile Legends.
+                Pemain cadangan bersifat opsional.
+              </div>
+            </div>
+          )}
+
           {/* Pemain Aktif */}
-          <div className="glass-card rounded-3xl p-6 space-y-5">
-            <div className="flex items-center justify-between">
+          <div className="glass-card rounded-3xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-border/30">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 border border-primary/25">
                   <Users className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-black uppercase tracking-widest">Pemain Aktif</h2>
-                  <p className="text-[11px] text-foreground/35">Minimal 1 pemain, maksimal 10</p>
+                  <h2 className="text-sm font-black">
+                    Pemain Aktif
+                    <span className="ml-2 text-[10px] font-normal text-foreground/30">
+                      {activeplayers.length}/10
+                    </span>
+                  </h2>
+                  <p className="text-[11px] text-foreground/35">
+                    {isML ? "Wajib 5 pemain · maks 10" : "Min 1 pemain · maks 10"}
+                  </p>
                 </div>
               </div>
               {activeplayers.length < 10 && (
-                <button type="button" onClick={() => setActiveplayers(prev => [...prev, EMPTY_PLAYER()])}
+                <button type="button"
+                  onClick={() => setActiveplayers(prev => [...prev, EMPTY_PLAYER()])}
                   className="flex items-center gap-1.5 rounded-xl border border-primary/30 bg-primary/8 px-3 py-1.5 text-xs font-bold text-primary/80 hover:bg-primary/15 transition-colors">
                   <Plus className="h-3 w-3" /> Tambah
                 </button>
               )}
             </div>
+
             <div className="space-y-3">
               {activeplayers.map((p, i) => (
                 <PlayerCard key={i} player={p} index={i} isReserve={false}
+                  isML={isML}
                   onChange={np => updateActive(i, np)}
                   onRemove={() => setActiveplayers(prev => prev.filter((_, idx) => idx !== i))}
-                  canRemove={activeplayers.length > 1} />
+                  canRemove={isML ? activeplayers.length > 5 : activeplayers.length > 1}
+                />
               ))}
             </div>
+
+            {unfilledPlayers > 0 && (
+              <p className="text-[11px] text-red-400/70 text-center">
+                {unfilledPlayers} pemain belum diisi nama IGN-nya
+              </p>
+            )}
           </div>
 
           {/* Pemain Cadangan */}
-          <div className="glass-card rounded-3xl p-6 space-y-5">
-            <div className="flex items-center justify-between">
+          <div className="glass-card rounded-3xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-border/30">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-yellow-500/15 border border-yellow-500/25">
                   <UserPlus className="h-4 w-4 text-yellow-400" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-black uppercase tracking-widest">Pemain Cadangan</h2>
-                  <p className="text-[11px] text-foreground/35">Opsional · Maksimal 5 pemain</p>
+                  <h2 className="text-sm font-black">
+                    Pemain Cadangan
+                    <span className="ml-2 text-[10px] font-normal text-foreground/30">
+                      {reserveplayers.length}/5
+                    </span>
+                  </h2>
+                  <p className="text-[11px] text-foreground/35">Opsional · Maks 5</p>
                 </div>
               </div>
               {reserveplayers.length < 5 && (
-                <button type="button" onClick={() => setReserveplayers(prev => [...prev, EMPTY_PLAYER()])}
+                <button type="button"
+                  onClick={() => setReserveplayers(prev => [...prev, EMPTY_PLAYER()])}
                   className="flex items-center gap-1.5 rounded-xl border border-yellow-500/30 bg-yellow-500/8 px-3 py-1.5 text-xs font-bold text-yellow-400/80 hover:bg-yellow-500/15 transition-colors">
                   <Plus className="h-3 w-3" /> Tambah
                 </button>
               )}
             </div>
+
             {reserveplayers.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border/30 px-4 py-6 text-center">
+              <div className="rounded-xl border border-dashed border-border/25 px-4 py-6 text-center">
                 <p className="text-xs text-foreground/25">Belum ada pemain cadangan</p>
+                <p className="text-[10px] text-foreground/15 mt-0.5">Klik "Tambah" jika diperlukan</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {reserveplayers.map((p, i) => (
                   <PlayerCard key={i} player={p} index={i} isReserve={true}
+                    isML={isML}
                     onChange={np => updateReserve(i, np)}
                     onRemove={() => setReserveplayers(prev => prev.filter((_, idx) => idx !== i))}
-                    canRemove={true} />
+                    canRemove={true}
+                  />
                 ))}
               </div>
             )}
@@ -563,32 +737,42 @@ export default function EventRegisterPage() {
               className="flex items-center gap-2 rounded-xl border border-border/50 px-4 py-2.5 text-sm font-semibold text-foreground/60 hover:text-foreground transition-colors">
               <ArrowLeft className="h-3.5 w-3.5" /> Kembali
             </button>
-            <button onClick={() => { if (!canGoStep3) { setError("Isi nama semua pemain aktif terlebih dahulu."); return; } setError(""); setStep(3); }}
-              className={cn("flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all",
-                canGoStep3 ? "bg-primary text-white hover:-translate-y-0.5 shadow-lg shadow-primary/20" : "bg-border/20 text-foreground/25 cursor-not-allowed")}>
+            <button
+              onClick={() => {
+                if (!canGoStep3) { setError("Isi nama IGN semua pemain aktif terlebih dahulu."); return; }
+                setError(""); setStep(3);
+              }}
+              className={cn(
+                "flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all",
+                canGoStep3
+                  ? "bg-primary text-white hover:-translate-y-0.5 shadow-lg shadow-primary/20"
+                  : "bg-muted/20 text-foreground/30 cursor-not-allowed"
+              )}>
               Preview <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
       )}
 
-      {/* ════════ STEP 3: Preview / Konfirmasi ════════ */}
+      {/* ══════════════════════════════════════
+          STEP 3: Preview
+          ══════════════════════════════════════ */}
       {step === 3 && (
         <div className="space-y-5">
           <div className="glass-card rounded-3xl p-6 space-y-5">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 pb-2 border-b border-border/30">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green-500/15 border border-green-500/25">
                 <CheckCircle2 className="h-4 w-4 text-green-400" />
               </div>
               <div>
-                <h2 className="text-sm font-black uppercase tracking-widest">Preview Pendaftaran</h2>
+                <h2 className="text-sm font-black">Review Pendaftaran</h2>
                 <p className="text-[11px] text-foreground/35">Cek kembali sebelum submit</p>
               </div>
             </div>
 
-            {/* Team summary */}
-            <div className="rounded-2xl border border-border/40 bg-black/20 p-4 space-y-3">
-              <div className="flex items-center gap-3">
+            {/* Tim */}
+            <div className="rounded-2xl border border-border/40 bg-black/20 p-4">
+              <div className="flex items-center gap-3 mb-3">
                 {teamlogourl ? (
                   <div className="h-12 w-12 flex-shrink-0 rounded-xl overflow-hidden border border-border/40">
                     <Image src={teamlogourl} alt="logo" width={48} height={48} className="h-full w-full object-cover" onError={() => setTeamlogourl("")} />
@@ -599,15 +783,19 @@ export default function EventRegisterPage() {
                   </div>
                 )}
                 <div>
-                  <p className="text-lg font-black">{teamname}</p>
-                  {contactname && <p className="text-xs text-foreground/40">PIC: {contactname}{contactdiscord ? ` · ${contactdiscord}` : ""}</p>}
+                  <p className="text-base font-black">{teamname}</p>
+                  <p className="text-xs text-foreground/40">
+                    PIC: {contactname} · Discord: {contactdiscord}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Players */}
-            <div className="space-y-3">
-              <p className="text-[10px] font-black uppercase tracking-widest text-primary/50">Pemain Aktif ({activeplayers.filter(p => p.name).length})</p>
+            {/* Pemain Aktif */}
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary/50 mb-2.5">
+                Pemain Aktif ({activeplayers.filter(p => p.name).length})
+              </p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {activeplayers.filter(p => p.name).map((p, i) => (
                   <div key={i} className="flex items-center gap-2.5 rounded-xl border border-primary/15 bg-primary/5 px-3 py-2.5">
@@ -619,41 +807,43 @@ export default function EventRegisterPage() {
                   </div>
                 ))}
               </div>
-
-              {reserveplayers.filter(p => p.name).length > 0 && (
-                <>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-yellow-500/50">
-                    Pemain Cadangan ({reserveplayers.filter(p => p.name).length})
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {reserveplayers.filter(p => p.name).map((p, i) => (
-                      <div key={i} className="flex items-center gap-2.5 rounded-xl border border-yellow-500/15 bg-yellow-500/5 px-3 py-2.5">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-yellow-500/20 text-[10px] font-black text-yellow-400">C{i + 1}</span>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-bold truncate">{p.name}</p>
-                          {p.role && <p className="text-[10px] text-foreground/35">{p.role}</p>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
 
-            {notes && (
-              <div className="rounded-xl border border-border/30 bg-black/20 px-4 py-3">
-                <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30 mb-1">Catatan</p>
-                <p className="text-xs text-foreground/60">{notes}</p>
+            {/* Pemain Cadangan */}
+            {reserveplayers.filter(p => p.name).length > 0 && (
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-yellow-500/50 mb-2.5">
+                  Pemain Cadangan ({reserveplayers.filter(p => p.name).length})
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {reserveplayers.filter(p => p.name).map((p, i) => (
+                    <div key={i} className="flex items-center gap-2.5 rounded-xl border border-yellow-500/15 bg-yellow-500/5 px-3 py-2.5">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-yellow-500/20 text-[10px] font-black text-yellow-400">C{i+1}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold truncate">{p.name}</p>
+                        {p.role && <p className="text-[10px] text-foreground/35">{p.role}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* Bukti bayar preview */}
+            {/* Catatan */}
+            {notes && (
+              <div className="rounded-xl border border-border/30 bg-black/20 px-4 py-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30 mb-1">Catatan</p>
+                <p className="text-xs text-foreground/60 whitespace-pre-wrap">{notes}</p>
+              </div>
+            )}
+
+            {/* Bukti bayar */}
             {event?.ispaid && paymentproof && (
-              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2">
+              <div className="rounded-2xl border border-amber-500/25 bg-amber-500/5 p-4 space-y-2">
                 <p className="text-[10px] font-black uppercase tracking-widest text-amber-400/70">Bukti Pembayaran</p>
                 <div className="relative rounded-xl overflow-hidden border border-amber-500/20">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={paymentproof} alt="Bukti bayar" className="w-full max-h-48 object-contain bg-black/20" />
+                  <img src={paymentproof} alt="Bukti" className="w-full max-h-48 object-contain bg-black/20" />
                 </div>
               </div>
             )}
