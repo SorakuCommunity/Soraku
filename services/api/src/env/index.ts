@@ -25,6 +25,10 @@ export const env = createEnv({
     // https://github.com/consumet/consumet.ts
     CONSUMET_API_URL: z.string().url().optional(),
 
+    // Upstash Redis — caching anime data (free tier cukup)
+    UPSTASH_REDIS_REST_URL:   z.string().url().optional(),
+    UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   },
   client: {},
@@ -37,6 +41,8 @@ export const env = createEnv({
     TRAKTEER_WEBHOOK_SECRET:   process.env.TRAKTEER_WEBHOOK_SECRET,
     CORS_ORIGINS:              process.env.CORS_ORIGINS,
     CONSUMET_API_URL:          process.env.CONSUMET_API_URL,
+    UPSTASH_REDIS_REST_URL:   process.env.UPSTASH_REDIS_REST_URL,
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     NODE_ENV:                  process.env.NODE_ENV,
   },
   skipValidation:         !!process.env.SKIP_ENV_VALIDATION,
