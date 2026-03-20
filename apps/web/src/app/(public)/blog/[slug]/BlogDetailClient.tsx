@@ -186,7 +186,7 @@ export default function BlogDetailClient({ slug, content, likecount, siteUrl, ti
   const [isLoggedIn,  setIsLoggedIn]  = useState(false);
   const [comments,    setComments]    = useState<Comment[]>([]);
   const [commLoading, setCommLoading] = useState(true);
-  const [commOpen,    setCommOpen]    = useState(true);
+  const [commOpen,    setCommOpen]    = useState(false);
   const [newComment,  setNewComment]  = useState("");
   const [preview,     setPreview]     = useState(false);
   const [submitting,  setSubmitting]  = useState(false);

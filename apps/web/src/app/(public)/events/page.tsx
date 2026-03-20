@@ -80,9 +80,11 @@ function PaymentIcons({ methods }: { methods: PaymentMethod[] }) {
 }
 
 function EventCard({ event }: { event: EventRow }) {
-  const now        = new Date();
-  const start      = new Date(event.startdate);
-  const isUpcoming = start > now;
+  const nowMs      = Date.now();
+  const startMs    = new Date(event.startdate).getTime();
+  const endMs      = event.enddate ? new Date(event.enddate).getTime() : null;
+  const isUpcoming = startMs > nowMs;
+  const isLive     = !isUpcoming && (!endMs || nowMs < endMs);
   const TypeIcon   = event.isonline ? Wifi : MapPin;
   const typeLabel  = event.isonline ? "Online" : "Offline";
   const methods    = event.paymentmethods ?? [];
@@ -100,7 +102,7 @@ function EventCard({ event }: { event: EventRow }) {
         {event.coverurl ? (
           <Image src={event.coverurl} alt={event.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" unoptimized />
         ) : (
-          <div className={`absolute inset-0 flex items-center justify-center ${isUpcoming ? "bg-gradient-to-br from-primary/25 via-accent/10 to-violet-500/15" : "bg-gradient-to-br from-muted/40 to-muted/20"}`}>
+          <div className={`absolute inset-0 flex items-center justify-center ${isLive ? "bg-gradient-to-br from-green-500/20 via-emerald-500/10 to-teal-500/15" : isUpcoming ? "bg-gradient-to-br from-primary/25 via-accent/10 to-violet-500/15" : "bg-gradient-to-br from-muted/40 to-muted/20"}`}>
             <span className="text-[5rem] font-black opacity-[0.06] select-none">空</span>
           </div>
         )}
@@ -120,8 +122,16 @@ function EventCard({ event }: { event: EventRow }) {
         </div>
 
         <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
-          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${isUpcoming ? "bg-primary text-white shadow-md shadow-primary/30" : "bg-muted/80 text-muted-foreground backdrop-blur-sm"}`}>
-            {isUpcoming ? "🔥 Upcoming" : "✓ Selesai"}
+          <span className={`flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold ${isLive ? "bg-green-500/90 text-white shadow-md shadow-green-500/30" : isUpcoming ? "bg-primary text-white shadow-md shadow-primary/30" : "bg-muted/80 text-muted-foreground backdrop-blur-sm"}`}>
+            {isLive ? (
+                <span className="flex items-center gap-1.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                  </span>
+                  Live
+                </span>
+              ) : isUpcoming ? "🔥 Upcoming" : "✓ Selesai"}
           </span>
           <span className="flex items-center gap-1 rounded-full bg-background/70 px-2.5 py-0.5 text-[11px] font-medium text-foreground/80 backdrop-blur-sm">
             <TypeIcon className="h-3 w-3" />{typeLabel}
@@ -173,7 +183,7 @@ function EventCard({ event }: { event: EventRow }) {
 export default async function EventsPage({ searchParams }: { searchParams?: Promise<{ filter?: string }> }) {
   const params       = await searchParams;
   const activeFilter = params?.filter ?? "Semua";
-  const now          = new Date().toISOString();
+  const now          = Date.now();
 
   let query = (await db())
     .from("events")
@@ -186,8 +196,8 @@ export default async function EventsPage({ searchParams }: { searchParams?: Prom
 
   const { data: allEvents } = await query;
   const events = allEvents ?? [];
-  const upcoming = events.filter((e) => e.startdate > now);
-  const past     = events.filter((e) => e.startdate <= now).reverse();
+  const upcoming = events.filter((e) => new Date(e.startdate).getTime() > now);
+  const past     = events.filter((e) => new Date(e.startdate).getTime() <= now).reverse();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
