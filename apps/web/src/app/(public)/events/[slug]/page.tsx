@@ -106,7 +106,7 @@ export default async function EventDetailPage({ params }: Props) {
 
       <EventTracker id={event.id} title={event.title} />
 
-      {/* Breadcrumb */
+      {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground/50">
         <Link href="/" className="flex items-center gap-1 hover:text-muted-foreground transition-colors">
           <Home className="h-3.5 w-3.5" /> Beranda
