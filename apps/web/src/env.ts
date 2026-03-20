@@ -26,7 +26,7 @@ export const env = createEnv({
     SUPABASE_SERVICE_KEY:      z.string().optional(), // legacy alias
 
     // Central API (services/api)
-    // Contoh: https://apisoraku-git-master-soraku.vercel.app
+    // Contoh: https://apisoraku-git-master-www.soraku.id
     API_URL: z.string().optional().default('http://localhost:4000'),
 
     // Payment (opsional)

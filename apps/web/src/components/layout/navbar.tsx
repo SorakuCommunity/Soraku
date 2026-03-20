@@ -3,10 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Menu, X, Moon, Sun, ChevronDown,
-  Bell, LogOut, Shield, CheckCheck, User,
+  Bell, LogOut, LayoutDashboard, Shield, CheckCheck, User, Home,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -19,8 +19,11 @@ type NavItem =
   | { type: "dropdown"; label: string; children: NavChild[] };
 
 interface SessionUser {
-  id: string; username: string | null; displayname: string | null;
-  avatarurl: string | null; role: string;
+  id: string;
+  username: string | null;
+  displayname: string | null;
+  avatarurl: string | null;
+  role: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -39,20 +42,20 @@ const NAV_ITEMS: NavItem[] = [
     type: "dropdown",
     label: "Komunitas",
     children: [
-      { label: "VTuber",  href: "/vtubers", desc: "Virtual YouTuber Soraku" },
-      { label: "Premium", href: "/premium", desc: "Dukung Soraku Community" },
-      { label: "Donasi",  href: "/donate",  desc: "Donasi untuk komunitas"  },
+      { label: "VTuber",  href: "/vtubers", desc: "Virtual YouTuber Soraku"  },
+      { label: "Premium", href: "/premium", desc: "Dukung Soraku Community"  },
+      { label: "Donasi",  href: "/donate",  desc: "Donasi untuk komunitas"   },
     ],
   },
   {
     type: "dropdown",
     label: "Informasi",
     children: [
-      { label: "Privasi",   href: "/privacy",      desc: "Kebijakan privasi"    },
-      { label: "Ketentuan", href: "/tos",           desc: "Syarat penggunaan"    },
-      { label: "Masukan",   href: "/feedback",      desc: "Kirim masukan"        },
-      { label: "Lisensi",   href: "/license",       desc: "Lisensi konten"       },
-      { label: "Rekrutmen", href: "/requirements",  desc: "Bergabung bersama kami" },
+      { label: "Privasi",    href: "/privacy",      desc: "Kebijakan privasi"    },
+      { label: "Ketentuan",  href: "/tos",           desc: "Syarat penggunaan"    },
+      { label: "Masukan",    href: "/feedback",      desc: "Kirim masukan"        },
+      { label: "Lisensi",    href: "/license",       desc: "Lisensi konten"       },
+      { label: "Rekrutmen",  href: "/requirements",  desc: "Bergabung bersama kami" },
     ],
   },
 ];
@@ -60,17 +63,18 @@ const NAV_ITEMS: NavItem[] = [
 const IS_ADMIN = (r: string) => ["OWNER","MANAGER","ADMIN"].includes(r.toUpperCase());
 
 export function Navbar() {
-  const pathname  = usePathname();
-  const router    = useRouter();
+  const pathname = usePathname();
+  const router   = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
-  const [menuOpen,     setMenuOpen]     = useState(false);
-  const [notifOpen,    setNotifOpen]    = useState(false);
+  const [menuOpen,   setMenuOpen]   = useState(false);
+  const [notifOpen,  setNotifOpen]  = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [user,         setUser]         = useState<SessionUser | null>(null);
-  const [mounted,      setMounted]      = useState(false);
+  const [user, setUser] = useState<SessionUser | null>(null);
+  const [mounted, setMounted] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const enabled  = !!user;
 
-  const { notifications, unreadCount, markRead, markAllRead } = useNotifications(!!user);
+  const { notifications, unreadCount, markRead, markAllRead } = useNotifications(enabled);
 
   useEffect(() => {
     setMounted(true);
@@ -80,18 +84,21 @@ export function Navbar() {
       .catch(() => setUser(null));
   }, []);
 
+  // Close notif on outside click
   useEffect(() => {
-    const h = (e: MouseEvent) => {
+    const handler = (e: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node))
         setNotifOpen(false);
     };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   const handleSignout = async () => {
     await fetch("/api/auth/signout", { method: "POST" }).catch(() => {});
-    setUser(null); router.push("/"); router.refresh();
+    setUser(null);
+    router.push("/");
+    router.refresh();
   };
 
   const displayName = user?.displayname ?? user?.username ?? "";
@@ -102,7 +109,7 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
+        <Link href="/" className="flex items-center gap-2.5 group">
           <div className="h-8 w-8 overflow-hidden rounded-lg border border-border/60 bg-[#1a1c20]">
             <Image src="/logo.png" alt="Soraku" width={32} height={32}
               className="h-full w-full object-cover object-top transition-transform group-hover:scale-110 duration-300" />
@@ -113,7 +120,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-0.5 lg:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           {NAV_ITEMS.map((item) => {
             if (item.type === "link") {
               const active = pathname === item.href;
@@ -128,6 +135,7 @@ export function Navbar() {
               );
             }
 
+            // Dropdown
             const isOpen = openDropdown === item.label;
             return (
               <div key={item.label} className="relative"
@@ -140,19 +148,17 @@ export function Navbar() {
                   {item.label}
                   <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", isOpen && "rotate-180")} />
                 </button>
-
-                {/* Dropdown panel */}
                 <div className={cn(
-                  "absolute left-0 top-full pt-1.5 transition-all duration-150 origin-top-left",
-                  isOpen ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-95 pointer-events-none"
+                  "absolute left-0 top-full pt-2 transition-all duration-200",
+                  isOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-1 pointer-events-none"
                 )}>
-                  <div className="w-52 overflow-hidden rounded-xl border border-border/60 bg-background/98 shadow-xl backdrop-blur-xl">
-                    {(item as { type: "dropdown"; label: string; children: NavChild[] }).children.map(child => (
+                  <div className="w-52 overflow-hidden rounded-xl border border-border/60 bg-background/95 shadow-xl backdrop-blur-xl">
+                    {item.children.map(child => (
                       <Link key={child.href} href={child.href}
                         className="block px-4 py-3 transition-colors hover:bg-primary/8"
                         onClick={() => setOpenDropdown(null)}>
-                        <p className="text-sm font-semibold text-foreground/90">{child.label}</p>
-                        {child.desc && <p className="mt-0.5 text-xs text-muted-foreground/55">{child.desc}</p>}
+                        <p className="text-sm font-medium text-foreground">{child.label}</p>
+                        {child.desc && <p className="mt-0.5 text-xs text-muted-foreground/60">{child.desc}</p>}
                       </Link>
                     ))}
                   </div>
@@ -163,9 +169,9 @@ export function Navbar() {
         </nav>
 
         {/* Right actions */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
 
-          {/* Theme */}
+          {/* Theme toggle */}
           {mounted && (
             <button onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
@@ -190,13 +196,15 @@ export function Navbar() {
               </button>
 
               {notifOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-2xl border border-border/60 bg-background/98 shadow-2xl backdrop-blur-xl">
+                <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-2xl border border-border/60 bg-background/95 shadow-2xl backdrop-blur-xl">
                   <div className="flex items-center justify-between border-b border-border/40 px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Bell className="h-3.5 w-3.5 text-primary" />
                       <span className="text-sm font-bold">Notifikasi</span>
                       {unreadCount > 0 && (
-                        <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">{unreadCount}</span>
+                        <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                          {unreadCount}
+                        </span>
                       )}
                     </div>
                     {unreadCount > 0 && (
@@ -213,26 +221,29 @@ export function Navbar() {
                         <Bell className="mx-auto mb-2 h-8 w-8 text-muted-foreground/20" />
                         <p className="text-xs text-muted-foreground/40">Tidak ada notifikasi</p>
                       </div>
-                    ) : notifications.slice(0, 6).map((n) => {
-                      const cfg  = NOTIF_CONFIG[n.type] ?? NOTIF_CONFIG.info;
-                      const Icon = cfg.icon as React.ElementType | undefined;
-                      return (
-                        <button key={n.id} onClick={() => { markRead([n.id]); setNotifOpen(false); }}
-                          className={cn(
-                            "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-primary/5",
-                            !n.isread && "bg-primary/5"
-                          )}>
-                          <div className={cn("mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border", cfg.bg)}>
-                            {Icon ? <Icon className={cn("h-3.5 w-3.5", cfg.color)} /> : <span className={cfg.color}>{cfg.emoji}</span>}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-semibold">{n.title}</p>
-                            {n.body && <p className="mt-0.5 text-[11px] text-muted-foreground/60 line-clamp-2">{n.body}</p>}
-                          </div>
-                          {!n.isread && <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />}
-                        </button>
-                      );
-                    })}
+                    ) : (
+                      notifications.slice(0, 6).map((n) => {
+                        const cfg  = NOTIF_CONFIG[n.type] ?? NOTIF_CONFIG.info;
+                        const Icon = cfg.icon;
+                        return (
+                          <button key={n.id}
+                            onClick={() => { markRead(n.id); setNotifOpen(false); }}
+                            className={cn(
+                              "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-primary/5",
+                              !n.isread && "bg-primary/5"
+                            )}>
+                            <div className={cn("mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border", cfg.bg, cfg.border)}>
+                              <Icon className={cn("h-3.5 w-3.5", cfg.color)} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-semibold text-foreground">{n.title}</p>
+                              {n.message && <p className="mt-0.5 text-[11px] text-muted-foreground/60 line-clamp-2">{n.message}</p>}
+                            </div>
+                            {!n.isread && <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />}
+                          </button>
+                        );
+                      })
+                    )}
                   </div>
 
                   <Link href="/notifications" onClick={() => setNotifOpen(false)}
@@ -243,7 +254,7 @@ export function Navbar() {
               )}
             </div>
 
-            {/* User avatar dropdown */}
+            {/* User menu */}
             <div className="relative group">
               <button className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-primary/10 text-primary font-bold text-sm transition-all hover:border-primary/40 hover:ring-2 hover:ring-primary/20">
                 {user.avatarurl
@@ -252,8 +263,8 @@ export function Navbar() {
                 }
               </button>
 
-              <div className="absolute right-0 top-full pt-2 opacity-0 scale-95 origin-top-right pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-150">
-                <div className="w-52 overflow-hidden rounded-xl border border-border/60 bg-background/98 shadow-xl backdrop-blur-xl">
+              <div className="absolute right-0 top-full pt-2 opacity-0 -translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200">
+                <div className="w-52 overflow-hidden rounded-xl border border-border/60 bg-background/95 shadow-xl backdrop-blur-xl">
                   <div className="border-b border-border/40 px-4 py-3">
                     <p className="text-sm font-semibold truncate">{displayName}</p>
                     <p className="text-xs text-muted-foreground/60 truncate">@{user.username ?? "—"}</p>
@@ -290,7 +301,7 @@ export function Navbar() {
             </Link>
           )}
 
-          {/* Mobile toggle */}
+          {/* Mobile hamburger */}
           <button onClick={() => setMenuOpen(o => !o)}
             className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors lg:hidden">
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -300,7 +311,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="border-t border-border/40 bg-background/98 backdrop-blur-xl lg:hidden">
+        <div className="border-t border-border/40 bg-background/95 backdrop-blur-xl lg:hidden">
           <div className="space-y-0.5 px-4 py-3">
             {NAV_ITEMS.map((item) => {
               if (item.type === "link") {
@@ -316,11 +327,11 @@ export function Navbar() {
                 );
               }
               return (
-                <div key={item.label} className="pt-1">
-                  <p className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/35">
+                <div key={item.label}>
+                  <p className="px-3 py-1.5 text-[11px] font-black uppercase tracking-widest text-muted-foreground/40">
                     {item.label}
                   </p>
-                  {(item as { type: "dropdown"; label: string; children: NavChild[] }).children.map(child => (
+                  {item.children.map(child => (
                     <Link key={child.href} href={child.href}
                       onClick={() => setMenuOpen(false)}
                       className="block rounded-xl px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
@@ -330,6 +341,14 @@ export function Navbar() {
                 </div>
               );
             })}
+            {user && (
+              <div className="border-t border-border/40 pt-2 mt-2">
+                <Link href="/notifications" onClick={() => setMenuOpen(false)}
+                  className="block rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                  Notifikasi {unreadCount > 0 && `(${unreadCount})`}
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
