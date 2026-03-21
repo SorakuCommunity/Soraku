@@ -32,11 +32,12 @@ const NAV_ITEMS: NavItem[] = [
     { label:"VTuber",  href:"/vtubers", desc:"Virtual YouTuber",     icon:Users     },
   ]},
   { type:"dropdown", label:"Info",      children:[
-    { label:"Privasi",   href:"/privacy",      desc:"Kebijakan privasi"       },
-    { label:"Ketentuan", href:"/tos",           desc:"Syarat penggunaan"       },
-    { label:"Masukan",   href:"/feedback",      desc:"Kirim masukan"           },
-    { label:"Lisensi",   href:"/license",       desc:"Lisensi konten"          },
-    { label:"Rekrutmen", href:"/requirements",  desc:"Bergabung bersama kami"  },
+    { label:"Tentang",   href:"/about",         desc:"Kenali Soraku Community"  },
+    { label:"Rekrutmen", href:"/requirements",  desc:"Bergabung bersama kami"   },
+    { label:"Masukan",   href:"/feedback",      desc:"Kirim saran & laporan"    },
+    { label:"Privasi",   href:"/privacy",       desc:"Kebijakan privasi"        },
+    { label:"Ketentuan", href:"/tos",            desc:"Syarat penggunaan"        },
+    { label:"Lisensi",   href:"/license",        desc:"Lisensi open source"      },
   ]},
 ];
 
@@ -341,10 +342,10 @@ export function Navbar() {
                 <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/35">Komunitas</p>
                 <div className="space-y-1">
                   {[
-                    {label:"Tentang",   href:"/about",        emoji:"ℹ️"},
                     {label:"Discord",   href:"https://discord.gg/qm3XJvRa6B", emoji:"💬", external:true},
                     {label:"Donasi",    href:"/donate",       emoji:"💚"},
                     {label:"Premium",   href:"/premium",      emoji:"⭐"},
+                    {label:"VTuber",    href:"/vtubers",      emoji:"🎭"},
                   ].map(item=>(
                     item.external
                       ? <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer"
@@ -362,16 +363,19 @@ export function Navbar() {
               {/* Info */}
               <div>
                 <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/35">Informasi</p>
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-3 gap-1.5">
                   {[
-                    {label:"Privasi",   href:"/privacy"},
-                    {label:"Ketentuan", href:"/tos"},
-                    {label:"Masukan",   href:"/feedback"},
-                    {label:"Rekrutmen", href:"/requirements"},
+                    {label:"Privasi",   href:"/privacy",      emoji:"🔒"},
+                    {label:"Ketentuan", href:"/tos",           emoji:"📄"},
+                    {label:"Masukan",   href:"/feedback",      emoji:"💬"},
+                    {label:"Rekrutmen", href:"/requirements",  emoji:"✨"},
+                    {label:"Lisensi",   href:"/license",       emoji:"⚖️"},
+                    {label:"Tentang",   href:"/about",         emoji:"ℹ️"},
                   ].map(item=>(
                     <Link key={item.href} href={item.href} onClick={()=>setMenuOpen(false)}
-                      className="rounded-xl border border-border/30 px-3 py-2.5 text-xs font-medium text-muted-foreground/60 hover:text-foreground hover:border-primary/25 hover:bg-primary/5 transition-colors text-center">
-                      {item.label}
+                      className="flex flex-col items-center gap-1 rounded-xl border border-border/30 py-3 text-center hover:border-primary/25 hover:bg-primary/5 transition-colors">
+                      <span className="text-base">{item.emoji}</span>
+                      <span className="text-[10px] font-medium text-muted-foreground/60 hover:text-foreground">{item.label}</span>
                     </Link>
                   ))}
                 </div>

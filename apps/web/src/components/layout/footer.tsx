@@ -100,10 +100,24 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-border/30 text-muted-foreground/35 mt-12 flex flex-col items-start justify-between gap-3 border-t pt-6 text-xs sm:flex-row sm:items-center">
-          <p>© 2023 – {new Date().getFullYear()} Soraku Community · Non-profit Indonesia</p>
-          <p className="flex items-center gap-1">
-            Dibangun dengan <span className="text-rose-400/60">♥</span> untuk komunitas
+        <div className="border-border/30 mt-12 border-t pt-6 space-y-3">
+          <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center text-xs text-muted-foreground/35">
+            <p>© 2023 – {new Date().getFullYear()} Soraku Community · Non-profit Indonesia</p>
+            <p className="flex items-center gap-1">
+              Dibangun dengan <span className="text-rose-400/60">♥</span> untuk komunitas
+            </p>
+          </div>
+          {/* License notice — dari Soraku/LICENSE */}
+          <p className="text-[10px] text-muted-foreground/20 leading-relaxed max-w-2xl">
+            Dilindungi oleh{" "}
+            <Link href="/license" className="underline underline-offset-2 hover:text-muted-foreground/40 transition-colors">
+              Soraku Community Source License v1.0
+            </Link>{" "}
+            · Hak Cipta (c) 2023–{new Date().getFullYear()} Soraku Community · Riu (Koordinator) ·{" "}
+            Dilarang menyalin, mendistribusikan, atau menggunakan ulang tanpa izin tertulis ·{" "}
+            <a href="mailto:echo.soraku@gmail.com" className="underline underline-offset-2 hover:text-muted-foreground/40 transition-colors">
+              echo.soraku@gmail.com
+            </a>
           </p>
         </div>
       </div>

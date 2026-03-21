@@ -257,82 +257,69 @@ export default function HomePage() {
           ══════════════════════════════════════════════ */}
       <section className="relative overflow-hidden">
 
-        {/* MOBILE: mascot full viewport */}
-        <div className="lg:hidden">
-          <div className="relative w-full h-[100svh] min-h-[600px]">
-            {/* Atmospheric orbs */}
-            <div className="pointer-events-none absolute inset-0 z-0">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[160px]"/>
-              <div className="absolute bottom-1/4 right-0 h-[300px] w-[300px] rounded-full bg-accent/8 blur-[100px]"/>
-            </div>
-
-            {/* Mascot — full bleed, NO card */}
-            <Image src="/logo-full.png" alt="Soraku" fill className="object-cover object-top" priority/>
-
-            {/* Seamless fades */}
-            <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-background to-transparent z-10"/>
-            <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-background via-background/80 to-transparent z-10"/>
-            <div className="absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-background/80 to-transparent z-10"/>
-            <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background/80 to-transparent z-10"/>
-
-            {/* Float badges — no background fill */}
-            {[
-              { text:"🌸 Komunitas",   right:"1rem",  top:"20%",   delay:"0s"   },
-              { text:"🎌 Anime & Manga",left:"1rem",  top:"36%",   delay:"1s"   },
-              { text:"✨ Non-profit",   right:"1rem",  top:"55%",   delay:"2s"   },
-              { text:"🇮🇩 Indonesia",  left:"1rem",   top:"68%",   delay:"0.5s" },
-            ].map((b,i)=>(
-              <div key={i} className="absolute z-20 float-badge" style={{...(b.right?{right:b.right}:{left:b.left}),top:b.top,animationDelay:b.delay}}>
-                <span className="rounded-full border border-white/12 px-3 py-1.5 text-[11px] font-semibold text-white/60 backdrop-blur-md">
-                  {b.text}
-                </span>
-              </div>
-            ))}
-
-            {/* Live + stats overlay */}
-            <div className="absolute bottom-[54%] inset-x-0 z-20 px-5 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2 w-2 flex-shrink-0">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/>
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"/>
-                </span>
-                <span className="text-[11px] font-bold text-white/50">
-                  {discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+ online`}
-                </span>
-              </div>
-              <span className="flex items-center gap-1 text-[9px] font-black text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"/> Live
-              </span>
-            </div>
+        {/* MOBILE: hero tanpa mascot — clean, text focused */}
+        <div className="lg:hidden px-5 pt-16 pb-14 min-h-[85svh] flex flex-col justify-center">
+          {/* Atmospheric glow */}
+          <div className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[140px]"/>
+            <div className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-accent/6 blur-[100px]"/>
           </div>
 
-          {/* Text hero below mascot */}
-          <div className="relative px-5 pb-16 -mt-14 z-10 space-y-5">
-            <div className="reveal-up">
-              <h1 className="text-[clamp(3rem,16vw,5rem)] font-black leading-[0.88] tracking-tighter">
-                Soraku
-              </h1>
-              <p className="text-[clamp(0.85rem,4vw,1.1rem)] font-light text-muted-foreground/45 tracking-wide mt-1 pl-0.5">
-                Community · 空 · Est. 2023
-              </p>
-            </div>
-            <div className="h-px w-14 bg-gradient-to-r from-primary/40 to-transparent reveal-up reveal-delay-1"/>
-            <div className="reveal-up reveal-delay-2">
-              <p className="text-[13px] leading-relaxed text-muted-foreground/65 max-w-xs">
-                <span className="font-bold text-foreground/85">Soraku</span> — dari <em className="not-italic font-medium text-foreground/70">"Sora"</em> (langit) dan <em className="not-italic font-medium text-foreground/70">"ku"</em> (milikku).
-                Komunitas non-profit anime & budaya Jepang Indonesia.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 reveal-up reveal-delay-3">
-              <Link href="/register"
-                className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 hover:-translate-y-0.5 transition-all">
-                Bergabung <ArrowRight className="h-3.5 w-3.5"/>
-              </Link>
-              <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-2xl border border-indigo-500/25 bg-indigo-500/8 px-5 py-3 text-sm font-semibold text-indigo-300/80 hover:-translate-y-0.5 transition-all">
-                <DiscordIcon className="h-4 w-4"/>
-              </a>
-            </div>
+          {/* Live badge */}
+          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/12 bg-primary/5 px-4 py-1.5 w-fit reveal-up">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"/>
+            </span>
+            <span className="text-[10px] font-black tracking-[0.15em] text-primary/60 uppercase">
+              {discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+ online`}
+            </span>
+          </div>
+
+          <div className="reveal-up">
+            <h1 className="text-[clamp(3.5rem,18vw,6rem)] font-black leading-[0.88] tracking-tighter">
+              Soraku
+            </h1>
+            <p className="text-[clamp(0.9rem,4vw,1.2rem)] font-light text-muted-foreground/45 tracking-wide mt-1.5 pl-0.5">
+              Community · 空 · Est. 2023
+            </p>
+          </div>
+
+          <div className="h-px w-16 bg-gradient-to-r from-primary/40 to-transparent my-6 reveal-up reveal-delay-1"/>
+
+          <div className="reveal-up reveal-delay-2 space-y-2.5 max-w-xs">
+            <p className="text-sm leading-relaxed text-muted-foreground/75">
+              <span className="font-bold text-foreground/90">Soraku</span> — dari <em className="not-italic font-medium text-foreground/70">"Sora"</em> (langit) dan <em className="not-italic font-medium text-foreground/70">"ku"</em> (milikku).
+            </p>
+            <p className="text-[13px] leading-loose text-muted-foreground/55">
+              Komunitas non-profit untuk semua pecinta anime, manga, dan budaya Jepang di Indonesia.
+            </p>
+          </div>
+
+          <div className="mt-8 flex items-center gap-3 reveal-up reveal-delay-3">
+            <Link href="/register"
+              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 hover:-translate-y-0.5 transition-all">
+              Bergabung <ArrowRight className="h-3.5 w-3.5"/>
+            </Link>
+            <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-2xl border border-indigo-500/25 bg-indigo-500/8 px-5 py-3 text-sm font-semibold text-indigo-300/80 hover:-translate-y-0.5 transition-all">
+              <DiscordIcon className="h-4 w-4"/> Discord
+            </a>
+          </div>
+
+          {/* Stats mobile */}
+          <div className="mt-10 flex items-center gap-6 reveal-up reveal-delay-4">
+            {[
+              {val:discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+`,label:"online",live:true},
+              {val:"20+",label:"event"},
+              {val:"100+",label:"konten"},
+            ].map((s,i)=>(
+              <div key={i} className="flex items-center gap-1.5">
+                {s.live&&<span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"/><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"/></span>}
+                <span className="text-xs font-black text-foreground">{s.val}</span>
+                <span className="text-[10px] text-muted-foreground/35">{s.label}</span>
+              </div>
+            ))}
           </div>
         </div>
 
