@@ -23,6 +23,11 @@ export class DatabaseManager {
 
   closeAll() { /* Supabase tidak butuh close */ }
 
+  // ── Welcome ────────────────────────────────────────────────────
+  getWelcomeSettings(g)           { return this.guild.getWelcomeSettings(g) }
+  setWelcomeSetting(g, k, v)      { return this.guild.setWelcomeSetting(g, k, v) }
+  resetWelcomeSettings(g)         { return this.guild.resetWelcomeSettings(g) }
+
   // ── Guild ──────────────────────────────────────────────────
   getPrefixes(g)              { return this.guild.getPrefixes(g) }
   setPrefixes(g, p)           { return this.guild.setPrefixes(g, p) }

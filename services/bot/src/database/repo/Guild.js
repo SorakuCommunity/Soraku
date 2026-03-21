@@ -76,3 +76,26 @@ export class Guild extends Database {
     await this.update('guilds', { auto_disconnect: enabled, updated_at: new Date().toISOString() }, { guild_id: guildId })
   }
 }
+
+  // ── Welcome Settings ──────────────────────────────────────────────────────
+  async getWelcomeSettings(guildId) {
+    const g = await this.ensureGuild(guildId)
+    return {
+      enabled:    g.welcome_enabled    ?? false,
+      channel_id: g.welcome_channel_id ?? null,
+      message:    g.welcome_message    ?? null,
+    }
+  }
+
+  async setWelcomeSetting(guildId, key, value) {
+    await this.ensureGuild(guildId)
+    await this.update('guilds', { [`welcome_${key}`]: value, updated_at: new Date().toISOString() }, { guild_id: guildId })
+  }
+
+  async resetWelcomeSettings(guildId) {
+    await this.ensureGuild(guildId)
+    await this.update('guilds', {
+      welcome_enabled: false, welcome_channel_id: null, welcome_message: null,
+      updated_at: new Date().toISOString(),
+    }, { guild_id: guildId })
+  }
