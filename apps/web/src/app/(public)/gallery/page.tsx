@@ -286,7 +286,7 @@ export default function GalleryPage() {
   const [page, setPage] = useState(1);
   const [lightbox, setLightbox] = useState<GalleryItem|null>(null);
   const [showUpload, setShowUpload] = useState(false);
-  const searchTimeout = useRef<NodeJS.Timeout>();
+  const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
 
   const fetchGallery = useCallback(async (filter:string, q:string, p:number) => {
     setLoading(true);

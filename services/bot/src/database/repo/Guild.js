@@ -75,7 +75,6 @@ export class Guild extends Database {
   async setAutoDisconnect(guildId, enabled) {
     await this.update('guilds', { auto_disconnect: enabled, updated_at: new Date().toISOString() }, { guild_id: guildId })
   }
-}
 
   // ── Welcome Settings ──────────────────────────────────────────────────────
   async getWelcomeSettings(guildId) {
@@ -99,3 +98,4 @@ export class Guild extends Database {
       updated_at: new Date().toISOString(),
     }, { guild_id: guildId })
   }
+}
