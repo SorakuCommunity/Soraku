@@ -15,17 +15,36 @@ export async function GET(req: NextRequest) {
 
   // Reserved words
   const RESERVED = new Set([
-    'me','admin','administrator','soraku','system','support','help','api',
-    'auth','login','register','logout','signin','signup','root','null','undefined',
-    'profile','user','users','dashboard','dash','staff','team','mod','moderator',
+    'me',
+    'admin',
+    'administrator',
+    'soraku',
+    'system',
+    'support',
+    'help',
+    'api',
+    'auth',
+    'login',
+    'register',
+    'logout',
+    'signin',
+    'signup',
+    'root',
+    'null',
+    'undefined',
+    'profile',
+    'user',
+    'users',
+    'dashboard',
+    'dash',
+    'staff',
+    'team',
+    'mod',
+    'moderator',
   ])
   if (RESERVED.has(username)) return err('Username ini tidak tersedia', 409)
 
-  const { data } = await adminDb()
-    .from('users')
-    .select('id')
-    .eq('username', username)
-    .maybeSingle()
+  const { data } = await adminDb().from('users').select('id').eq('username', username).maybeSingle()
 
   if (data) return err('Username sudah dipakai', 409)
   return ok({ available: true })

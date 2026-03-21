@@ -23,37 +23,39 @@ export async function GET(_req: NextRequest) {
       .limit(4)
 
     // Get author info for posts
-    const authorIds = [...new Set((posts ?? []).filter(p => p.authorid).map(p => p.authorid!))]
+    const authorIds = [...new Set((posts ?? []).filter((p) => p.authorid).map((p) => p.authorid!))]
     let authorsMap: Record<string, any> = {}
     if (authorIds.length > 0) {
       const { data: users } = await adminDb()
-        .from('users').select('id,username,displayname,avatarurl').in('id', authorIds)
-      if (users) authorsMap = Object.fromEntries(users.map(u => [u.id, u]))
+        .from('users')
+        .select('id,username,displayname,avatarurl')
+        .in('id', authorIds)
+      if (users) authorsMap = Object.fromEntries(users.map((u) => [u.id, u]))
     }
 
-    const blogs = (posts ?? []).map(p => ({
-      id:          p.id,
-      slug:        p.slug,
-      title:       p.title,
-      excerpt:     p.excerpt,
-      coverurl:    p.coverurl,
+    const blogs = (posts ?? []).map((p) => ({
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt,
+      coverurl: p.coverurl,
       publishedat: p.publishedat,
-      viewcount:   p.viewcount ?? 0,
-      likecount:   p.likecount ?? 0,
-      author:      p.authorid ? authorsMap[p.authorid] ?? null : null,
+      viewcount: p.viewcount ?? 0,
+      likecount: p.likecount ?? 0,
+      author: p.authorid ? (authorsMap[p.authorid] ?? null) : null,
     }))
 
     // Format events with status
     const now = new Date()
-    const formattedEvents = (events ?? []).map(e => ({
-      id:          e.id,
-      slug:        e.slug,
-      title:       e.title,
+    const formattedEvents = (events ?? []).map((e) => ({
+      id: e.id,
+      slug: e.slug,
+      title: e.title,
       description: e.description,
-      coverurl:    e.coverurl,
-      startdate:   e.startdate,
-      status:      new Date(e.startdate) > now ? 'online' : 'selesai',
-      author:      null,
+      coverurl: e.coverurl,
+      startdate: e.startdate,
+      status: new Date(e.startdate) > now ? 'online' : 'selesai',
+      author: null,
     }))
 
     // Partnerships
@@ -64,5 +66,7 @@ export async function GET(_req: NextRequest) {
       .limit(8)
 
     return ok({ events: formattedEvents, blogs, partnerships: partnerships ?? [] })
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }

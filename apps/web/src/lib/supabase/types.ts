@@ -4,7 +4,7 @@
 // Schema : soraku — lowercase, no underscore
 // ════════════════════════════════════════════════════════════════
 
-export type UserRole      = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'KREATOR' | 'USER'
+export type UserRole = 'OWNER' | 'MANAGER' | 'ADMIN' | 'AGENSI' | 'KREATOR' | 'USER'
 export type SupporterRole = 'DONATUR' | 'VIP' | 'VVIP'
 export type GalleryStatus = 'pending' | 'approved' | 'rejected'
 export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn'
@@ -55,7 +55,7 @@ export interface DbEvent {
   enddate: string | null
   location: string | null
   isonline: boolean
-  status: EventStatus        // 'online' | 'pending' | 'selesai'
+  status: EventStatus // 'online' | 'pending' | 'selesai'
   ispublished: boolean
   tags: string[]
   createdby: string | null

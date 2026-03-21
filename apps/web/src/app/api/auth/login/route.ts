@@ -7,14 +7,14 @@ import { z } from 'zod'
 export const dynamic = 'force-dynamic'
 
 const LoginSchema = z.object({
-  email:    z.string().email(),
+  email: z.string().email(),
   password: z.string().min(1),
 })
 
 // POST /api/auth/login
 export async function POST(req: NextRequest) {
   try {
-    const body   = await req.json()
+    const body = await req.json()
     const parsed = LoginSchema.safeParse(body)
     if (!parsed.success) return err('Email atau password tidak valid')
 
@@ -38,14 +38,16 @@ export async function POST(req: NextRequest) {
     const meta = data.user.user_metadata ?? {}
 
     return ok({
-      id:            data.user.id,
-      email:         data.user.email,
-      username:      profile?.username      ?? meta.user_name ?? null,
-      displayname:   profile?.displayname   ?? meta.full_name ?? null,
-      avatarurl:     profile?.avatarurl     ?? meta.avatar_url ?? null,
-      role:          profile?.role          ?? 'USER',
+      id: data.user.id,
+      email: data.user.email,
+      username: profile?.username ?? meta.user_name ?? null,
+      displayname: profile?.displayname ?? meta.full_name ?? null,
+      avatarurl: profile?.avatarurl ?? meta.avatar_url ?? null,
+      role: profile?.role ?? 'USER',
       supporterrole: profile?.supporterrole ?? null,
-      issupporter:   profile?.supporterrole != null,
+      issupporter: profile?.supporterrole != null,
     })
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }

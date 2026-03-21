@@ -24,7 +24,9 @@ export async function GET() {
       .limit(30)
     if (error) return SERVER_ERROR()
     return ok(data ?? [])
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }
 
 // PATCH /api/notifications — mark as read (specific ids atau semua)
@@ -32,14 +34,11 @@ export async function PATCH(req: NextRequest) {
   try {
     const session = await getSession()
     if (!session) return UNAUTHORIZED()
-    const body   = await req.json()
+    const body = await req.json()
     const parsed = MarkReadSchema.safeParse(body)
     if (!parsed.success) return err('Payload tidak valid')
 
-    let query = adminDb()
-      .from('notifications')
-      .update({ isread: true })
-      .eq('userid', session.id)
+    let query = adminDb().from('notifications').update({ isread: true }).eq('userid', session.id)
 
     if (parsed.data.all) {
       query = query.eq('isread', false)
@@ -50,5 +49,7 @@ export async function PATCH(req: NextRequest) {
     const { error } = await query
     if (error) return SERVER_ERROR()
     return ok({ updated: true })
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }

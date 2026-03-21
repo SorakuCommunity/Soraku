@@ -14,7 +14,9 @@ export async function GET(
     // Fetch user
     const { data: user, error } = await adminDb()
       .from('users')
-      .select('id,username,displayname,avatarurl,coverurl,bio,role,supporterrole,sociallinks,isprivate,createdat')
+      .select(
+        'id,username,displayname,avatarurl,coverurl,bio,role,supporterrole,sociallinks,isprivate,createdat'
+      )
       .eq('username', username)
       .maybeSingle()
 
@@ -74,25 +76,27 @@ export async function GET(
     }
 
     return ok({
-      id:             user.id,
-      username:       user.username,
-      displayname:    user.displayname,
-      avatarurl:      user.avatarurl,
-      coverurl:       user.coverurl,
-      bio:            user.bio,
-      role:           user.role ?? 'USER',
-      supporterrole:  user.supporterrole ?? null,
-      sociallinks:    (user.sociallinks as Record<string, string>) ?? {},
-      isprivate:      user.isprivate ?? false,
-      createdat:      user.createdat,
-      level:          lvl ?? { level: 1, xpcurrent: 0, xprequired: 100, reputationscore: 0 },
-      badges:         badges ?? [],
-      galleryCount:   galleryCount ?? 0,
-      galleryPosts:   gallery ?? [],
-      followers:      followersCount ?? 0,
-      following:      followingCount ?? 0,
+      id: user.id,
+      username: user.username,
+      displayname: user.displayname,
+      avatarurl: user.avatarurl,
+      coverurl: user.coverurl,
+      bio: user.bio,
+      role: user.role ?? 'USER',
+      supporterrole: user.supporterrole ?? null,
+      sociallinks: (user.sociallinks as Record<string, string>) ?? {},
+      isprivate: user.isprivate ?? false,
+      createdat: user.createdat,
+      level: lvl ?? { level: 1, xpcurrent: 0, xprequired: 100, reputationscore: 0 },
+      badges: badges ?? [],
+      galleryCount: galleryCount ?? 0,
+      galleryPosts: gallery ?? [],
+      followers: followersCount ?? 0,
+      following: followingCount ?? 0,
       isFollowing,
-      supportTotal:   0,
+      supportTotal: 0,
     })
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }

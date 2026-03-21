@@ -9,27 +9,34 @@ export async function proxy(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return request.cookies.getAll() },
+        getAll() {
+          return request.cookies.getAll()
+        },
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           response = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
+            response.cookies.set(name, value, options)
           )
         },
       },
-    },
+    }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const { pathname, searchParams, origin } = request.nextUrl
 
   // ── OAuth error redirect — Supabase mengirim error params ke Site URL (/) ──
   // Contoh: /?error=invalid_request&error_code=bad_oauth_callback&...
   if (pathname === '/') {
-    const hasOauthError = ['error', 'error_code', 'error_description'].some(p => searchParams.has(p))
+    const hasOauthError = ['error', 'error_code', 'error_description'].some((p) =>
+      searchParams.has(p)
+    )
     if (hasOauthError) {
-      const desc = searchParams.get('error_description') ?? searchParams.get('error') ?? 'oauth_error'
+      const desc =
+        searchParams.get('error_description') ?? searchParams.get('error') ?? 'oauth_error'
       const loginUrl = new URL('/login', origin)
       loginUrl.searchParams.set('error', desc)
       return NextResponse.redirect(loginUrl)
@@ -42,13 +49,19 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url), 301)
   }
   if (pathname === '/agensi/vtuber' || pathname.startsWith('/agensi/vtuber/')) {
-    return NextResponse.redirect(new URL(pathname.replace('/agensi/vtuber', '/vtubers'), request.url), 301)
+    return NextResponse.redirect(
+      new URL(pathname.replace('/agensi/vtuber', '/vtubers'), request.url),
+      301
+    )
   }
   if (pathname === '/premium/donatur' || pathname.startsWith('/premium/donatur/')) {
     return NextResponse.redirect(new URL('/donate/leaderboard', request.url), 301)
   }
   if (pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL(pathname.replace('/dashboard', '/profile/me'), request.url), 301)
+    return NextResponse.redirect(
+      new URL(pathname.replace('/dashboard', '/profile/me'), request.url),
+      301
+    )
   }
 
   // ── Auth guards ──────────────────────────────────────────────────────────

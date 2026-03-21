@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       return err('Gagal membaca file.', 400)
     }
 
-    const file   = form.get('file') as File | null
+    const file = form.get('file') as File | null
     const bucket = (form.get('bucket') as string) || 'events'
     const folder = (form.get('folder') as string) || 'uploads'
 
@@ -28,14 +28,14 @@ export async function POST(req: NextRequest) {
     if (!allowed.includes(file.type)) return err('Format tidak didukung (jpg/png/webp/gif).', 400)
     if (file.size > 8 * 1024 * 1024) return err('Ukuran maksimal 8MB.', 400)
 
-    const ext      = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
     const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
 
     const buffer = await file.arrayBuffer()
     const supabase = createAdminClient()
 
-    const { error: storageErr } = await supabase
-      .storage.from(bucket)
+    const { error: storageErr } = await supabase.storage
+      .from(bucket)
       .upload(filename, buffer, { contentType: file.type, upsert: false })
 
     if (storageErr) {
@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
         // Coba buat bucket public
         await supabase.storage.createBucket(bucket, { public: true }).catch(() => {})
         // Retry upload
-        const { error: retryErr } = await supabase
-          .storage.from(bucket)
+        const { error: retryErr } = await supabase.storage
+          .from(bucket)
           .upload(filename, buffer, { contentType: file.type, upsert: false })
         if (retryErr) return err(`Upload gagal: ${retryErr.message}`, 500)
       } else {

@@ -14,7 +14,7 @@ function createDb() {
   if (!env.DATABASE_URL) {
     throw new Error(
       '[db] DATABASE_URL belum diset di Vercel.\n' +
-      'Supabase → Project Settings → Database → Connection string → Transaction (port 6543)'
+        'Supabase → Project Settings → Database → Connection string → Transaction (port 6543)'
     )
   }
   const client = postgres(env.DATABASE_URL, { prepare: false })

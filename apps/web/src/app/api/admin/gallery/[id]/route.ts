@@ -9,8 +9,8 @@ export const dynamic = 'force-dynamic'
 type Params = { params: Promise<{ id: string }> }
 
 const PatchSchema = z.object({
-  approved:        z.boolean().optional(),
-  status:          z.enum(['approved','rejected','pending']).optional(),
+  approved: z.boolean().optional(),
+  status: z.enum(['approved', 'rejected', 'pending']).optional(),
   rejectionreason: z.string().optional(),
 })
 
@@ -20,27 +20,37 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     const session = await getSession()
     if (!session || !isStaff(session.role)) return FORBIDDEN()
     const { id } = await params
-    const body    = await req.json()
-    const parsed  = PatchSchema.safeParse(body)
+    const body = await req.json()
+    const parsed = PatchSchema.safeParse(body)
     if (!parsed.success) return err(parsed.error.message)
 
     // Support dua cara: { approved: true/false } atau { status: 'approved' }
-    const status = parsed.data.status
-      ?? (parsed.data.approved === true ? 'approved'
-        : parsed.data.approved === false ? 'rejected'
-        : undefined)
+    const status =
+      parsed.data.status ??
+      (parsed.data.approved === true
+        ? 'approved'
+        : parsed.data.approved === false
+          ? 'rejected'
+          : undefined)
 
     if (!status) return err('status atau approved wajib ada')
 
     const { data, error } = await adminDb()
       .from('gallery')
-      .update({ status, reviewedby: session.id, rejectionreason: parsed.data.rejectionreason ?? null })
+      .update({
+        status,
+        reviewedby: session.id,
+        rejectionreason: parsed.data.rejectionreason ?? null,
+      })
       .eq('id', id)
-      .select().single()
+      .select()
+      .single()
 
     if (error) return err(error.message)
     return ok(data)
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }
 
 // DELETE /api/admin/gallery/[id]
@@ -48,9 +58,11 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
     const session = await getSession()
     if (!session || !isStaff(session.role)) return FORBIDDEN()
-    const { id }    = await params
+    const { id } = await params
     const { error } = await adminDb().from('gallery').delete().eq('id', id)
     if (error) return err(error.message)
     return ok({ deleted: true })
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }

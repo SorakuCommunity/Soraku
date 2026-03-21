@@ -1,13 +1,27 @@
-"use client";
-import Link from "next/link";
+'use client'
+import Link from 'next/link'
 export default function EventsError({ reset }: { error: Error; reset: () => void }) {
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center text-center px-4">
-      <p className="text-5xl mb-4">😢</p>
-      <h2 className="text-xl font-bold mb-2">Gagal memuat event</h2>
-      <p className="text-muted-foreground text-sm mb-6">Terjadi kesalahan saat memuat halaman event.</p>
-      <div className="flex gap-3"><button onClick={reset} className="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white">Coba Lagi</button>
-      <Link href="/" className="rounded-xl border border-border px-5 py-2.5 text-sm text-muted-foreground">Beranda</Link></div>
+    <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
+      <p className="mb-4 text-5xl">😢</p>
+      <h2 className="mb-2 text-xl font-bold">Gagal memuat event</h2>
+      <p className="text-muted-foreground mb-6 text-sm">
+        Terjadi kesalahan saat memuat halaman event.
+      </p>
+      <div className="flex gap-3">
+        <button
+          onClick={reset}
+          className="bg-primary rounded-xl px-5 py-2.5 text-sm font-bold text-white"
+        >
+          Coba Lagi
+        </button>
+        <Link
+          href="/"
+          className="border-border text-muted-foreground rounded-xl border px-5 py-2.5 text-sm"
+        >
+          Beranda
+        </Link>
+      </div>
     </div>
-  );
+  )
 }

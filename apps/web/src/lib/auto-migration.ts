@@ -252,7 +252,9 @@ export async function runAutoMigration() {
     return
   }
 
-  const client = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } })
+  const client = createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
 
   try {
     // Jalankan schema setup
@@ -283,9 +285,9 @@ async function runViaSqlEndpoint(url: string, key: string, sql: string) {
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
-      'Content-Type':  'application/json',
-      'Authorization': `Bearer ${key}`,
-      'apikey':        key,
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`,
+      apikey: key,
     },
     body: JSON.stringify({ sql }),
   })
@@ -293,7 +295,7 @@ async function runViaSqlEndpoint(url: string, key: string, sql: string) {
     // Coba via pg REST direct SQL (Supabase has this)
     const direct = await fetch(`${url}/pg/query`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}`, 'apikey': key },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}`, apikey: key },
       body: JSON.stringify({ query: sql }),
     })
     if (!direct.ok) throw new Error(`SQL failed: ${await response.text()}`)

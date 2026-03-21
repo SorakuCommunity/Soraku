@@ -1,25 +1,25 @@
-"use client";
+'use client'
 
-import Script from "next/script";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, Suspense } from "react";
+import Script from 'next/script'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { useEffect, Suspense } from 'react'
 
-const PIXEL_ID = "D6UQBU3C77UFTE0HO0R0";
+const PIXEL_ID = 'D6UQBU3C77UFTE0HO0R0'
 
 // ─── SPA page tracker ─────────────────────────────────────────────────────────
 function TikTokPageTracker() {
-  const pathname     = usePathname();
-  const searchParams = useSearchParams();
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
-    const ttq = (window as any).ttq;
-    if (!ttq) return;
-    ttq.page();
+    const ttq = (window as any).ttq
+    if (!ttq) return
+    ttq.page()
     // Juga kirim ke server-side untuk deduplicate
-    sendS2S("PageView");
-  }, [pathname, searchParams]);
+    sendS2S('PageView')
+  }, [pathname, searchParams])
 
-  return null;
+  return null
 }
 
 // ─── Root component — inject ke layout ───────────────────────────────────────
@@ -50,7 +50,7 @@ export function TikTokPixel() {
         <TikTokPageTracker />
       </Suspense>
     </>
-  );
+  )
 }
 
 // ─── Server-side (S2S) sender ─────────────────────────────────────────────────
@@ -60,21 +60,21 @@ export function TikTokPixel() {
 async function sendS2S(
   event: string,
   properties?: {
-    content_id?:   string;
-    content_name?: string;
-    content_type?: string;
-    query?:        string;
-    value?:        number;
-    currency?:     string;
+    content_id?: string
+    content_name?: string
+    content_type?: string
+    query?: string
+    value?: number
+    currency?: string
   },
   eventId?: string
 ) {
   try {
-    await fetch("/api/analytics/tiktok", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    await fetch('/api/analytics/tiktok', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ event, event_id: eventId, properties }),
-    });
+    })
   } catch {
     // silent fail — jangan ganggu UX
   }
@@ -84,44 +84,49 @@ async function sendS2S(
 
 /** Track register — dipanggil setelah register berhasil */
 export function trackRegistration() {
-  const eventId = `register-${Date.now()}`;
-  const ttq = (window as any).ttq;
-  if (ttq) ttq.track("CompleteRegistration", {}, { event_id: eventId });
-  sendS2S("CompleteRegistration", undefined, eventId);
+  const eventId = `register-${Date.now()}`
+  const ttq = (window as any).ttq
+  if (ttq) ttq.track('CompleteRegistration', {}, { event_id: eventId })
+  sendS2S('CompleteRegistration', undefined, eventId)
 }
 
 /** Track view konten (event page / blog) */
 export function trackViewContent(params: {
-  content_id: string;
-  content_name: string;
-  content_type?: string;
+  content_id: string
+  content_name: string
+  content_type?: string
 }) {
-  const eventId = `view-${params.content_id}-${Date.now()}`;
-  const ttq = (window as any).ttq;
-  if (ttq) ttq.track("ViewContent", {
-    contents: [{ content_id: params.content_id, content_name: params.content_name }],
-    content_type: params.content_type ?? "product",
-  }, { event_id: eventId });
-  sendS2S("ViewContent", { ...params }, eventId);
+  const eventId = `view-${params.content_id}-${Date.now()}`
+  const ttq = (window as any).ttq
+  if (ttq)
+    ttq.track(
+      'ViewContent',
+      {
+        contents: [{ content_id: params.content_id, content_name: params.content_name }],
+        content_type: params.content_type ?? 'product',
+      },
+      { event_id: eventId }
+    )
+  sendS2S('ViewContent', { ...params }, eventId)
 }
 
 /** Track subscribe / donasi */
 export function trackSubscribe(value?: number) {
-  const eventId = `subscribe-${Date.now()}`;
-  const ttq = (window as any).ttq;
-  if (ttq) ttq.track("Subscribe", { value: value ?? 0, currency: "IDR" }, { event_id: eventId });
-  sendS2S("Subscribe", { value, currency: "IDR" }, eventId);
+  const eventId = `subscribe-${Date.now()}`
+  const ttq = (window as any).ttq
+  if (ttq) ttq.track('Subscribe', { value: value ?? 0, currency: 'IDR' }, { event_id: eventId })
+  sendS2S('Subscribe', { value, currency: 'IDR' }, eventId)
 }
 
 /** Track search */
 export function trackSearch(query: string) {
-  const ttq = (window as any).ttq;
-  if (ttq) ttq.track("Search", { query });
-  sendS2S("Search", { query });
+  const ttq = (window as any).ttq
+  if (ttq) ttq.track('Search', { query })
+  sendS2S('Search', { query })
 }
 
 // Alias untuk backward compatibility
-export const trackTikTokRegistration  = trackRegistration;
-export const trackTikTokViewContent   = trackViewContent;
-export const trackTikTokSubscribe     = trackSubscribe;
-export const trackTikTokSearch        = trackSearch;
+export const trackTikTokRegistration = trackRegistration
+export const trackTikTokViewContent = trackViewContent
+export const trackTikTokSubscribe = trackSubscribe
+export const trackTikTokSearch = trackSearch

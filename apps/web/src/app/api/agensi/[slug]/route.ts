@@ -11,9 +11,15 @@ export async function GET(_req: NextRequest, { params }: Params) {
   try {
     const { slug } = await params
     const { data, error } = await adminDb()
-      .from('vtubers').select('*').eq('slug', slug).eq('isactive', true).single()
+      .from('vtubers')
+      .select('*')
+      .eq('slug', slug)
+      .eq('isactive', true)
+      .single()
 
     if (error || !data) return NOT_FOUND()
     return ok(data)
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }

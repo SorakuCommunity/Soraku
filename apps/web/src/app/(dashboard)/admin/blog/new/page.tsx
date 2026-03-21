@@ -1,187 +1,351 @@
-"use client";
-export const dynamic = "force-dynamic";
+'use client'
+export const dynamic = 'force-dynamic'
 
-import { useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import {
-  ArrowLeft, Save, Eye, Loader2, Plus, X, Bold, Italic,
-  Heading1, Heading2, Heading3, List, ListOrdered, Quote,
-  Code, Link2, Image as ImageIcon, Minus, Upload,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import MarkdownRenderer from "@/components/blog/MarkdownRenderer";
-import { ImageUrlInput } from "@/components/ui/image-url-input";
+  ArrowLeft,
+  Save,
+  Eye,
+  Loader2,
+  Plus,
+  X,
+  Bold,
+  Italic,
+  Heading1,
+  Heading2,
+  Heading3,
+  List,
+  ListOrdered,
+  Quote,
+  Code,
+  Link2,
+  Image as ImageIcon,
+  Minus,
+  Upload,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import MarkdownRenderer from '@/components/blog/MarkdownRenderer'
+import { ImageUrlInput } from '@/components/ui/image-url-input'
 
-function ToolbarBtn({ icon: Icon, label, onClick }: { icon: any; label: string; onClick: () => void }) {
+function ToolbarBtn({
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  icon: any
+  label: string
+  onClick: () => void
+}) {
   return (
-    <button type="button" onClick={onClick} title={label}
-      className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground/60 hover:bg-muted/40 hover:text-foreground transition-colors">
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      className="text-muted-foreground/60 hover:bg-muted/40 hover:text-foreground flex h-7 w-7 items-center justify-center rounded-lg transition-colors"
+    >
       <Icon className="h-3.5 w-3.5" />
     </button>
-  );
+  )
 }
 
-function insertMarkdown(ref: React.RefObject<HTMLTextAreaElement | null>, setValue: (v: string) => void, before: string, after = "", placeholder = "teks") {
-  const el = ref.current;
-  if (!el) return;
-  const start = el.selectionStart;
-  const end   = el.selectionEnd;
-  const sel   = el.value.slice(start, end) || placeholder;
-  const newVal = el.value.slice(0, start) + before + sel + after + el.value.slice(end);
-  setValue(newVal);
+function insertMarkdown(
+  ref: React.RefObject<HTMLTextAreaElement | null>,
+  setValue: (v: string) => void,
+  before: string,
+  after = '',
+  placeholder = 'teks'
+) {
+  const el = ref.current
+  if (!el) return
+  const start = el.selectionStart
+  const end = el.selectionEnd
+  const sel = el.value.slice(start, end) || placeholder
+  const newVal = el.value.slice(0, start) + before + sel + after + el.value.slice(end)
+  setValue(newVal)
   setTimeout(() => {
-    el.focus();
-    const ns = start + before.length;
-    el.setSelectionRange(ns, ns + sel.length);
-  }, 0);
+    el.focus()
+    const ns = start + before.length
+    el.setSelectionRange(ns, ns + sel.length)
+  }, 0)
 }
 
 export default function AdminBlogNewPage() {
-  const router = useRouter();
-  const taRef  = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter()
+  const taRef = useRef<HTMLTextAreaElement>(null)
 
-  const [loading,   setLoading]   = useState(false);
-  const [error,     setError]     = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"write" | "preview">("write");
-  const [uploading, setUploading] = useState(false);
-  const [title,     setTitle]     = useState("");
-  const [slug,      setSlug]      = useState("");
-  const [excerpt,   setExcerpt]   = useState("");
-  const [content,   setContent]   = useState("");
-  const [coverurl,  setCoverurl]  = useState("");
-  const [tagInput,  setTagInput]  = useState("");
-  const [tags,      setTags]      = useState<string[]>([]);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write')
+  const [uploading, setUploading] = useState(false)
+  const [title, setTitle] = useState('')
+  const [slug, setSlug] = useState('')
+  const [excerpt, setExcerpt] = useState('')
+  const [content, setContent] = useState('')
+  const [coverurl, setCoverurl] = useState('')
+  const [tagInput, setTagInput] = useState('')
+  const [tags, setTags] = useState<string[]>([])
 
   const handleTitle = (v: string) => {
-    setTitle(v);
-    setSlug(v.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim());
-  };
+    setTitle(v)
+    setSlug(
+      v
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim()
+    )
+  }
 
   const addTag = () => {
-    const t = tagInput.trim().toLowerCase();
-    if (t && !tags.includes(t)) setTags([...tags, t]);
-    setTagInput("");
-  };
+    const t = tagInput.trim().toLowerCase()
+    if (t && !tags.includes(t)) setTags([...tags, t])
+    setTagInput('')
+  }
 
   const uploadContentImage = async (file: File) => {
-    setUploading(true);
+    setUploading(true)
     try {
-      const fd = new FormData();
-      fd.append("file", file); fd.append("bucket", "blog"); fd.append("folder", "content");
-      const res  = await fetch("/api/upload/image", { method: "POST", body: fd });
-      const data = await res.json();
-      if (res.ok && data?.data?.url) insertMarkdown(taRef, setContent, "![", `](${data.data.url})`, "deskripsi gambar");
-      else setError("Gagal upload gambar.");
-    } catch { setError("Gagal upload."); }
-    finally { setUploading(false); }
-  };
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('bucket', 'blog')
+      fd.append('folder', 'content')
+      const res = await fetch('/api/upload/image', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (res.ok && data?.data?.url)
+        insertMarkdown(taRef, setContent, '![', `](${data.data.url})`, 'deskripsi gambar')
+      else setError('Gagal upload gambar.')
+    } catch {
+      setError('Gagal upload.')
+    } finally {
+      setUploading(false)
+    }
+  }
 
-  const ins = useCallback((before: string, after = "", ph = "teks") => {
-    insertMarkdown(taRef, setContent, before, after, ph);
-  }, []);
+  const ins = useCallback((before: string, after = '', ph = 'teks') => {
+    insertMarkdown(taRef, setContent, before, after, ph)
+  }, [])
 
   const handleSubmit = async (publish: boolean) => {
-    if (!title.trim() || !slug.trim()) { setError("Judul dan slug wajib diisi."); return; }
-    setLoading(true); setError(null);
-    const res = await fetch("/api/admin/blog", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: title.trim(), slug: slug.trim(), excerpt: excerpt.trim() || undefined, content: content.trim() || undefined, coverurl: coverurl.trim() || undefined, tags, ispublished: publish }),
-    });
-    const data = await res.json();
-    if (!res.ok) { setError(data?.error?.message ?? "Gagal menyimpan."); setLoading(false); return; }
-    if (publish && data.data?.id) {
-      fetch("/api/admin/blog/discord", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: data.data.id }) }).catch(() => {});
+    if (!title.trim() || !slug.trim()) {
+      setError('Judul dan slug wajib diisi.')
+      return
     }
-    router.push("/admin/blog");
-  };
+    setLoading(true)
+    setError(null)
+    const res = await fetch('/api/admin/blog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: title.trim(),
+        slug: slug.trim(),
+        excerpt: excerpt.trim() || undefined,
+        content: content.trim() || undefined,
+        coverurl: coverurl.trim() || undefined,
+        tags,
+        ispublished: publish,
+      }),
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      setError(data?.error?.message ?? 'Gagal menyimpan.')
+      setLoading(false)
+      return
+    }
+    if (publish && data.data?.id) {
+      fetch('/api/admin/blog/discord', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: data.data.id }),
+      }).catch(() => {})
+    }
+    router.push('/admin/blog')
+  }
 
-  const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
-  const readMins  = Math.max(1, Math.ceil(wordCount / 200));
+  const wordCount = content.trim().split(/\s+/).filter(Boolean).length
+  const readMins = Math.max(1, Math.ceil(wordCount / 200))
 
   return (
-    <div className="space-y-4 max-w-4xl">
+    <div className="max-w-4xl space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/admin/blog" className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/admin/blog"
+            className="border-border text-muted-foreground hover:text-foreground flex h-9 w-9 items-center justify-center rounded-xl border transition-colors"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
             <h1 className="text-xl font-bold">Tulis Artikel Baru</h1>
-            <p className="text-xs text-muted-foreground/50">{wordCount} kata · ~{readMins} menit baca</p>
+            <p className="text-muted-foreground/50 text-xs">
+              {wordCount} kata · ~{readMins} menit baca
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => handleSubmit(false)} disabled={loading}
-            className="flex items-center gap-1.5 rounded-xl border border-border px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40">
-            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Draft
+          <button
+            onClick={() => handleSubmit(false)}
+            disabled={loading}
+            className="border-border text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-40"
+          >
+            {loading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Save className="h-3.5 w-3.5" />
+            )}{' '}
+            Draft
           </button>
-          <button onClick={() => handleSubmit(true)} disabled={loading}
-            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-40">
-            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />} Publish
+          <button
+            onClick={() => handleSubmit(true)}
+            disabled={loading}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold transition-colors disabled:opacity-40"
+          >
+            {loading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Eye className="h-3.5 w-3.5" />
+            )}{' '}
+            Publish
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          <span className="flex-1">{error}</span><button onClick={() => setError(null)}><X className="h-3.5 w-3.5" /></button>
+        <div className="border-destructive/30 bg-destructive/10 text-destructive flex items-center gap-2 rounded-xl border px-4 py-3 text-sm">
+          <span className="flex-1">{error}</span>
+          <button onClick={() => setError(null)}>
+            <X className="h-3.5 w-3.5" />
+          </button>
         </div>
       )}
 
       <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
         <div className="space-y-3">
-          <input value={title} onChange={e => handleTitle(e.target.value)} placeholder="Judul artikel..."
-            className="w-full rounded-xl border-0 border-b-2 border-border/30 bg-transparent px-0 py-2 text-2xl font-black outline-none placeholder:text-muted-foreground/20 focus:border-primary/50 transition-colors" />
-          <div className="flex items-center gap-2 text-xs text-muted-foreground/40">
+          <input
+            value={title}
+            onChange={(e) => handleTitle(e.target.value)}
+            placeholder="Judul artikel..."
+            className="border-border/30 placeholder:text-muted-foreground/20 focus:border-primary/50 w-full rounded-xl border-0 border-b-2 bg-transparent px-0 py-2 text-2xl font-black transition-colors outline-none"
+          />
+          <div className="text-muted-foreground/40 flex items-center gap-2 text-xs">
             <span>/blog/</span>
-            <input value={slug} onChange={e => setSlug(e.target.value)}
-              className="font-mono bg-transparent outline-none border-b border-dashed border-border/40 focus:border-primary/40 text-xs transition-colors flex-1" />
+            <input
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              className="border-border/40 focus:border-primary/40 flex-1 border-b border-dashed bg-transparent font-mono text-xs transition-colors outline-none"
+            />
           </div>
 
-          <div className="glass-card rounded-xl overflow-hidden">
-            <div className="flex items-center justify-between border-b border-border/30 px-3 py-2 bg-card/20">
+          <div className="glass-card overflow-hidden rounded-xl">
+            <div className="border-border/30 bg-card/20 flex items-center justify-between border-b px-3 py-2">
               <div className="flex gap-1">
-                {(["write", "preview"] as const).map(tab => (
-                  <button key={tab} onClick={() => setActiveTab(tab)}
-                    className={cn("rounded-lg px-3 py-1 text-xs font-semibold capitalize transition-all",
-                      activeTab === tab ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground")}>
-                    {tab === "write" ? "Tulis" : "Preview"}
+                {(['write', 'preview'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={cn(
+                      'rounded-lg px-3 py-1 text-xs font-semibold capitalize transition-all',
+                      activeTab === tab
+                        ? 'bg-primary text-white'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    {tab === 'write' ? 'Tulis' : 'Preview'}
                   </button>
                 ))}
               </div>
-              {activeTab === "write" && (
-                <div className="flex items-center gap-0.5 flex-wrap">
-                  <ToolbarBtn icon={Bold}        label="Bold"     onClick={() => ins("**", "**", "teks tebal")} />
-                  <ToolbarBtn icon={Italic}      label="Italic"   onClick={() => ins("*", "*", "teks miring")} />
-                  <div className="mx-1 h-4 w-px bg-border/40" />
-                  <ToolbarBtn icon={Heading1}    label="H1"       onClick={() => ins("# ", "", "Heading 1")} />
-                  <ToolbarBtn icon={Heading2}    label="H2"       onClick={() => ins("## ", "", "Heading 2")} />
-                  <ToolbarBtn icon={Heading3}    label="H3"       onClick={() => ins("### ", "", "Heading 3")} />
-                  <div className="mx-1 h-4 w-px bg-border/40" />
-                  <ToolbarBtn icon={List}        label="List"     onClick={() => ins("- ", "", "item")} />
-                  <ToolbarBtn icon={ListOrdered} label="Ordered"  onClick={() => ins("1. ", "", "item")} />
-                  <ToolbarBtn icon={Quote}       label="Quote"    onClick={() => ins("> ", "", "kutipan")} />
-                  <div className="mx-1 h-4 w-px bg-border/40" />
-                  <ToolbarBtn icon={Code}        label="Code"     onClick={() => ins("`", "`", "code")} />
-                  <ToolbarBtn icon={Link2}       label="Link"     onClick={() => ins("[", "](url)", "teks")} />
-                  <ToolbarBtn icon={Minus}       label="Divider"  onClick={() => ins("\n---\n", "", "")} />
-                  <div className="mx-1 h-4 w-px bg-border/40" />
-                  <label title="Upload gambar" className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground/60 hover:bg-muted/40 hover:text-foreground transition-colors">
-                    {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
-                    <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) uploadContentImage(f); }} />
+              {activeTab === 'write' && (
+                <div className="flex flex-wrap items-center gap-0.5">
+                  <ToolbarBtn
+                    icon={Bold}
+                    label="Bold"
+                    onClick={() => ins('**', '**', 'teks tebal')}
+                  />
+                  <ToolbarBtn
+                    icon={Italic}
+                    label="Italic"
+                    onClick={() => ins('*', '*', 'teks miring')}
+                  />
+                  <div className="bg-border/40 mx-1 h-4 w-px" />
+                  <ToolbarBtn
+                    icon={Heading1}
+                    label="H1"
+                    onClick={() => ins('# ', '', 'Heading 1')}
+                  />
+                  <ToolbarBtn
+                    icon={Heading2}
+                    label="H2"
+                    onClick={() => ins('## ', '', 'Heading 2')}
+                  />
+                  <ToolbarBtn
+                    icon={Heading3}
+                    label="H3"
+                    onClick={() => ins('### ', '', 'Heading 3')}
+                  />
+                  <div className="bg-border/40 mx-1 h-4 w-px" />
+                  <ToolbarBtn icon={List} label="List" onClick={() => ins('- ', '', 'item')} />
+                  <ToolbarBtn
+                    icon={ListOrdered}
+                    label="Ordered"
+                    onClick={() => ins('1. ', '', 'item')}
+                  />
+                  <ToolbarBtn icon={Quote} label="Quote" onClick={() => ins('> ', '', 'kutipan')} />
+                  <div className="bg-border/40 mx-1 h-4 w-px" />
+                  <ToolbarBtn icon={Code} label="Code" onClick={() => ins('`', '`', 'code')} />
+                  <ToolbarBtn
+                    icon={Link2}
+                    label="Link"
+                    onClick={() => ins('[', '](url)', 'teks')}
+                  />
+                  <ToolbarBtn icon={Minus} label="Divider" onClick={() => ins('\n---\n', '', '')} />
+                  <div className="bg-border/40 mx-1 h-4 w-px" />
+                  <label
+                    title="Upload gambar"
+                    className="text-muted-foreground/60 hover:bg-muted/40 hover:text-foreground flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
+                  >
+                    {uploading ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="h-3.5 w-3.5" />
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0]
+                        if (f) uploadContentImage(f)
+                      }}
+                    />
                   </label>
-                  <ToolbarBtn icon={ImageIcon}   label="Image URL" onClick={() => ins("![alt](", ")", "url")} />
+                  <ToolbarBtn
+                    icon={ImageIcon}
+                    label="Image URL"
+                    onClick={() => ins('![alt](', ')', 'url')}
+                  />
                 </div>
               )}
             </div>
-            {activeTab === "write" ? (
-              <textarea ref={taRef} value={content} onChange={e => setContent(e.target.value)} rows={28}
-                placeholder={"Mulai tulis artikel...\n\n# Heading\n## Sub Heading\n\nParagraf **bold** *italic*\n\n- List item\n\n> Blockquote\n\n```\ncode block\n```"}
-                className="w-full resize-none bg-transparent px-4 py-3 text-sm font-mono leading-relaxed outline-none placeholder:text-muted-foreground/15" />
+            {activeTab === 'write' ? (
+              <textarea
+                ref={taRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={28}
+                placeholder={
+                  'Mulai tulis artikel...\n\n# Heading\n## Sub Heading\n\nParagraf **bold** *italic*\n\n- List item\n\n> Blockquote\n\n```\ncode block\n```'
+                }
+                className="placeholder:text-muted-foreground/15 w-full resize-none bg-transparent px-4 py-3 font-mono text-sm leading-relaxed outline-none"
+              />
             ) : (
               <div className="min-h-[400px] px-4 py-3">
-                {content.trim() ? <MarkdownRenderer content={content} /> : <p className="italic text-muted-foreground/30 text-sm">Belum ada konten.</p>}
+                {content.trim() ? (
+                  <MarkdownRenderer content={content} />
+                ) : (
+                  <p className="text-muted-foreground/30 text-sm italic">Belum ada konten.</p>
+                )}
               </div>
             )}
           </div>
@@ -189,44 +353,84 @@ export default function AdminBlogNewPage() {
 
         <div className="space-y-3">
           <div className="glass-card p-4">
-            <ImageUrlInput label="Cover / Thumbnail" value={coverurl} onChange={setCoverurl}
-              placeholder="https://... atau paste gambar" hint="Rekomendasi 1280×720px" previewClass="h-32" required={false} />
+            <ImageUrlInput
+              label="Cover / Thumbnail"
+              value={coverurl}
+              onChange={setCoverurl}
+              placeholder="https://... atau paste gambar"
+              hint="Rekomendasi 1280×720px"
+              previewClass="h-32"
+              required={false}
+            />
           </div>
           <div className="glass-card p-4">
-            <label className="mb-1.5 block text-xs font-semibold text-muted-foreground/60 uppercase tracking-wide">Deskripsi Singkat</label>
-            <textarea value={excerpt} onChange={e => setExcerpt(e.target.value)} rows={3}
+            <label className="text-muted-foreground/60 mb-1.5 block text-xs font-semibold tracking-wide uppercase">
+              Deskripsi Singkat
+            </label>
+            <textarea
+              value={excerpt}
+              onChange={(e) => setExcerpt(e.target.value)}
+              rows={3}
               placeholder="Deskripsi singkat untuk SEO dan preview..."
-              className="w-full resize-none rounded-xl border border-border/50 bg-background/40 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30 transition-all" />
+              className="border-border/50 bg-background/40 focus:ring-primary/30 w-full resize-none rounded-xl border px-3 py-2 text-sm transition-all outline-none focus:ring-2"
+            />
           </div>
-          <div className="glass-card p-4 space-y-2">
-            <label className="block text-xs font-semibold text-muted-foreground/60 uppercase tracking-wide">Tags / Hashtag</label>
+          <div className="glass-card space-y-2 p-4">
+            <label className="text-muted-foreground/60 block text-xs font-semibold tracking-wide uppercase">
+              Tags / Hashtag
+            </label>
             <div className="flex gap-2">
-              <input value={tagInput} onChange={e => setTagInput(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addTag())}
-                placeholder="anime, review..." className="flex-1 rounded-xl border border-border/50 bg-background/40 px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 transition-all" />
-              <button onClick={addTag} className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15 text-primary hover:bg-primary/25 transition-colors">
+              <input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                placeholder="anime, review..."
+                className="border-border/50 bg-background/40 focus:ring-primary/30 flex-1 rounded-xl border px-3 py-1.5 text-sm transition-all outline-none focus:ring-2"
+              />
+              <button
+                onClick={addTag}
+                className="bg-primary/15 text-primary hover:bg-primary/25 flex h-8 w-8 items-center justify-center rounded-xl transition-colors"
+              >
                 <Plus className="h-3.5 w-3.5" />
               </button>
             </div>
-            <div className="flex flex-wrap gap-1.5 min-h-[24px]">
+            <div className="flex min-h-[24px] flex-wrap gap-1.5">
               {tags.map((t: string) => (
-                <span key={t} className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">
-                  #{t}<button onClick={() => setTags(tags.filter(x => x !== t))}><X className="h-2.5 w-2.5" /></button>
+                <span
+                  key={t}
+                  className="bg-primary/10 text-primary flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs"
+                >
+                  #{t}
+                  <button onClick={() => setTags(tags.filter((x) => x !== t))}>
+                    <X className="h-2.5 w-2.5" />
+                  </button>
                 </span>
               ))}
-              {tags.length === 0 && <span className="text-[10px] text-muted-foreground/30">Belum ada tag</span>}
+              {tags.length === 0 && (
+                <span className="text-muted-foreground/30 text-[10px]">Belum ada tag</span>
+              )}
             </div>
           </div>
-          <div className="glass-card p-4 space-y-1.5">
-            <p className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wide">Info Artikel</p>
-            {[["Kata", wordCount], ["Estimasi baca", `~${readMins} menit`], ["Karakter", content.length]].map(([k, v]) => (
-              <div key={String(k)} className="flex justify-between text-xs text-muted-foreground/60">
-                <span>{k}</span><span className="font-mono">{v}</span>
+          <div className="glass-card space-y-1.5 p-4">
+            <p className="text-muted-foreground/50 text-xs font-semibold tracking-wide uppercase">
+              Info Artikel
+            </p>
+            {[
+              ['Kata', wordCount],
+              ['Estimasi baca', `~${readMins} menit`],
+              ['Karakter', content.length],
+            ].map(([k, v]) => (
+              <div
+                key={String(k)}
+                className="text-muted-foreground/60 flex justify-between text-xs"
+              >
+                <span>{k}</span>
+                <span className="font-mono">{v}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

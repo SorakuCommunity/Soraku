@@ -1,12 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 import { env } from '@/env'
 
-const SUPABASE_URL  = env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL
 // Support dua nama ENV — SUPABASE_SERVICE_ROLE_KEY (standar) + SUPABASE_SERVICE_KEY (legacy fallback)
-const SERVICE_KEY   = env.SUPABASE_SERVICE_ROLE_KEY ?? env.SUPABASE_SERVICE_KEY ?? ''
+const SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY ?? env.SUPABASE_SERVICE_KEY ?? ''
 
 if (!SERVICE_KEY) {
-  console.error('[supabase/admin] ⚠ SUPABASE_SERVICE_ROLE_KEY tidak ditemukan — adminDb() akan gagal!')
+  console.error(
+    '[supabase/admin] ⚠ SUPABASE_SERVICE_ROLE_KEY tidak ditemukan — adminDb() akan gagal!'
+  )
 }
 
 /** Admin client — bypass RLS. HANYA dipakai di API routes server-side. */

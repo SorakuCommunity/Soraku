@@ -11,14 +11,14 @@ const ReplySchema = z.object({
 
 function normalizeComment(c: any) {
   return {
-    id:        c.id ?? '',
-    parentid:  c.parentid ?? null,
-    userid:    c.userid ?? c.authorid ?? null,
+    id: c.id ?? '',
+    parentid: c.parentid ?? null,
+    userid: c.userid ?? c.authorid ?? null,
     guestname: c.guestname ?? null,
-    content:   c.content ?? '',
+    content: c.content ?? '',
     createdat: c.createdat ?? new Date().toISOString(),
-    author:    null,
-    replies:   [],
+    author: null,
+    replies: [],
   }
 }
 
@@ -33,28 +33,35 @@ export async function POST(
 
     if (!session?.id) return err('Harus login untuk membalas.', 401)
 
-    const body   = await req.json()
+    const body = await req.json()
     const parsed = ReplySchema.safeParse(body)
     if (!parsed.success) return err(parsed.error.issues[0]?.message ?? 'Input tidak valid')
 
     // Get post
     const { data: post } = await adminDb()
-      .from('posts').select('id').eq('slug', slug).eq('ispublished', true).maybeSingle()
+      .from('posts')
+      .select('id')
+      .eq('slug', slug)
+      .eq('ispublished', true)
+      .maybeSingle()
     if (!post) return NOT_FOUND()
 
     // Verify parent comment exists
     const { data: parent } = await adminDb()
-      .from('postcomments').select('id').eq('id', commentId).maybeSingle()
+      .from('postcomments')
+      .select('id')
+      .eq('id', commentId)
+      .maybeSingle()
     if (!parent) return NOT_FOUND()
 
     // Insert reply with minimal columns
     const { data, error } = await adminDb()
       .from('postcomments')
       .insert({
-        postid:   post.id,
+        postid: post.id,
         parentid: commentId,
-        userid:   session.id,
-        content:  parsed.data.content.trim(),
+        userid: session.id,
+        content: parsed.data.content.trim(),
       })
       .select('*')
       .single()
@@ -65,7 +72,10 @@ export async function POST(
     }
 
     const { data: u } = await adminDb()
-      .from('users').select('username,displayname,avatarurl').eq('id', session.id).maybeSingle()
+      .from('users')
+      .select('username,displayname,avatarurl')
+      .eq('id', session.id)
+      .maybeSingle()
 
     return ok({ ...normalizeComment(data), author: u ?? null }, 201)
   } catch (e: any) {

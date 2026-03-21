@@ -24,17 +24,28 @@ export async function GET() {
       db.from('events').select('*', { count: 'exact', head: true }),
       db.from('gallery').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
       db.from('users').select('*', { count: 'exact', head: true }).eq('isbanned', false),
-      db.from('posts').select('id,title,slug,ispublished,createdat').order('createdat', { ascending: false }).limit(5),
-      db.from('gallery').select('id,title,imageurl,tags,createdat').eq('status', 'pending').order('createdat', { ascending: false }).limit(5),
+      db
+        .from('posts')
+        .select('id,title,slug,ispublished,createdat')
+        .order('createdat', { ascending: false })
+        .limit(5),
+      db
+        .from('gallery')
+        .select('id,title,imageurl,tags,createdat')
+        .eq('status', 'pending')
+        .order('createdat', { ascending: false })
+        .limit(5),
     ])
 
     return ok({
-      blog_count:      blogCount      ?? 0,
-      event_count:     eventCount     ?? 0,
+      blog_count: blogCount ?? 0,
+      event_count: eventCount ?? 0,
       gallery_pending: galleryPending ?? 0,
-      member_count:    memberCount    ?? 0,
-      recent_posts:    recentPosts    ?? [],
+      member_count: memberCount ?? 0,
+      recent_posts: recentPosts ?? [],
       pending_gallery: pendingGallery ?? [],
     })
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }

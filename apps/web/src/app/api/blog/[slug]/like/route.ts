@@ -5,16 +5,17 @@ import { getSession } from '@/lib/auth'
 import { ok, NOT_FOUND, SERVER_ERROR } from '@/lib/api'
 
 // GET /api/blog/[slug]/like
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params
-    const session  = await getSession()
+    const session = await getSession()
 
     const { data: post } = await adminDb()
-      .from('posts').select('id,likecount').eq('slug', slug).eq('ispublished', true).maybeSingle()
+      .from('posts')
+      .select('id,likecount')
+      .eq('slug', slug)
+      .eq('ispublished', true)
+      .maybeSingle()
     if (!post) return NOT_FOUND()
 
     let reaction: 'like' | 'dislike' | null = null
@@ -31,22 +32,25 @@ export async function GET(
 
     // Dislike count = total - likes (simplified: just use likes only for now)
     return ok({ likecount: post.likecount ?? 0, dislikecount: 0, reaction })
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }
 
 // POST /api/blog/[slug]/like — toggle like (requires login)
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
-    const { slug }  = await params
-    const session   = await getSession()
-    const body      = await req.json().catch(() => ({}))
-    const type      = body?.type === 'dislike' ? 'dislike' : 'like'
+    const { slug } = await params
+    const session = await getSession()
+    const body = await req.json().catch(() => ({}))
+    const type = body?.type === 'dislike' ? 'dislike' : 'like'
 
     const { data: post } = await adminDb()
-      .from('posts').select('id,likecount').eq('slug', slug).eq('ispublished', true).maybeSingle()
+      .from('posts')
+      .select('id,likecount')
+      .eq('slug', slug)
+      .eq('ispublished', true)
+      .maybeSingle()
     if (!post) return NOT_FOUND()
 
     if (!session?.id) {
@@ -75,5 +79,7 @@ export async function POST(
       await adminDb().from('posts').update({ likecount: newCount }).eq('id', post.id)
       return ok({ likecount: newCount, dislikecount: 0, reaction: 'like' })
     }
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }

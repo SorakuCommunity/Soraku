@@ -16,16 +16,18 @@ export async function GET() {
     if (error) return SERVER_ERROR()
 
     // Map ke shape yang dipakai music player context
-    const tracks = (data ?? []).map(t => ({
-      id:       t.id,
-      title:    t.title,
-      artist:   t.artist,
-      anime:    t.anime ?? null,
-      cover:    t.coverurl ?? '🎵',   // emoji fallback jika belum ada cover
-      src:      t.srcurl,
+    const tracks = (data ?? []).map((t) => ({
+      id: t.id,
+      title: t.title,
+      artist: t.artist,
+      anime: t.anime ?? null,
+      cover: t.coverurl ?? '🎵', // emoji fallback jika belum ada cover
+      src: t.srcurl,
       duration: t.duration ?? 0,
     }))
 
     return ok(tracks)
-  } catch { return SERVER_ERROR() }
+  } catch {
+    return SERVER_ERROR()
+  }
 }
