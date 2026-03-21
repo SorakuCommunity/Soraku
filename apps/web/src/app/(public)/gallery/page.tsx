@@ -286,7 +286,7 @@ export default function GalleryPage() {
   const [page, setPage] = useState(1);
   const [lightbox, setLightbox] = useState<GalleryItem|null>(null);
   const [showUpload, setShowUpload] = useState(false);
-  const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchGallery = useCallback(async (filter:string, q:string, p:number) => {
     setLoading(true);
@@ -306,7 +306,7 @@ export default function GalleryPage() {
 
   const handleSearch = (v: string) => {
     setSearch(v);
-    clearTimeout(searchTimeout.current);
+    if (searchTimeout.current !== null) clearTimeout(searchTimeout.current);
     searchTimeout.current = setTimeout(() => { setPage(1); fetchGallery(activeFilter, v, 1); }, 400);
   };
 
