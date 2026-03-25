@@ -7,7 +7,8 @@ import { useEffect, useState, useRef } from "react";
 import {
   ArrowRight, Users, Wifi, Calendar, BookOpen,
   Handshake, Eye, Heart, ChevronRight, Hash,
-  MessageSquare, Volume2, Circle,
+  MessageSquare, Volume2, Circle, Zap, Crown,
+  Star, Sparkles, Trophy, Check, TrendingUp, Gift,
 } from "lucide-react";
 import {
   DiscordIcon, InstagramIcon, FacebookIcon, XIcon,
@@ -15,7 +16,7 @@ import {
 } from "@/components/icons/custom-icons";
 import { cn } from "@/lib/utils";
 
-// ─── Constants ─────────────────────────────────────────────────────────────
+// ─── Constants ──────────────────────────────────────────────────────────────
 
 const SOCIAL_LINKS = [
   { slug:"discord",   name:"Discord",   href:"https://discord.gg/qm3XJvRa6B",               Icon:DiscordIcon,   color:"text-indigo-400", bg:"hover:bg-indigo-500/8"  },
@@ -30,19 +31,132 @@ const SOCIAL_LINKS = [
 const DISCORD_GUILD_ID = "1033369620989124628";
 
 const DISCORD_CHANNELS = [
-  { id:"1", name:"pengumuman",  label:"📢・pengumuman", type:"text",  active:true  },
-  { id:"2", name:"umum",        label:"💬・umum",        type:"text",  active:true  },
-  { id:"3", name:"anime-manga", label:"🎌・anime-manga", type:"text",  active:true  },
-  { id:"4", name:"fanart",      label:"🎨・fanart",      type:"text",  active:false },
-  { id:"5", name:"gaming",      label:"🎮・gaming",      type:"text",  active:false },
-  { id:"6", name:"musik",       label:"🎵・musik",       type:"voice", active:true  },
+  { id:"1", name:"pengumuman",  type:"text",  active:true  },
+  { id:"2", name:"umum",        type:"text",  active:true  },
+  { id:"3", name:"anime-manga", type:"text",  active:true  },
+  { id:"4", name:"fanart",      type:"text",  active:false },
+  { id:"5", name:"gaming",      type:"text",  active:false },
+  { id:"6", name:"musik",       type:"voice", active:true  },
 ];
 
 const FAKE_MSGS = [
-  { user:"Sora",       color:"text-indigo-300", msg:"Selamat datang di Soraku Community! 🌸",            time:"10.00" },
-  { user:"Kaizo",      color:"text-emerald-300",msg:"Halo~ ada yang nonton anime baru musim ini?",       time:"10.02" },
-  { user:"MemberBaru", color:"text-violet-300", msg:"Baru gabung nih, senang bisa kenal kalian ✨",       time:"10.05" },
-  { user:"AniWatcher", color:"text-amber-300",  msg:"Frieren season 2 kapan ya... 😭",                   time:"10.08" },
+  { user:"Sora",       color:"text-indigo-300", msg:"Selamat datang di Soraku! 🌸",               time:"10:00" },
+  { user:"Kaizo",      color:"text-emerald-300",msg:"Halo~ ada yang nonton anime baru musim ini?", time:"10:02" },
+  { user:"MemberBaru", color:"text-violet-300", msg:"Baru gabung nih, senang bisa kenal kalian ✨", time:"10:05" },
+  { user:"AniWatcher", color:"text-amber-300",  msg:"Frieren season 2 kapan ya... 😭",             time:"10:08" },
+];
+
+// Tier premium Soraku
+const TIERS = [
+  {
+    id: "donatur",
+    name: "Donatur",
+    emoji: "💙",
+    price: "Bebas",
+    period: "",
+    desc: "Dukung Soraku seikhlasnya via Trakteer",
+    color: "from-blue-500/10 to-transparent",
+    border: "border-blue-500/20",
+    accent: "text-blue-400",
+    badge: "text-blue-300 bg-blue-500/10 border-blue-500/25",
+    perks: [
+      "Badge Donatur di profil",
+      "Akses channel donatur Discord",
+      "Terima kasih dari tim Soraku",
+    ],
+    href: "/donate",
+    cta: "Donasi Sekarang",
+  },
+  {
+    id: "vip",
+    name: "VIP",
+    emoji: "⭐",
+    price: "Rp 25.000",
+    period: "/bulan",
+    desc: "Untuk supporter setia komunitas Soraku",
+    color: "from-primary/15 to-transparent",
+    border: "border-primary/30",
+    accent: "text-primary",
+    badge: "text-primary bg-primary/10 border-primary/25",
+    highlight: true,
+    perks: [
+      "Badge VIP di profil & Discord",
+      "Channel VIP eksklusif",
+      "Early access event & konten",
+      "Priority response dari tim",
+      "Nama di halaman Top Supporter",
+    ],
+    href: "/premium#vip",
+    cta: "Mulai VIP",
+  },
+  {
+    id: "vvip",
+    name: "VVIP",
+    emoji: "✨",
+    price: "Rp 75.000",
+    period: "/bulan",
+    desc: "Supporter tertinggi — Community Builder",
+    color: "from-amber-500/12 via-accent/8 to-transparent",
+    border: "border-amber-500/35",
+    accent: "text-amber-400",
+    badge: "text-amber-300 bg-amber-500/10 border-amber-500/25",
+    perks: [
+      "Semua benefit VIP",
+      "Badge VVIP dengan glow emas",
+      "Custom role Discord",
+      "Shoutout bulanan di sosmed",
+      "Akses beta fitur platform",
+      "Nama besar di Top Supporter",
+    ],
+    href: "/premium#vvip",
+    cta: "Mulai VVIP",
+  },
+];
+
+// Fitur komunitas Soraku
+const FEATURES = [
+  {
+    icon: "🎌",
+    title: "Anime & Manga Hub",
+    desc: "Diskusi seru seputar anime musiman, manga terbaru, dan rekomendasi konten.",
+    color: "from-red-500/8 to-transparent",
+    link: "/blog",
+  },
+  {
+    icon: "🎨",
+    title: "Galeri Kreator",
+    desc: "Pajang karyamu — fanart, cosplay, ilustrasi — di hadapan ribuan anggota.",
+    color: "from-purple-500/8 to-transparent",
+    link: "/gallery",
+  },
+  {
+    icon: "🎭",
+    title: "Agensi VTuber",
+    desc: "Soraku punya talent VTuber, kreator, dan cosplayer yang aktif berkarya.",
+    color: "from-pink-500/8 to-transparent",
+    link: "/agensi",
+  },
+  {
+    icon: "🏆",
+    title: "Event Komunitas",
+    desc: "Turnamen, lomba, nonton bareng, dan event offline reguler tiap bulan.",
+    color: "from-amber-500/8 to-transparent",
+    link: "/events",
+  },
+  {
+    icon: "💬",
+    title: "Server Discord Aktif",
+    desc: "500+ member online setiap hari. Chat, voice, dan collab tanpa henti.",
+    color: "from-indigo-500/8 to-transparent",
+    link: "https://discord.gg/qm3XJvRa6B",
+  },
+  {
+    icon: "🌸",
+    title: "Non-Profit & Terbuka",
+    desc: "Gratis selamanya. Komunitas dibuat dari penggemar, untuk penggemar.",
+    color: "from-rose-500/8 to-transparent",
+    link: "/about",
+  },
 ];
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -53,7 +167,7 @@ interface BlogItem   { id:string; slug:string; title:string; excerpt:string|null
 interface Partnership{ id:string; name:string; logourl:string|null; website:string|null; category:string|null; }
 interface DmMember   { username:string; avatar:string|null; status:string; activity?:string; }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function fmtDate(iso:string) {
   return new Date(iso).toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
@@ -77,7 +191,7 @@ function useDiscord() {
   return d;
 }
 
-// ─── Card seamless (tanpa box, image overlay) ─────────────────────────────
+// ─── Content Card — image poster style ───────────────────────────────────────
 
 function ContentCard({href,cover,title,meta,badge}:{href:string;cover:string|null;title:string;meta:string;badge?:React.ReactNode}) {
   return (
@@ -87,11 +201,9 @@ function ContentCard({href,cover,title,meta,badge}:{href:string;cover:string|nul
           ? <Image src={cover} alt={title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" unoptimized/>
           : <div className="h-full w-full bg-gradient-to-br from-primary/15 via-accent/8 to-violet-500/10"/>
         }
-        {/* Dark gradient overlay bottom → menyatu ke background */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent"/>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"/>
         {badge && <div className="absolute top-3 right-3">{badge}</div>}
       </div>
-      {/* Teks di atas gradient — TIDAK ADA card box */}
       <div className="absolute inset-x-0 bottom-0 p-4">
         <p className="text-[10px] text-white/35 mb-1">{meta}</p>
         <h3 className="line-clamp-2 text-sm font-black text-white/90 leading-snug group-hover:text-primary/90 transition-colors">{title}</h3>
@@ -100,26 +212,16 @@ function ContentCard({href,cover,title,meta,badge}:{href:string;cover:string|nul
   );
 }
 
-// ─── Skeleton ──────────────────────────────────────────────────────────────
+// ─── Section Header ───────────────────────────────────────────────────────────
 
-function Skeleton4() {
+function SH({eyebrow,title,href,center}:{eyebrow:string;title:string;href?:string;center?:boolean}) {
   return (
-    <div className="grid gap-3 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {[1,2,3,4].map(i=><div key={i} className="animate-pulse rounded-2xl bg-muted/8 aspect-[4/5] sm:aspect-[3/4]"/>)}
-    </div>
-  );
-}
-
-// ─── Section header ────────────────────────────────────────────────────────
-
-function SH({eyebrow,title,href}:{eyebrow:string;title:string;href?:string}) {
-  return (
-    <div className="mb-7 flex items-end justify-between">
-      <div>
+    <div className={cn("mb-8 flex items-end justify-between",center && "justify-center text-center flex-col items-center")}>
+      <div className={center ? "text-center" : ""}>
         <p className="text-[9px] font-black uppercase tracking-[0.25em] text-primary/40 mb-1.5">{eyebrow}</p>
         <h2 className="text-2xl font-black tracking-tight sm:text-3xl">{title}</h2>
       </div>
-      {href&&(
+      {href && !center && (
         <Link href={href} className="group flex items-center gap-1 text-xs font-semibold text-muted-foreground/35 hover:text-primary transition-colors">
           Semua <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform"/>
         </Link>
@@ -128,14 +230,13 @@ function SH({eyebrow,title,href}:{eyebrow:string;title:string;href?:string}) {
   );
 }
 
-// ─── Discord embed soraku-style ────────────────────────────────────────────
+// ─── Discord Embed ────────────────────────────────────────────────────────────
 
 function DiscordEmbed({discord}:{discord:ReturnType<typeof useDiscord>}) {
   const [active,setActive]=useState("2");
   const SC={online:"bg-emerald-500",idle:"bg-amber-400",dnd:"bg-red-500",offline:"bg-muted-foreground/30"};
   return (
     <div className="overflow-hidden rounded-2xl border border-white/6 bg-[#1e1f22]/90 shadow-2xl shadow-black/40 backdrop-blur-sm">
-      {/* Server bar */}
       <div className="flex items-center justify-between gap-3 px-4 py-3 bg-[#1e1f22]">
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border border-indigo-500/30">
@@ -156,11 +257,8 @@ function DiscordEmbed({discord}:{discord:ReturnType<typeof useDiscord>}) {
           <DiscordIcon className="h-3 w-3"/> Gabung
         </a>
       </div>
-
-      {/* Body */}
-      <div className="flex h-[320px] sm:h-[360px]">
-        {/* Sidebar */}
-        <div className="w-[160px] flex-shrink-0 bg-[#2b2d31]/90 flex flex-col overflow-y-auto py-2 gap-0.5">
+      <div className="flex h-[300px] sm:h-[340px]">
+        <div className="w-[150px] flex-shrink-0 bg-[#2b2d31]/90 flex flex-col overflow-y-auto py-2 gap-0.5">
           <p className="px-3 pb-1 pt-0.5 text-[9px] font-black uppercase tracking-wider text-white/20">Channels</p>
           {DISCORD_CHANNELS.map(ch=>(
             <button key={ch.id} onClick={()=>setActive(ch.id)}
@@ -184,8 +282,6 @@ function DiscordEmbed({discord}:{discord:ReturnType<typeof useDiscord>}) {
             </div>
           )):<p className="px-3 text-[10px] text-white/20">Widget offline</p>}
         </div>
-
-        {/* Chat */}
         <div className="flex-1 flex flex-col bg-[#313338]/60 min-w-0">
           <div className="flex items-center gap-2 px-4 py-2 border-b border-white/5">
             <Hash className="h-3.5 w-3.5 text-white/25 flex-shrink-0"/>
@@ -221,8 +317,6 @@ function DiscordEmbed({discord}:{discord:ReturnType<typeof useDiscord>}) {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/5 bg-[#1e1f22]/80">
         <div className="flex items-center gap-4 text-[10px] text-white/25">
           <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400"/>{discord.loading?"...":discord.presence?`${discord.presence.toLocaleString("id-ID")} online`:"—"}</span>
@@ -235,7 +329,7 @@ function DiscordEmbed({discord}:{discord:ReturnType<typeof useDiscord>}) {
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
   const discord=useDiscord();
@@ -252,20 +346,15 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ══════════════════════════════════════════════
-          HERO — seamless mascot, no card ever
-          ══════════════════════════════════════════════ */}
+      {/* ══ HERO ══════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden">
 
-        {/* MOBILE: hero tanpa mascot — clean, text focused */}
+        {/* Mobile */}
         <div className="lg:hidden px-5 pt-16 pb-14 min-h-[85svh] flex flex-col justify-center">
-          {/* Atmospheric glow */}
           <div className="pointer-events-none absolute inset-0 -z-10">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[140px]"/>
             <div className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-accent/6 blur-[100px]"/>
           </div>
-
-          {/* Live badge */}
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/12 bg-primary/5 px-4 py-1.5 w-fit reveal-up">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/>
@@ -275,30 +364,19 @@ export default function HomePage() {
               {discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+ online`}
             </span>
           </div>
-
           <div className="reveal-up">
-            <h1 className="text-[clamp(3.5rem,18vw,6rem)] font-black leading-[0.88] tracking-tighter">
-              Soraku
-            </h1>
-            <p className="text-[clamp(0.9rem,4vw,1.2rem)] font-light text-muted-foreground/45 tracking-wide mt-1.5 pl-0.5">
-              Community · 空 · Est. 2023
-            </p>
+            <h1 className="text-[clamp(3.5rem,18vw,6rem)] font-black leading-[0.88] tracking-tighter">Soraku</h1>
+            <p className="text-[clamp(0.9rem,4vw,1.2rem)] font-light text-muted-foreground/45 tracking-wide mt-1.5">Community · 空 · Est. 2023</p>
           </div>
-
           <div className="h-px w-16 bg-gradient-to-r from-primary/40 to-transparent my-6 reveal-up reveal-delay-1"/>
-
-          <div className="reveal-up reveal-delay-2 space-y-2.5 max-w-xs">
+          <div className="reveal-up reveal-delay-2 space-y-2 max-w-xs">
             <p className="text-sm leading-relaxed text-muted-foreground/75">
-              <span className="font-bold text-foreground/90">Soraku</span> — dari <em className="not-italic font-medium text-foreground/70">"Sora"</em> (langit) dan <em className="not-italic font-medium text-foreground/70">"ku"</em> (milikku).
+              <span className="font-bold text-foreground/90">Soraku</span> — komunitas non-profit untuk semua pecinta anime, manga, dan budaya Jepang di Indonesia.
             </p>
-            <p className="text-[13px] leading-loose text-muted-foreground/55">
-              Komunitas non-profit untuk semua pecinta anime, manga, dan budaya Jepang di Indonesia.
-            </p>
+            <p className="text-xs text-muted-foreground/45">Gratis. Terbuka. Hangat. <span className="text-primary/65 font-semibold">Ini rumah digitalmu.</span></p>
           </div>
-
           <div className="mt-8 flex items-center gap-3 reveal-up reveal-delay-3">
-            <Link href="/register"
-              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 hover:-translate-y-0.5 transition-all">
+            <Link href="/register" className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 hover:-translate-y-0.5 transition-all">
               Bergabung <ArrowRight className="h-3.5 w-3.5"/>
             </Link>
             <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
@@ -306,13 +384,10 @@ export default function HomePage() {
               <DiscordIcon className="h-4 w-4"/> Discord
             </a>
           </div>
-
-          {/* Stats mobile */}
           <div className="mt-10 flex items-center gap-6 reveal-up reveal-delay-4">
             {[
               {val:discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+`,label:"online",live:true},
-              {val:"20+",label:"event"},
-              {val:"100+",label:"konten"},
+              {val:"20+",label:"event"},{val:"100+",label:"konten"},
             ].map((s,i)=>(
               <div key={i} className="flex items-center gap-1.5">
                 {s.live&&<span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"/><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"/></span>}
@@ -323,11 +398,10 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* DESKTOP: two-column */}
+        {/* Desktop */}
         <div className="hidden lg:flex items-center min-h-[96vh] px-6 py-16">
           <div className="mx-auto w-full max-w-7xl">
             <div className="grid gap-20 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_440px] items-center">
-              {/* Left */}
               <div className="max-w-2xl">
                 <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-primary/12 bg-primary/5 px-4 py-1.5">
                   <span className="relative flex h-2 w-2">
@@ -338,25 +412,20 @@ export default function HomePage() {
                     {discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+ online`} · Soraku Community
                   </span>
                 </div>
-
                 <div className="space-y-1 reveal-up">
                   <h1 className="text-[clamp(4rem,10vw,8rem)] font-black leading-[0.88] tracking-tighter">Soraku</h1>
                   <p className="text-[clamp(1rem,2.2vw,1.6rem)] font-light text-muted-foreground/45 tracking-wide pl-0.5">Community · 空 · Est. 2023</p>
                 </div>
-
                 <div className="my-8 h-px w-20 bg-gradient-to-r from-primary/35 to-transparent"/>
-
                 <div className="space-y-3 max-w-lg reveal-up reveal-delay-1">
                   <p className="text-base leading-relaxed text-muted-foreground/80">
                     <span className="font-bold text-foreground">Soraku</span> — dari <em className="not-italic font-medium text-foreground/70">"Sora"</em> (langit) dan <em className="not-italic font-medium text-foreground/70">"ku"</em> (milikku).
                   </p>
                   <p className="text-sm leading-loose text-muted-foreground/55">
                     Ruang komunitas non-profit untuk semua pecinta anime, manga, dan budaya Jepang di Indonesia.
-                    Berbagi karya, berdiskusi, ikuti event, bertemu teman sefrekuensi.
                   </p>
                   <p className="text-sm text-muted-foreground/40">Gratis. Terbuka. Hangat. <span className="text-primary/65 font-semibold">Ini rumah digitalmu.</span></p>
                 </div>
-
                 <div className="mt-10 flex flex-wrap items-center gap-3 reveal-up reveal-delay-2">
                   <Link href="/register"
                     className="group relative overflow-hidden rounded-2xl bg-primary px-8 py-3.5 text-sm font-bold text-white shadow-xl shadow-primary/20 transition-all hover:-translate-y-0.5">
@@ -368,12 +437,10 @@ export default function HomePage() {
                     <DiscordIcon className="h-4 w-4"/> Gabung Discord
                   </a>
                 </div>
-
                 <div className="mt-12 flex flex-wrap items-center gap-7 reveal-up reveal-delay-3">
                   {[
                     {val:discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+`,label:"online",live:true},
-                    {val:"20+",label:"event"},
-                    {val:"100+",label:"konten"},
+                    {val:"20+",label:"event"},{val:"100+",label:"konten"},
                   ].map((s,i)=>(
                     <div key={i} className="flex items-center gap-2">
                       {s.live&&<span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"/><span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"/></span>}
@@ -385,7 +452,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Right — mascot, NO card, NO border, fully seamless */}
+              {/* Mascot */}
               <div className="flex justify-end">
                 <div className="relative w-[360px] xl:w-[420px]">
                   <div className="absolute inset-0 -m-14 rounded-full bg-primary/8 blur-3xl pointer-events-none"/>
@@ -400,14 +467,13 @@ export default function HomePage() {
                       <span className="flex items-center gap-1 text-[9px] font-black text-emerald-400"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"/> Live</span>
                     </div>
                   </div>
-                  {/* Floating labels — no background fill, just blur border */}
                   {[
-                    {text:"🌸 Komunitas",   right:"-2.5rem",top:"4rem",   delay:"0s"   },
-                    {text:"🎌 Anime & Manga",left:"-3.5rem",top:"8.5rem", delay:"1s"   },
-                    {text:"✨ Non-profit",   right:"-2rem",  bottom:"9rem",delay:"2s"   },
-                    {text:"🇮🇩 Indonesia",  left:"-2.5rem", bottom:"5.5rem",delay:"0.5s"},
+                    {text:"🌸 Komunitas",   r:"-2.5rem",t:"4rem",   d:"0s"   },
+                    {text:"🎌 Anime & Manga",l:"-3.5rem",t:"8.5rem", d:"1s"   },
+                    {text:"✨ Non-profit",   r:"-2rem",  b:"9rem",   d:"2s"   },
+                    {text:"🇮🇩 Indonesia",  l:"-2.5rem", b:"5.5rem", d:"0.5s" },
                   ].map((b,i)=>(
-                    <div key={i} className="absolute z-20 float-badge" style={{...(b.right?{right:b.right}:{left:b.left}),...(b.top?{top:b.top}:{bottom:b.bottom}),animationDelay:b.delay}}>
+                    <div key={i} className="absolute z-20 float-badge" style={{...(b.r?{right:b.r}:{left:b.l}),...(b.t?{top:b.t}:{bottom:b.b}),animationDelay:b.d}}>
                       <span className="rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-semibold text-white/55 backdrop-blur-md">{b.text}</span>
                     </div>
                   ))}
@@ -416,156 +482,225 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-
-        {/* Scroll hint */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 opacity-20 flex flex-col items-center gap-1 lg:block hidden">
-          <div className="h-8 w-px bg-gradient-to-b from-foreground/40 to-transparent"/>
-          <div className="h-4 w-px bg-gradient-to-b from-foreground/15 to-transparent"/>
-        </div>
       </section>
 
-      {/* ══ MARQUEE ══ */}
+      {/* ══ MARQUEE ══════════════════════════════════════════════════════════ */}
       <div className="overflow-hidden border-y border-border/12 py-3">
         <div className="marquee-track flex gap-12 whitespace-nowrap text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/15">
           {[...Array(4)].map((_,i)=>["🎌 Anime","📚 Manga","🎵 J-Music","🎭 VTuber","🎨 Fanart","👘 Cosplay","🎮 Gaming","🌸 Culture","🌙 Soraku"].map(item=><span key={`${i}-${item}`}>{item}</span>))}
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════
-          KOMPLEKS THINGS MADE SIMPLE — Soraku version
-          Terinspirasi dari gambar: kalimat mewah + outline text
-          ══════════════════════════════════════════════ */}
+      {/* ══ COMMUNITY STATEMENT ═══════════════════════════════════════════════ */}
       <section className="relative px-4 py-20 sm:py-28 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/2 to-transparent"/>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-primary/4 blur-3xl"/>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/3 to-transparent"/>
+          <div className="absolute left-1/4 top-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-primary/5 blur-3xl"/>
+          <div className="absolute right-1/4 top-1/3 h-[400px] w-[400px] rounded-full bg-accent/4 blur-3xl"/>
         </div>
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="font-heading text-[clamp(1.8rem,6vw,3.5rem)] font-light italic text-foreground/30 leading-tight mb-2 sm:mb-3">
-            Budaya Jepang
-          </p>
-          <h2 className="text-[clamp(2.8rem,9vw,6rem)] font-black tracking-tight leading-[0.9] mb-5 sm:mb-7">
-            <span className="text-foreground">Lebih </span>
-            <span className="text-outline-primary">Dekat</span>
-            <br/>
-            <span className="text-foreground">di </span>
-            <span className="text-gradient">Soraku</span>
-          </h2>
-          <p className="text-sm sm:text-base text-muted-foreground/50 leading-relaxed max-w-xl mx-auto">
-            Kami menghadirkan ruang yang inklusif untuk berbagi, berdiskusi, dan tumbuh bersama — komunitas yang terasa seperti rumah.
-          </p>
-          {/* Stats row */}
-          <div className="mt-10 sm:mt-12 grid grid-cols-3 gap-4 sm:gap-8 max-w-sm sm:max-w-none sm:flex sm:justify-center mx-auto">
-            {[
-              {n:"500+",label:"Member Aktif"},
-              {n:"20+", label:"Event Digelar"},
-              {n:"100+",label:"Karya Komunitas"},
-              {n:"3+",  label:"Tahun Berjalan"},
-            ].map((s,i)=>(
-              <div key={i} className="flex flex-col items-center gap-1 sm:min-w-[100px]">
-                <span className="text-2xl sm:text-3xl font-black text-foreground">{s.n}</span>
-                <span className="text-[10px] sm:text-xs text-muted-foreground/40 text-center">{s.label}</span>
-              </div>
+        <div className="mx-auto max-w-5xl">
+          <div className="relative flex flex-col items-center text-center">
+            <div className="pointer-events-none absolute inset-0 hidden lg:block">
+              {[
+                {text:"🎌 Anime",  l:"-1rem",   t:"15%",   cls:"community-tag",   d:"0s"  },
+                {text:"🎨 Fanart", r:"-1rem",   t:"10%",   cls:"community-tag-r", d:"0.5s"},
+                {text:"👘 Cosplay",l:"3%",      t:"55%",   cls:"community-tag",   d:"1.2s"},
+                {text:"🎭 VTuber", r:"2%",      t:"50%",   cls:"community-tag-r", d:"0.8s"},
+                {text:"🎮 Gaming", l:"-0.5rem", b:"15%",   cls:"community-tag",   d:"1.8s"},
+                {text:"📚 Manga",  r:"1%",      b:"20%",   cls:"community-tag-r", d:"1.5s"},
+              ].map((t,i)=>(
+                <div key={i} className={cn("absolute",t.cls)} style={{...(t.l?{left:t.l}:{right:t.r}),...(t.t?{top:t.t}:{bottom:t.b}),animationDelay:t.d}}>
+                  <span className="inline-flex items-center rounded-full border border-white/10 bg-background/60 px-4 py-2 text-[12px] font-semibold text-foreground/40 backdrop-blur-sm shadow-sm">{t.text}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-5 py-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary/60"/>
+              <span className="text-[11px] font-black tracking-[0.2em] text-primary/60 uppercase">Komunitas Soraku</span>
+            </div>
+            <div className="space-y-1 sm:space-y-2 mb-7">
+              <p className="text-[clamp(1.1rem,3.5vw,2rem)] font-light text-muted-foreground/35 leading-tight tracking-wide">dari penggemar,</p>
+              <h2 className="text-[clamp(3rem,10vw,7rem)] font-black tracking-tighter leading-[0.88]">
+                <span className="text-foreground/90">untuk </span>
+                <span className="text-shimmer">penggemar</span>
+              </h2>
+              <p className="text-[clamp(1.1rem,3.5vw,2rem)] font-light text-muted-foreground/35 leading-tight tracking-wide">— di seluruh Indonesia</p>
+            </div>
+            <p className="text-sm sm:text-base text-muted-foreground/55 leading-relaxed max-w-lg mx-auto mb-10">
+              Soraku bukan sekadar komunitas. Ini tempat kamu ketemu orang-orang yang <em className="not-italic font-semibold text-foreground/70">ngerti duniamu</em> — yang sama-sama suka anime, ngobrolin manga, dan nonton VTuber sampai pagi.
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 mb-10 lg:hidden">
+              {["🎌 Anime","📚 Manga","🎨 Fanart","🎭 VTuber","👘 Cosplay","🎮 Gaming","🌸 Culture"].map((t,i)=>(
+                <span key={i} className="inline-flex items-center rounded-full border border-border/35 bg-card/30 px-3.5 py-1.5 text-xs font-medium text-muted-foreground/60">{t}</span>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+              {[
+                {n:"500+",label:"Member aktif",    emoji:"👥"},
+                {n:"20+", label:"Event komunitas", emoji:"🗓️"},
+                {n:"100+",label:"Karya & konten",  emoji:"🎨"},
+                {n:"3+",  label:"Tahun bersama",   emoji:"🌸"},
+              ].map((s,i)=>(
+                <div key={i} className="flex flex-col items-center gap-1 min-w-[80px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-base">{s.emoji}</span>
+                    <span className="text-2xl sm:text-3xl font-black text-foreground tabular-nums">{s.n}</span>
+                  </div>
+                  <span className="text-[10px] sm:text-[11px] text-muted-foreground/40">{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ FITUR KOMUNITAS — 6 grid ══════════════════════════════════════════ */}
+      <section className="px-4 pb-20 sm:pb-24 border-t border-border/10 pt-16">
+        <div className="mx-auto max-w-7xl">
+          <SH eyebrow="Platform" title="Semua yang kamu butuhkan"/>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((f,i)=>(
+              <Link key={i} href={f.link.startsWith("http")?f.link:f.link} {...(f.link.startsWith("http")?{target:"_blank",rel:"noopener noreferrer"}:{})}
+                className="group relative overflow-hidden rounded-2xl border border-border/12 bg-transparent p-5 transition-all duration-300 hover:border-border/25 hover:-translate-y-0.5">
+                <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300",f.color)}/>
+                <div className="relative">
+                  <div className="mb-4 text-3xl">{f.icon}</div>
+                  <h3 className="text-sm font-black mb-1.5 group-hover:text-foreground transition-colors">{f.title}</h3>
+                  <p className="text-xs text-muted-foreground/50 leading-relaxed">{f.desc}</p>
+                  <div className="mt-4 flex items-center gap-1 text-[10px] text-muted-foreground/25 group-hover:text-primary/60 transition-colors font-semibold">
+                    Jelajahi <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5"/>
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          EVENTS
-          ══════════════════════════════════════════════ */}
-      <section className="px-4 pb-16 sm:pb-20">
+      {/* ══ EVENTS ════════════════════════════════════════════════════════════ */}
+      <section className="px-4 pb-16 sm:pb-20 border-t border-border/10 pt-16">
         <div className="mx-auto max-w-7xl">
           <SH eyebrow="Event" title="Event Terbaru" href="/events"/>
-          {loading ? <Skeleton4/> : data.events.length===0 ? (
+          {loading ? (
+            <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+              {[1,2,3,4].map(i=><div key={i} className="animate-pulse rounded-2xl bg-muted/8 aspect-[3/4]"/>)}
+            </div>
+          ) : data.events.length===0 ? (
             <div className="py-16 text-center"><Calendar className="mx-auto h-8 w-8 text-muted-foreground/10 mb-3"/><p className="text-sm text-muted-foreground/25">Belum ada event</p></div>
           ) : (
             <div className="grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {data.events.map(e=>{
                 const st=getStatusInfo(e.status,e.startdate);
-                return (
-                  <ContentCard key={e.id} href={`/events/${e.slug}`} cover={e.coverurl} title={e.title} meta={fmtDate(e.startdate)}
-                    badge={<span className={cn("flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-black backdrop-blur-sm",st.cls)}><span className={cn("h-1.5 w-1.5 rounded-full",st.dot)}/>{st.label}</span>}
-                  />
-                );
+                return <ContentCard key={e.id} href={`/events/${e.slug}`} cover={e.coverurl} title={e.title} meta={fmtDate(e.startdate)}
+                  badge={<span className={cn("flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-black backdrop-blur-sm",st.cls)}><span className={cn("h-1.5 w-1.5 rounded-full",st.dot)}/>{st.label}</span>}/>;
               })}
             </div>
           )}
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          BLOG
-          ══════════════════════════════════════════════ */}
+      {/* ══ BLOG ═════════════════════════════════════════════════════════════ */}
       <section className="px-4 pb-16 sm:pb-20">
         <div className="mx-auto max-w-7xl">
           <SH eyebrow="Komunitas" title="Artikel Terbaru" href="/blog"/>
-          {loading ? <Skeleton4/> : data.blogs.length===0 ? (
+          {loading ? (
+            <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+              {[1,2,3,4].map(i=><div key={i} className="animate-pulse rounded-2xl bg-muted/8 aspect-[3/4]"/>)}
+            </div>
+          ) : data.blogs.length===0 ? (
             <div className="py-16 text-center"><BookOpen className="mx-auto h-8 w-8 text-muted-foreground/10 mb-3"/><p className="text-sm text-muted-foreground/25">Belum ada artikel</p></div>
           ) : (
             <div className="grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {data.blogs.map(b=>(
-                <ContentCard key={b.id} href={`/blog/${b.slug}`} cover={b.coverurl} title={b.title} meta={fmtDate(b.publishedat)}/>
-              ))}
+              {data.blogs.map(b=><ContentCard key={b.id} href={`/blog/${b.slug}`} cover={b.coverurl} title={b.title} meta={fmtDate(b.publishedat)}/>)}
             </div>
           )}
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          DISCORD CTA — simplified banner
-          ══════════════════════════════════════════════ */}
-      <section className="px-4 pb-16 sm:pb-20">
+      {/* ══ DISCORD EMBED ════════════════════════════════════════════════════ */}
+      <section className="px-4 pb-16 sm:pb-20 border-t border-border/10 pt-16">
         <div className="mx-auto max-w-5xl">
-          <div className="relative overflow-hidden rounded-3xl border border-indigo-500/15 bg-gradient-to-br from-indigo-950/60 via-background/40 to-background px-8 py-10 sm:px-12 text-center sm:text-left sm:flex sm:items-center sm:gap-10">
-            <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl"/>
-            <div className="mb-6 flex justify-center sm:mb-0 sm:flex-shrink-0">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-indigo-500/20 bg-indigo-500/10">
-                <DiscordIcon className="h-8 w-8 text-indigo-300"/>
-              </div>
-            </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-black mb-2">Gabung Server Discord Soraku</h3>
-              <p className="text-sm text-muted-foreground/60 leading-relaxed max-w-md mx-auto sm:mx-0">
-                Chat, nonton bareng, dan temukan teman sefrekuensi. Aktif 24/7 bersama {discord.loading?"ratusan":discord.presence?`${discord.presence.toLocaleString("id-ID")}`:"ratusan"} member online.
-              </p>
-            </div>
-            <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
-              className="mt-6 sm:mt-0 flex-shrink-0 inline-flex items-center gap-2 rounded-2xl bg-indigo-500 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 transition-all hover:bg-indigo-400">
-              <DiscordIcon className="h-4 w-4"/> Gabung Sekarang <ArrowRight className="h-3.5 w-3.5"/>
-            </a>
-          </div>
+          <SH eyebrow="Real-time" title="Server Discord"/>
+          <DiscordEmbed discord={discord}/>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          SPONSORSHIP & PARTNERSHIP
-          ══════════════════════════════════════════════ */}
-      {data.partnerships.length>0&&(
-        <section className="px-4 pb-16 sm:pb-20 border-t border-border/10 pt-16">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-10 text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/20 mb-2">Dukungan</p>
-              <h2 className="text-2xl font-black tracking-tight">Sponsor &amp; Partner</h2>
+      {/* ══ MONETISASI — Dukung Soraku ════════════════════════════════════════ */}
+      <section className="relative px-4 py-20 sm:py-24 overflow-hidden border-t border-border/10">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/2 to-transparent"/>
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[600px] w-[400px] rounded-full bg-primary/4 blur-3xl"/>
+          <div className="absolute right-0 top-1/3 h-[400px] w-[300px] rounded-full bg-amber-500/3 blur-3xl"/>
+        </div>
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-1.5">
+              <Heart className="h-3.5 w-3.5 text-amber-400"/>
+              <span className="text-[10px] font-black tracking-[0.2em] text-amber-400/70 uppercase">Dukung Soraku</span>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14">
-              {data.partnerships.map(p=>(
-                <a key={p.id} href={p.website??"#"} target={p.website?"_blank":undefined} rel="noopener noreferrer"
-                  className="group flex flex-col items-center gap-2 opacity-35 hover:opacity-85 transition-all hover:-translate-y-0.5">
-                  <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-muted/10 border border-border/15 group-hover:border-primary/15 transition-colors">
-                    {p.logourl?<Image src={p.logourl} alt={p.name} width={48} height={48} className="h-full w-full object-contain"/>:<Handshake className="h-5 w-5 text-muted-foreground/15"/>}
-                  </div>
-                  <p className="text-[10px] font-bold text-foreground/35 group-hover:text-primary transition-colors">{p.name}</p>
-                </a>
-              ))}
-            </div>
+            <h2 className="text-2xl font-black tracking-tight sm:text-3xl mb-3">Jadilah Bagian yang Lebih Besar</h2>
+            <p className="text-sm text-muted-foreground/50 max-w-md mx-auto leading-relaxed">
+              Soraku tetap gratis selamanya. Tapi dengan dukunganmu, kami bisa bikin komunitas ini makin seru.
+            </p>
           </div>
-        </section>
-      )}
 
-      {/* ══════════════════════════════════════════════
-          SOSIAL MEDIA — marquee dua arah
-          ══════════════════════════════════════════════ */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            {TIERS.map((t)=>(
+              <div key={t.id}
+                className={cn(
+                  "relative overflow-hidden rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1",
+                  t.border,
+                  t.highlight && "tier-vvip-glow",
+                )}>
+                <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br",t.color)}/>
+                {t.highlight && (
+                  <div className="absolute top-3 right-3">
+                    <span className="rounded-full bg-primary/15 border border-primary/25 px-2.5 py-0.5 text-[9px] font-black text-primary uppercase tracking-wider">Populer</span>
+                  </div>
+                )}
+                <div className="relative">
+                  <div className="mb-4">
+                    <span className="text-2xl">{t.emoji}</span>
+                  </div>
+                  <h3 className="text-lg font-black mb-1">{t.name}</h3>
+                  <p className="text-xs text-muted-foreground/50 mb-4 leading-relaxed">{t.desc}</p>
+
+                  <div className="mb-5">
+                    <span className={cn("text-2xl font-black",t.accent)}>{t.price}</span>
+                    {t.period && <span className="text-xs text-muted-foreground/40 ml-1">{t.period}</span>}
+                  </div>
+
+                  <ul className="space-y-2 mb-6">
+                    {t.perks.map((p,i)=>(
+                      <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground/65">
+                        <Check className="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-emerald-400/70"/>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link href={t.href}
+                    className={cn(
+                      "flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5",
+                      t.highlight
+                        ? "bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90"
+                        : `border ${t.border} ${t.accent} hover:bg-white/5`
+                    )}>
+                    {t.cta} <ArrowRight className="h-3.5 w-3.5"/>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-6 text-center text-[11px] text-muted-foreground/30">
+            Seluruh hasil dukungan digunakan untuk keberlangsungan platform dan event komunitas.
+            <Link href="/donate/leaderboard" className="ml-1 text-primary/50 hover:text-primary transition-colors">Lihat Top Supporter →</Link>
+          </p>
+        </div>
+      </section>
+
+      {/* ══ SOSIAL MEDIA — dual marquee ══════════════════════════════════════ */}
       <section className="py-16 sm:py-20 border-t border-border/10">
         <div className="mx-auto max-w-7xl px-4 mb-10">
           <div className="flex items-center gap-4">
@@ -600,19 +735,30 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          DISCORD EMBED — paling bawah
-          ══════════════════════════════════════════════ */}
-      <section className="px-4 pb-16 sm:pb-20 border-t border-border/10 pt-16">
-        <div className="mx-auto max-w-5xl">
-          <SH eyebrow="Real-time" title="Server Discord"/>
-          <DiscordEmbed discord={discord}/>
-        </div>
-      </section>
+      {/* ══ PARTNERSHIP ═══════════════════════════════════════════════════════ */}
+      {data.partnerships.length>0&&(
+        <section className="px-4 pb-16 sm:pb-20 border-t border-border/10 pt-16">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/20 mb-2">Kolaborasi</p>
+              <h2 className="text-2xl font-black tracking-tight">Sponsor &amp; Partner</h2>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14">
+              {data.partnerships.map(p=>(
+                <a key={p.id} href={p.website??"#"} target={p.website?"_blank":undefined} rel="noopener noreferrer"
+                  className="group flex flex-col items-center gap-2 opacity-35 hover:opacity-85 transition-all hover:-translate-y-0.5">
+                  <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-muted/10 border border-border/15 group-hover:border-primary/15 transition-colors">
+                    {p.logourl?<Image src={p.logourl} alt={p.name} width={48} height={48} className="h-full w-full object-contain"/>:<Handshake className="h-5 w-5 text-muted-foreground/15"/>}
+                  </div>
+                  <p className="text-[10px] font-bold text-foreground/35 group-hover:text-primary transition-colors">{p.name}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
-      {/* ══════════════════════════════════════════════
-          JOIN CTA — hanya jika belum login
-          ══════════════════════════════════════════════ */}
+      {/* ══ JOIN CTA — hanya jika belum login ════════════════════════════════ */}
       {!isLoggedIn&&user!=="loading"&&(
         <section className="relative px-4 pb-28 pt-16 overflow-hidden border-t border-border/10">
           <div className="pointer-events-none absolute inset-0 -z-10">

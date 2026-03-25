@@ -372,3 +372,32 @@ kbd {
 
 /* Gallery masonry hover */
 .gallery-item-hover:hover .gallery-overlay { opacity: 1; }
+
+/* ═══ Homepage monetisasi & community sections ═══════════════════════════ */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.count-up { animation: count-up 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes tier-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(168,85,247,0.1); }
+  50%       { box-shadow: 0 0 35px rgba(168,85,247,0.2); }
+}
+.tier-vvip-glow { animation: tier-glow 3s ease-in-out infinite; }
+
+@keyframes scroll-x {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.member-scroll { animation: scroll-x 22s linear infinite; }
+.member-scroll:hover { animation-play-state: paused; }
