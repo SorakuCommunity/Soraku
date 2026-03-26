@@ -4,11 +4,11 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import {
-  ArrowRight, Users, Wifi, Calendar, BookOpen,
-  Handshake, Eye, Heart, ChevronRight, Hash,
-  MessageSquare, Volume2, Circle, Zap, Crown,
-  Star, Sparkles, Trophy, Check, TrendingUp, Gift,
+  ArrowRight, Calendar, BookOpen, ChevronRight,
+  Hash, MessageSquare, Volume2, Circle, Eye, Heart,
+  MessageCircle, Clock, Zap, Users, Handshake, Sparkles,
 } from "lucide-react";
 import {
   DiscordIcon, InstagramIcon, FacebookIcon, XIcon,
@@ -19,16 +19,27 @@ import { cn } from "@/lib/utils";
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const SOCIAL_LINKS = [
-  { slug:"discord",   name:"Discord",   href:"https://discord.gg/qm3XJvRa6B",               Icon:DiscordIcon,   color:"text-indigo-400", bg:"hover:bg-indigo-500/8"  },
-  { slug:"instagram", name:"Instagram", href:"https://www.instagram.com/soraku.moe",          Icon:InstagramIcon, color:"text-pink-400",   bg:"hover:bg-pink-500/8"    },
-  { slug:"facebook",  name:"Facebook",  href:"https://www.facebook.com/share/1HQs9ZZeCw/",    Icon:FacebookIcon,  color:"text-blue-400",   bg:"hover:bg-blue-500/8"    },
-  { slug:"x",         name:"X",         href:"https://twitter.com/@AppSora",                 Icon:XIcon,         color:"text-white/60",   bg:"hover:bg-white/5"       },
-  { slug:"tiktok",    name:"TikTok",    href:"https://www.tiktok.com/@soraku.id",             Icon:TikTokIcon,    color:"text-pink-300",   bg:"hover:bg-pink-500/8"    },
-  { slug:"youtube",   name:"YouTube",   href:"https://youtube.com/@chsoraku",                Icon:YouTubeIcon,   color:"text-red-400",    bg:"hover:bg-red-500/8"     },
-  { slug:"bluesky",   name:"Bluesky",   href:"https://bsky.app/profile/soraku.id",           Icon:BlueSkyIcon,   color:"text-sky-400",    bg:"hover:bg-sky-500/8"     },
+  { slug:"discord",   name:"Discord",   href:"https://discord.gg/qm3XJvRa6B",             Icon:DiscordIcon,   color:"text-indigo-400" },
+  { slug:"instagram", name:"Instagram", href:"https://www.instagram.com/soraku.moe",        Icon:InstagramIcon, color:"text-pink-400"   },
+  { slug:"facebook",  name:"Facebook",  href:"https://www.facebook.com/share/1HQs9ZZeCw/",  Icon:FacebookIcon,  color:"text-blue-400"   },
+  { slug:"x",         name:"X / Twitter",href:"https://twitter.com/@AppSoraa",              Icon:XIcon,         color:"text-white/60"   },
+  { slug:"tiktok",    name:"TikTok",    href:"https://www.tiktok.com/@soraku.id",           Icon:TikTokIcon,    color:"text-pink-300"   },
+  { slug:"youtube",   name:"YouTube",   href:"https://youtube.com/@chsoraku",              Icon:YouTubeIcon,   color:"text-red-400"    },
+  { slug:"bluesky",   name:"Bluesky",   href:"https://bsky.app/profile/soraku.id",         Icon:BlueSkyIcon,   color:"text-sky-400"    },
 ];
 
-const DISCORD_GUILD_ID = "1033369620989124628";
+const DISCORD_GUILD_ID = "1116971049045729302";
+
+const CATEGORIES = [
+  { label:"Anime & Manga", color:"#4FA3D1", glow:"rgba(79,163,209,0.7)" },
+  { label:"Gaming",        color:"#a78bfa", glow:"rgba(167,139,250,0.7)" },
+  { label:"VTuber",        color:"#f472b6", glow:"rgba(244,114,182,0.7)" },
+  { label:"Fanart",        color:"#34d399", glow:"rgba(52,211,153,0.7)"  },
+  { label:"J-Music",       color:"#fbbf24", glow:"rgba(251,191,36,0.7)"  },
+  { label:"Cosplay",       color:"#E8C2A8", glow:"rgba(232,194,168,0.7)" },
+  { label:"Kreator",       color:"#818cf8", glow:"rgba(129,140,248,0.7)" },
+  { label:"Komunitas",     color:"#6ee7b7", glow:"rgba(110,231,183,0.7)" },
+];
 
 const DISCORD_CHANNELS = [
   { id:"1", name:"pengumuman",  type:"text",  active:true  },
@@ -39,132 +50,21 @@ const DISCORD_CHANNELS = [
   { id:"6", name:"musik",       type:"voice", active:true  },
 ];
 
-const FAKE_MSGS = [
-  { user:"Sora",       color:"text-indigo-300", msg:"Selamat datang di Soraku! 🌸",               time:"10:00" },
-  { user:"Kaizo",      color:"text-emerald-300",msg:"Halo~ ada yang nonton anime baru musim ini?", time:"10:02" },
-  { user:"MemberBaru", color:"text-violet-300", msg:"Baru gabung nih, senang bisa kenal kalian ✨", time:"10:05" },
-  { user:"AniWatcher", color:"text-amber-300",  msg:"Frieren season 2 kapan ya... 😭",             time:"10:08" },
-];
+// ─── Types ───────────────────────────────────────────────────────────────────
 
-// Tier premium Soraku
-const TIERS = [
-  {
-    id: "donatur",
-    name: "Donatur",
-    emoji: "💙",
-    price: "Bebas",
-    period: "",
-    desc: "Dukung Soraku seikhlasnya via Trakteer",
-    color: "from-blue-500/10 to-transparent",
-    border: "border-blue-500/20",
-    accent: "text-blue-400",
-    badge: "text-blue-300 bg-blue-500/10 border-blue-500/25",
-    perks: [
-      "Badge Donatur di profil",
-      "Akses channel donatur Discord",
-      "Terima kasih dari tim Soraku",
-    ],
-    href: "/donate",
-    cta: "Donasi Sekarang",
-  },
-  {
-    id: "vip",
-    name: "VIP",
-    emoji: "⭐",
-    price: "Rp 25.000",
-    period: "/bulan",
-    desc: "Untuk supporter setia komunitas Soraku",
-    color: "from-primary/15 to-transparent",
-    border: "border-primary/30",
-    accent: "text-primary",
-    badge: "text-primary bg-primary/10 border-primary/25",
-    highlight: true,
-    perks: [
-      "Badge VIP di profil & Discord",
-      "Channel VIP eksklusif",
-      "Early access event & konten",
-      "Priority response dari tim",
-      "Nama di halaman Top Supporter",
-    ],
-    href: "/premium#vip",
-    cta: "Mulai VIP",
-  },
-  {
-    id: "vvip",
-    name: "VVIP",
-    emoji: "✨",
-    price: "Rp 75.000",
-    period: "/bulan",
-    desc: "Supporter tertinggi — Community Builder",
-    color: "from-amber-500/12 via-accent/8 to-transparent",
-    border: "border-amber-500/35",
-    accent: "text-amber-400",
-    badge: "text-amber-300 bg-amber-500/10 border-amber-500/25",
-    perks: [
-      "Semua benefit VIP",
-      "Badge VVIP dengan glow emas",
-      "Custom role Discord",
-      "Shoutout bulanan di sosmed",
-      "Akses beta fitur platform",
-      "Nama besar di Top Supporter",
-    ],
-    href: "/premium#vvip",
-    cta: "Mulai VVIP",
-  },
-];
-
-// Fitur komunitas Soraku
-const FEATURES = [
-  {
-    icon: "🎌",
-    title: "Anime & Manga Hub",
-    desc: "Diskusi seru seputar anime musiman, manga terbaru, dan rekomendasi konten.",
-    color: "from-red-500/8 to-transparent",
-    link: "/blog",
-  },
-  {
-    icon: "🎨",
-    title: "Galeri Kreator",
-    desc: "Pajang karyamu — fanart, cosplay, ilustrasi — di hadapan ribuan anggota.",
-    color: "from-purple-500/8 to-transparent",
-    link: "/gallery",
-  },
-  {
-    icon: "🎭",
-    title: "Agensi VTuber",
-    desc: "Soraku punya talent VTuber, kreator, dan cosplayer yang aktif berkarya.",
-    color: "from-pink-500/8 to-transparent",
-    link: "/agensi",
-  },
-  {
-    icon: "🏆",
-    title: "Event Komunitas",
-    desc: "Turnamen, lomba, nonton bareng, dan event offline reguler tiap bulan.",
-    color: "from-amber-500/8 to-transparent",
-    link: "/events",
-  },
-  {
-    icon: "💬",
-    title: "Server Discord Aktif",
-    desc: "500+ member online setiap hari. Chat, voice, dan collab tanpa henti.",
-    color: "from-indigo-500/8 to-transparent",
-    link: "https://discord.gg/qm3XJvRa6B",
-  },
-  {
-    icon: "🌸",
-    title: "Non-Profit & Terbuka",
-    desc: "Gratis selamanya. Komunitas dibuat dari penggemar, untuk penggemar.",
-    color: "from-rose-500/8 to-transparent",
-    link: "/about",
-  },
-];
-
-// ─── Types ──────────────────────────────────────────────────────────────────
-
+interface EventItem  {
+  id:string; slug:string; title:string; description:string|null;
+  coverurl:string|null; startdate:string; enddate:string|null;
+  isonline:boolean; tags:string[]; status:string;
+}
 interface Author { username:string|null; displayname:string|null; avatarurl:string|null; }
-interface EventItem  { id:string; slug:string; title:string; description:string|null; coverurl:string|null; startdate:string; status:string; }
-interface BlogItem   { id:string; slug:string; title:string; excerpt:string|null; coverurl:string|null; publishedat:string; viewcount?:number; likecount?:number; author:Author|null; }
-interface Partnership{ id:string; name:string; logourl:string|null; website:string|null; category:string|null; }
+interface BlogItem   {
+  id:string; slug:string; title:string; excerpt:string|null;
+  coverurl:string|null; publishedat:string;
+  viewcount:number; likecount:number; commentcount:number;
+  tags:string[]; author:Author|null;
+}
+interface Partnership{ id:string; name:string; logourl:string|null; website:string|null; category:string|null; description:string|null; }
 interface DmMember   { username:string; avatar:string|null; status:string; activity?:string; }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -172,625 +72,587 @@ interface DmMember   { username:string; avatar:string|null; status:string; activ
 function fmtDate(iso:string) {
   return new Date(iso).toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
 }
-function getStatusInfo(status:string,startdate:string) {
-  const now=Date.now(),start=new Date(startdate).getTime();
-  if(start>now) return {label:"Upcoming",cls:"text-primary/80 bg-primary/8 border-primary/20",dot:"bg-primary animate-pulse"};
-  if(status==="selesai") return {label:"Selesai",cls:"text-white/30 bg-white/6 border-white/10",dot:"bg-white/20"};
-  return {label:"Live",cls:"text-emerald-400 bg-emerald-500/10 border-emerald-500/20",dot:"bg-emerald-400 animate-pulse"};
+
+function getStatusBadge(status:string) {
+  switch(status) {
+    case "live":     return { label:"Live",     cls:"bg-red-500/15 border-red-500/30 text-red-400",         dot:"bg-red-400 animate-pulse" };
+    case "upcoming": return { label:"Upcoming", cls:"bg-primary/15 border-primary/30 text-primary",         dot:"bg-primary animate-pulse" };
+    default:         return { label:"Selesai",  cls:"bg-white/5 border-white/10 text-white/30",             dot:"bg-white/25" };
+  }
 }
+
 function useDiscord() {
-  const [d,setD]=useState<{presence:number|null;name:string;loading:boolean;members:DmMember[]}>({presence:null,name:"Soraku Community",loading:true,members:[]});
+  const [d,setD] = useState<{presence:number|null;memberCount:number|null;name:string;loading:boolean;members:DmMember[]}>(
+    {presence:null,memberCount:null,name:"Soraku Community",loading:true,members:[]}
+  );
   useEffect(()=>{
     fetch(`https://discord.com/api/guilds/${DISCORD_GUILD_ID}/widget.json`)
       .then(r=>r.ok?r.json():null)
       .then(j=>{
-        const members=(j?.members??[]).slice(0,6).map((m:any)=>({username:m.username,avatar:m.avatar_url??null,status:m.status??"online",activity:m.game?.name}));
-        setD({presence:j?.presence_count??null,name:j?.name??"Soraku Community",loading:false,members});
+        const members=(j?.members??[]).slice(0,8).map((m:any)=>({
+          username:m.username, avatar:m.avatar_url??null,
+          status:m.status??"online", activity:m.game?.name
+        }));
+        setD({
+          presence:j?.presence_count??null,
+          memberCount:null, // widget tidak expose total member
+          name:j?.name??"Soraku Community",
+          loading:false, members
+        });
       }).catch(()=>setD(p=>({...p,loading:false})));
   },[]);
   return d;
 }
 
-// ─── Content Card — image poster style ───────────────────────────────────────
+// ─── Marquee Categories (glowing, colorful) ──────────────────────────────────
 
-function ContentCard({href,cover,title,meta,badge}:{href:string;cover:string|null;title:string;meta:string;badge?:React.ReactNode}) {
+function CategoryMarquee() {
+  const doubled = [...CATEGORIES,...CATEGORIES,...CATEGORIES,...CATEGORIES];
   return (
-    <Link href={href} className="group block relative overflow-hidden rounded-2xl bg-muted/8 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/30">
-      <div className="relative aspect-[4/5] sm:aspect-[3/4] w-full overflow-hidden">
-        {cover
-          ? <Image src={cover} alt={title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" unoptimized/>
+    <div className="relative overflow-hidden py-5 border-y border-white/[0.04]">
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#1C1E22] to-transparent z-10"/>
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#1C1E22] to-transparent z-10"/>
+      <div className="flex gap-4 whitespace-nowrap" style={{animation:"marquee-cat 30s linear infinite"}}>
+        {doubled.map((c,i)=>(
+          <span key={i}
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold tracking-wide flex-shrink-0 transition-all"
+            style={{
+              color: c.color,
+              borderColor: c.color + "35",
+              background: c.color + "10",
+              textShadow: `0 0 12px ${c.glow}`,
+              boxShadow: `0 0 10px ${c.color}18`,
+            }}>
+            <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{background:c.color,boxShadow:`0 0 6px ${c.glow}`}}/>
+            {c.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Floating petals ────────────────────────────────────────────────────────
+
+function Petal({style}:{style:React.CSSProperties}) {
+  return (
+    <motion.span className="absolute pointer-events-none select-none text-[#E8C2A8]"
+      style={{opacity:0.15,...style}}
+      animate={{y:[0,-14,0],rotate:[0,10,-5,0],opacity:[0.12,0.22,0.12]}}
+      transition={{duration:6+Math.random()*4,repeat:Infinity,ease:"easeInOut",delay:Math.random()*4}}>
+      ✿
+    </motion.span>
+  );
+}
+
+// ─── Event Card ──────────────────────────────────────────────────────────────
+
+function EventCard({event}:{event:EventItem}) {
+  const st = getStatusBadge(event.status);
+  return (
+    <Link href={`/events/${event.slug}`}
+      className="group relative overflow-hidden rounded-[20px] bg-white/[0.025] border border-white/[0.06] transition-all duration-400 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-black/40 hover:border-white/[0.12]">
+      <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden">
+        {event.coverurl
+          ? <Image src={event.coverurl} alt={event.title} fill className="object-cover transition-transform duration-600 group-hover:scale-110" unoptimized/>
           : <div className="h-full w-full bg-gradient-to-br from-primary/15 via-accent/8 to-violet-500/10"/>
         }
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"/>
-        {badge && <div className="absolute top-3 right-3">{badge}</div>}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"/>
+        <span className={cn("absolute top-3 right-3 flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-black backdrop-blur-md",st.cls)}>
+          <span className={cn("h-1.5 w-1.5 rounded-full flex-shrink-0",st.dot)}/>{st.label}
+        </span>
       </div>
       <div className="absolute inset-x-0 bottom-0 p-4">
-        <p className="text-[10px] text-white/35 mb-1">{meta}</p>
-        <h3 className="line-clamp-2 text-sm font-black text-white/90 leading-snug group-hover:text-primary/90 transition-colors">{title}</h3>
+        <p className="text-[9px] font-bold text-white/35 mb-1 tracking-widest uppercase flex items-center gap-1">
+          <Clock className="h-2.5 w-2.5"/>{fmtDate(event.startdate)}
+        </p>
+        <h3 className="line-clamp-2 text-sm font-black text-white/90 leading-snug group-hover:text-primary transition-colors">{event.title}</h3>
+        {event.tags.length>0&&(
+          <span className="mt-1.5 inline-block rounded-full bg-white/8 px-2 py-0.5 text-[9px] text-white/40 capitalize">{event.tags[0]}</span>
+        )}
       </div>
     </Link>
   );
 }
 
-// ─── Section Header ───────────────────────────────────────────────────────────
+// ─── Blog Card ───────────────────────────────────────────────────────────────
 
-function SH({eyebrow,title,href,center}:{eyebrow:string;title:string;href?:string;center?:boolean}) {
+function BlogCard({blog}:{blog:BlogItem}) {
   return (
-    <div className={cn("mb-8 flex items-end justify-between",center && "justify-center text-center flex-col items-center")}>
-      <div className={center ? "text-center" : ""}>
-        <p className="text-[9px] font-black uppercase tracking-[0.25em] text-primary/40 mb-1.5">{eyebrow}</p>
-        <h2 className="text-2xl font-black tracking-tight sm:text-3xl">{title}</h2>
+    <Link href={`/blog/${blog.slug}`}
+      className="group relative overflow-hidden rounded-[20px] bg-white/[0.025] border border-white/[0.06] transition-all duration-400 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-black/40 hover:border-white/[0.12]">
+      <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden">
+        {blog.coverurl
+          ? <Image src={blog.coverurl} alt={blog.title} fill className="object-cover transition-transform duration-600 group-hover:scale-110" unoptimized/>
+          : <div className="h-full w-full bg-gradient-to-br from-primary/12 via-accent/6 to-primary/4"/>
+        }
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent"/>
+
+        {/* Author avatar */}
+        {blog.author?.avatarurl&&(
+          <div className="absolute top-3 left-3">
+            <div className="h-7 w-7 overflow-hidden rounded-full border border-white/20">
+              <Image src={blog.author.avatarurl} alt={blog.author.displayname??""} width={28} height={28} className="object-cover"/>
+            </div>
+          </div>
+        )}
       </div>
-      {href && !center && (
-        <Link href={href} className="group flex items-center gap-1 text-xs font-semibold text-muted-foreground/35 hover:text-primary transition-colors">
-          Semua <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform"/>
+      <div className="absolute inset-x-0 bottom-0 p-4">
+        {blog.author&&(
+          <p className="text-[9px] text-white/40 mb-1 font-medium">
+            {blog.author.displayname??blog.author.username??""} · {fmtDate(blog.publishedat)}
+          </p>
+        )}
+        <h3 className="line-clamp-2 text-sm font-black text-white/90 leading-snug group-hover:text-primary transition-colors mb-2">{blog.title}</h3>
+        {/* Stats */}
+        <div className="flex items-center gap-3 text-[9px] text-white/30">
+          <span className="flex items-center gap-1"><Eye className="h-2.5 w-2.5"/>{blog.viewcount}</span>
+          <span className="flex items-center gap-1"><Heart className="h-2.5 w-2.5"/>{blog.likecount}</span>
+          <span className="flex items-center gap-1"><MessageCircle className="h-2.5 w-2.5"/>{blog.commentcount}</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ─── Discord Glass Card ───────────────────────────────────────────────────────
+
+function DiscordLiveCard({discord}:{discord:ReturnType<typeof useDiscord>}) {
+  const SC:{[k:string]:string}={online:"bg-emerald-400",idle:"bg-amber-400",dnd:"bg-red-500",offline:"bg-white/25"};
+
+  return (
+    <div className="relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl shadow-2xl shadow-black/40">
+      {/* Glass shimmer */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] via-transparent to-transparent pointer-events-none"/>
+
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-white/[0.06]">
+        <div className="flex items-center gap-3">
+          <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-white/15">
+            <Image src="/logo.png" alt="Soraku" fill className="object-cover"/>
+          </div>
+          <div>
+            <p className="text-sm font-black text-white/90">{discord.name}</p>
+            <p className="text-[10px] text-white/35">Server Discord Resmi</p>
+          </div>
+        </div>
+        <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
+          className="flex items-center gap-2 rounded-xl bg-indigo-500 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-400 transition-colors">
+          <DiscordIcon className="h-3.5 w-3.5"/> Gabung
+        </a>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-2 gap-3 px-5 py-4 border-b border-white/[0.06]">
+        <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"/>
+            <span className="text-lg font-black text-white tabular-nums">
+              {discord.loading?"—":discord.presence?.toLocaleString("id-ID")??"—"}
+            </span>
+          </div>
+          <span className="text-[10px] text-white/35">Online</span>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5">
+            <Users className="h-4 w-4 text-white/30 flex-shrink-0"/>
+            <span className="text-lg font-black text-white">500+</span>
+          </div>
+          <span className="text-[10px] text-white/35">Member</span>
+        </div>
+      </div>
+
+      {/* Active members */}
+      <div className="px-5 py-4">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/25 mb-3">Member Online</p>
+        {discord.loading ? (
+          <div className="space-y-2.5">
+            {[1,2,3,4].map(i=>(
+              <div key={i} className="flex items-center gap-2.5 animate-pulse">
+                <div className="h-8 w-8 rounded-full bg-white/8 flex-shrink-0"/>
+                <div className="flex-1 space-y-1">
+                  <div className="h-2.5 w-24 rounded bg-white/8"/>
+                  <div className="h-2 w-16 rounded bg-white/5"/>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : discord.members.length===0 ? (
+          <div className="py-6 text-center text-[11px] text-white/20">Widget tidak tersedia</div>
+        ) : (
+          <div className="space-y-2.5 max-h-[260px] overflow-y-auto pr-1 scrollbar-hide">
+            {discord.members.map((m,i)=>(
+              <div key={i} className="flex items-center gap-2.5">
+                <div className="relative flex-shrink-0">
+                  {m.avatar
+                    ? <div className="h-8 w-8 overflow-hidden rounded-full border border-white/10"><Image src={m.avatar} alt="" width={32} height={32} className="object-cover"/></div>
+                    : <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/30 text-xs font-black text-white/60">{m.username.charAt(0).toUpperCase()}</div>
+                  }
+                  <span className={cn("absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#1C1E22]",SC[m.status]??SC.online)}/>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-white/70 truncate">{m.username}</p>
+                  {m.activity&&<p className="text-[9px] text-white/28 truncate">{m.activity}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Footer link */}
+      <div className="px-5 pb-4">
+        <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full rounded-xl border border-indigo-500/25 bg-indigo-500/8 py-2.5 text-xs font-semibold text-indigo-300/70 hover:bg-indigo-500/15 hover:text-indigo-300 transition-colors">
+          Buka Server Discord <ArrowRight className="h-3 w-3"/>
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ─── Section header ───────────────────────────────────────────────────────────
+
+function SH({eyebrow,title,href}:{eyebrow:string;title:string;href?:string}) {
+  return (
+    <div className="mb-8 flex items-end justify-between">
+      <div>
+        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/50 mb-1.5">{eyebrow}</p>
+        <h2 className="text-2xl font-black tracking-tight sm:text-3xl text-white/90">{title}</h2>
+      </div>
+      {href&&(
+        <Link href={href} className="group flex items-center gap-1.5 text-xs font-bold text-white/22 hover:text-primary transition-colors">
+          Lihat Semua <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform"/>
         </Link>
       )}
     </div>
   );
 }
 
-// ─── Discord Embed ────────────────────────────────────────────────────────────
-
-function DiscordEmbed({discord}:{discord:ReturnType<typeof useDiscord>}) {
-  const [active,setActive]=useState("2");
-  const SC={online:"bg-emerald-500",idle:"bg-amber-400",dnd:"bg-red-500",offline:"bg-muted-foreground/30"};
-  return (
-    <div className="overflow-hidden rounded-2xl border border-white/6 bg-[#1e1f22]/90 shadow-2xl shadow-black/40 backdrop-blur-sm">
-      <div className="flex items-center justify-between gap-3 px-4 py-3 bg-[#1e1f22]">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border border-indigo-500/30">
-            <Image src="/logo.png" alt="S" fill className="object-cover"/>
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-black text-white/90 truncate">{discord.name}</p>
-            <div className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"/>
-              <span className="text-[10px] text-white/35 truncate">
-                {discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"—"} online`}
-              </span>
-            </div>
-          </div>
-        </div>
-        <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
-          className="flex-shrink-0 flex items-center gap-1.5 rounded-xl bg-indigo-500 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-indigo-400 transition-colors">
-          <DiscordIcon className="h-3 w-3"/> Gabung
-        </a>
-      </div>
-      <div className="flex h-[300px] sm:h-[340px]">
-        <div className="w-[150px] flex-shrink-0 bg-[#2b2d31]/90 flex flex-col overflow-y-auto py-2 gap-0.5">
-          <p className="px-3 pb-1 pt-0.5 text-[9px] font-black uppercase tracking-wider text-white/20">Channels</p>
-          {DISCORD_CHANNELS.map(ch=>(
-            <button key={ch.id} onClick={()=>setActive(ch.id)}
-              className={cn("flex items-center gap-1.5 mx-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-colors text-left",
-                active===ch.id?"bg-white/10 text-white/90":"text-white/30 hover:text-white/60 hover:bg-white/5")}>
-              {ch.type==="voice"?<Volume2 className="h-3 w-3 flex-shrink-0"/>:<Hash className="h-3 w-3 flex-shrink-0"/>}
-              <span className="truncate">{ch.name}</span>
-              {ch.active&&<span className="ml-auto h-1.5 w-1.5 rounded-full bg-emerald-400 flex-shrink-0"/>}
-            </button>
-          ))}
-          <p className="px-3 pb-1 pt-3 text-[9px] font-black uppercase tracking-wider text-white/20">Online</p>
-          {discord.loading?[1,2,3].map(i=>(<div key={i} className="flex items-center gap-2 px-2 py-1.5 mx-1 animate-pulse"><div className="h-5 w-5 rounded-full bg-white/10 flex-shrink-0"/><div className="h-2 w-14 rounded bg-white/10"/></div>))
-          :discord.members.length>0?discord.members.map((m,i)=>(
-            <div key={i} className="flex items-center gap-2 px-2 py-1.5 mx-1 rounded-lg hover:bg-white/5 transition-colors">
-              <div className="relative flex-shrink-0">
-                {m.avatar?<div className="h-5 w-5 overflow-hidden rounded-full"><Image src={m.avatar} alt="" width={20} height={20} className="object-cover"/></div>
-                :<div className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/40 text-[8px] font-black text-white/70">{m.username.charAt(0).toUpperCase()}</div>}
-                <span className={cn("absolute -bottom-px -right-px h-2 w-2 rounded-full border-[1.5px] border-[#2b2d31]",(SC as any)[m.status]??SC.online)}/>
-              </div>
-              <span className="text-[10px] text-white/50 truncate">{m.username}</span>
-            </div>
-          )):<p className="px-3 text-[10px] text-white/20">Widget offline</p>}
-        </div>
-        <div className="flex-1 flex flex-col bg-[#313338]/60 min-w-0">
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-white/5">
-            <Hash className="h-3.5 w-3.5 text-white/25 flex-shrink-0"/>
-            <span className="text-xs font-bold text-white/60 truncate">{DISCORD_CHANNELS.find(c=>c.id===active)?.name??"umum"}</span>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {FAKE_MSGS.map((m,i)=>(
-              <div key={i} className="flex items-start gap-2.5">
-                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-500/25 text-[9px] font-black text-white/60 mt-0.5">
-                  {m.user.charAt(0)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline gap-2 mb-0.5">
-                    <span className={cn("text-[11px] font-bold",m.color)}>{m.user}</span>
-                    <span className="text-[9px] text-white/20">{m.time}</span>
-                  </div>
-                  <p className="text-[11px] text-white/55 leading-relaxed">{m.msg}</p>
-                </div>
-              </div>
-            ))}
-            <div className="flex items-center gap-2 pt-0.5">
-              {[0,150,300].map(d=><span key={d} className="h-1.5 w-1.5 rounded-full bg-white/20 animate-bounce" style={{animationDelay:`${d}ms`}}/>)}
-              <span className="text-[9px] text-white/20">beberapa orang mengetik...</span>
-            </div>
-          </div>
-          <div className="px-3 pb-3">
-            <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 w-full rounded-xl bg-[#1e1f22] px-3 py-2 text-[11px] text-white/20 hover:text-white/40 transition-colors group">
-              <MessageSquare className="h-3.5 w-3.5 flex-shrink-0"/>
-              <span className="flex-1">Bergabung untuk kirim pesan...</span>
-              <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity"/>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/5 bg-[#1e1f22]/80">
-        <div className="flex items-center gap-4 text-[10px] text-white/25">
-          <span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400"/>{discord.loading?"...":discord.presence?`${discord.presence.toLocaleString("id-ID")} online`:"—"}</span>
-          <span className="flex items-center gap-1.5"><Circle className="h-2 w-2"/>500+ member</span>
-        </div>
-        <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
-          className="text-[10px] text-indigo-400/60 hover:text-indigo-300 transition-colors font-semibold">Buka Discord →</a>
-      </div>
-    </div>
-  );
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+const PETALS_POS:React.CSSProperties[] = [
+  {top:"18%",left:"7%",fontSize:"20px"},{top:"30%",right:"8%",fontSize:"15px"},
+  {bottom:"30%",left:"5%",fontSize:"13px"},{bottom:"20%",right:"9%",fontSize:"17px"},
+  {top:"12%",right:"22%",fontSize:"11px"},
+];
+
 export default function HomePage() {
-  const discord=useDiscord();
-  const [data,setData]=useState<{events:EventItem[];blogs:BlogItem[];partnerships:Partnership[]}>({events:[],blogs:[],partnerships:[]});
-  const [loading,setLoading]=useState(true);
-  const [user,setUser]=useState<{id:string}|null|"loading">("loading");
+  const discord = useDiscord();
+  const [data,setData] = useState<{events:EventItem[];blogs:BlogItem[];partnerships:Partnership[]}>({events:[],blogs:[],partnerships:[]});
+  const [loading,setLoading] = useState(true);
+  const [user,setUser] = useState<{id:string}|null|"loading">("loading");
+  const [mousePos,setMousePos] = useState({x:0,y:0});
+  const communityRef = useRef<HTMLElement>(null);
 
   useEffect(()=>{
     fetch("/api/home").then(r=>r.ok?r.json():null).then(d=>{if(d?.data)setData(d.data);}).catch(()=>{}).finally(()=>setLoading(false));
     fetch("/api/auth/me",{cache:"no-store"}).then(r=>r.json()).then(d=>setUser(d.data??null)).catch(()=>setUser(null));
   },[]);
 
-  const isLoggedIn=user!=="loading"&&user!==null;
+  const isLoggedIn = user!=="loading"&&user!==null;
 
   return (
-    <>
-      {/* ══ HERO ══════════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden">
+    <main className="min-h-screen bg-[#1C1E22] text-foreground overflow-x-hidden">
 
-        {/* Mobile */}
-        <div className="lg:hidden px-5 pt-16 pb-14 min-h-[85svh] flex flex-col justify-center">
-          <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[140px]"/>
-            <div className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-accent/6 blur-[100px]"/>
-          </div>
-          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/12 bg-primary/5 px-4 py-1.5 w-fit reveal-up">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"/>
-            </span>
-            <span className="text-[10px] font-black tracking-[0.15em] text-primary/60 uppercase">
-              {discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+ online`}
-            </span>
-          </div>
-          <div className="reveal-up">
-            <h1 className="text-[clamp(3.5rem,18vw,6rem)] font-black leading-[0.88] tracking-tighter">Soraku</h1>
-            <p className="text-[clamp(0.9rem,4vw,1.2rem)] font-light text-muted-foreground/45 tracking-wide mt-1.5">Community · 空 · Est. 2023</p>
-          </div>
-          <div className="h-px w-16 bg-gradient-to-r from-primary/40 to-transparent my-6 reveal-up reveal-delay-1"/>
-          <div className="reveal-up reveal-delay-2 space-y-2 max-w-xs">
-            <p className="text-sm leading-relaxed text-muted-foreground/75">
-              <span className="font-bold text-foreground/90">Soraku</span> — komunitas non-profit untuk semua pecinta anime, manga, dan budaya Jepang di Indonesia.
-            </p>
-            <p className="text-xs text-muted-foreground/45">Gratis. Terbuka. Hangat. <span className="text-primary/65 font-semibold">Ini rumah digitalmu.</span></p>
-          </div>
-          <div className="mt-8 flex items-center gap-3 reveal-up reveal-delay-3">
-            <Link href="/register" className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 hover:-translate-y-0.5 transition-all">
-              Bergabung <ArrowRight className="h-3.5 w-3.5"/>
-            </Link>
-            <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-2xl border border-indigo-500/25 bg-indigo-500/8 px-5 py-3 text-sm font-semibold text-indigo-300/80 hover:-translate-y-0.5 transition-all">
-              <DiscordIcon className="h-4 w-4"/> Discord
-            </a>
-          </div>
-          <div className="mt-10 flex items-center gap-6 reveal-up reveal-delay-4">
-            {[
-              {val:discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+`,label:"online",live:true},
-              {val:"20+",label:"event"},{val:"100+",label:"konten"},
-            ].map((s,i)=>(
-              <div key={i} className="flex items-center gap-1.5">
-                {s.live&&<span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"/><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400"/></span>}
-                <span className="text-xs font-black text-foreground">{s.val}</span>
-                <span className="text-[10px] text-muted-foreground/35">{s.label}</span>
-              </div>
-            ))}
-          </div>
+      {/* ══════════════════════════════════════════════
+          HERO — centered, no mascot, no "Sora/ku" etymology
+          ══════════════════════════════════════════════ */}
+      <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden pt-20 pb-12">
+        {/* Ambient glows */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-0 left-0 w-[500px] h-[420px] rounded-full blur-[140px] bg-[#4FA3D1]/10"/>
+          <div className="absolute bottom-0 right-0 w-[440px] h-[380px] rounded-full blur-[130px] bg-[#E8C2A8]/7"/>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[340px] rounded-full blur-[180px] bg-[#4FA3D1]/4"/>
         </div>
+        {PETALS_POS.map((s,i)=><Petal key={i} style={s}/>)}
 
-        {/* Desktop */}
-        <div className="hidden lg:flex items-center min-h-[96vh] px-6 py-16">
-          <div className="mx-auto w-full max-w-7xl">
-            <div className="grid gap-20 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_440px] items-center">
-              <div className="max-w-2xl">
-                <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-primary/12 bg-primary/5 px-4 py-1.5">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"/>
-                  </span>
-                  <span className="text-[10px] font-black tracking-[0.18em] text-primary/60 uppercase">
-                    {discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+ online`} · Soraku Community
-                  </span>
-                </div>
-                <div className="space-y-1 reveal-up">
-                  <h1 className="text-[clamp(4rem,10vw,8rem)] font-black leading-[0.88] tracking-tighter">Soraku</h1>
-                  <p className="text-[clamp(1rem,2.2vw,1.6rem)] font-light text-muted-foreground/45 tracking-wide pl-0.5">Community · 空 · Est. 2023</p>
-                </div>
-                <div className="my-8 h-px w-20 bg-gradient-to-r from-primary/35 to-transparent"/>
-                <div className="space-y-3 max-w-lg reveal-up reveal-delay-1">
-                  <p className="text-base leading-relaxed text-muted-foreground/80">
-                    <span className="font-bold text-foreground">Soraku</span> — dari <em className="not-italic font-medium text-foreground/70">"Sora"</em> (langit) dan <em className="not-italic font-medium text-foreground/70">"ku"</em> (milikku).
-                  </p>
-                  <p className="text-sm leading-loose text-muted-foreground/55">
-                    Ruang komunitas non-profit untuk semua pecinta anime, manga, dan budaya Jepang di Indonesia.
-                  </p>
-                  <p className="text-sm text-muted-foreground/40">Gratis. Terbuka. Hangat. <span className="text-primary/65 font-semibold">Ini rumah digitalmu.</span></p>
-                </div>
-                <div className="mt-10 flex flex-wrap items-center gap-3 reveal-up reveal-delay-2">
-                  <Link href="/register"
-                    className="group relative overflow-hidden rounded-2xl bg-primary px-8 py-3.5 text-sm font-bold text-white shadow-xl shadow-primary/20 transition-all hover:-translate-y-0.5">
-                    <span className="relative z-10 flex items-center gap-2">Bergabung Gratis <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"/></span>
-                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-white/0 via-white/10 to-white/0 transition-transform duration-500 group-hover:translate-x-full"/>
-                  </Link>
-                  <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-2xl border border-indigo-500/20 bg-indigo-500/7 px-8 py-3.5 text-sm font-semibold text-indigo-300/80 transition-all hover:-translate-y-0.5 hover:border-indigo-400/35">
-                    <DiscordIcon className="h-4 w-4"/> Gabung Discord
-                  </a>
-                </div>
-                <div className="mt-12 flex flex-wrap items-center gap-7 reveal-up reveal-delay-3">
-                  {[
-                    {val:discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"500"}+`,label:"online",live:true},
-                    {val:"20+",label:"event"},{val:"100+",label:"konten"},
-                  ].map((s,i)=>(
-                    <div key={i} className="flex items-center gap-2">
-                      {s.live&&<span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"/><span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"/></span>}
-                      <span className="text-sm font-black text-foreground">{s.val}</span>
-                      <span className="text-xs text-muted-foreground/35">{s.label}</span>
-                      {i<2&&<span className="ml-3 h-3 w-px bg-border/25"/>}
-                    </div>
-                  ))}
-                </div>
-              </div>
+        <div className="container mx-auto px-6 relative z-10 text-center max-w-[820px]">
+          {/* Script eyebrow */}
+          <motion.span initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{duration:0.7}}
+            className="block mb-4 text-2xl sm:text-3xl tracking-wide text-[#E8C2A8]/75"
+            style={{fontFamily:"var(--font-script,'Style Script',cursive)"}}>
+            Belajar, Berkarya, Bersama
+          </motion.span>
 
-              {/* Mascot */}
-              <div className="flex justify-end">
-                <div className="relative w-[360px] xl:w-[420px]">
-                  <div className="absolute inset-0 -m-14 rounded-full bg-primary/8 blur-3xl pointer-events-none"/>
-                  <div className="relative h-[560px] xl:h-[620px] w-full">
-                    <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background via-background/45 to-transparent z-10 pointer-events-none"/>
-                    <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-background via-background/65 to-transparent z-10 pointer-events-none"/>
-                    <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background/70 to-transparent z-10 pointer-events-none"/>
-                    <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background/70 to-transparent z-10 pointer-events-none"/>
-                    <Image src="/logo-full.png" alt="Soraku mascot" fill className="object-cover object-center" priority/>
-                    <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-6 flex items-end justify-between">
-                      <div><p className="text-base font-black text-white/80 drop-shadow-lg">Soraku</p><p className="text-[10px] text-white/30">Community · 空</p></div>
-                      <span className="flex items-center gap-1 text-[9px] font-black text-emerald-400"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"/> Live</span>
-                    </div>
-                  </div>
-                  {[
-                    {text:"🌸 Komunitas",   r:"-2.5rem",t:"4rem",   d:"0s"   },
-                    {text:"🎌 Anime & Manga",l:"-3.5rem",t:"8.5rem", d:"1s"   },
-                    {text:"✨ Non-profit",   r:"-2rem",  b:"9rem",   d:"2s"   },
-                    {text:"🇮🇩 Indonesia",  l:"-2.5rem", b:"5.5rem", d:"0.5s" },
-                  ].map((b,i)=>(
-                    <div key={i} className="absolute z-20 float-badge" style={{...(b.r?{right:b.r}:{left:b.l}),...(b.t?{top:b.t}:{bottom:b.b}),animationDelay:b.d}}>
-                      <span className="rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-semibold text-white/55 backdrop-blur-md">{b.text}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Live badge */}
+          <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:0.6,delay:0.05}}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] mb-6">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse"/>
+            <span className="text-[10px] font-bold tracking-[0.2em] text-white/38 uppercase">
+              {discord.loading?"—":discord.presence?.toLocaleString("id-ID")??"—"} ONLINE SEKARANG
+            </span>
+          </motion.div>
+
+          {/* Main heading */}
+          <motion.h1 initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.7,delay:0.1}}
+            className="font-black tracking-tighter leading-[1.0] text-foreground text-[clamp(44px,8.5vw,88px)] mb-0">
+            Temukan Duniamu<br/>
+            di{" "}
+            <span className="bg-clip-text text-transparent"
+              style={{backgroundImage:"linear-gradient(130deg,#4FA3D1 0%,#90c8e8 38%,#E8C2A8 72%,#d4a882 100%)",WebkitBackgroundClip:"text"}}>
+              Soraku
+            </span>
+          </motion.h1>
+
+          {/* Divider */}
+          <motion.div initial={{opacity:0,scaleX:0}} animate={{opacity:0.45,scaleX:1}} transition={{duration:0.6,delay:0.2}}
+            className="mx-auto my-5 h-[2px] w-12 rounded-full origin-center"
+            style={{background:"linear-gradient(90deg,#4FA3D1,#E8C2A8)"}}/>
+
+          {/* Description */}
+          <motion.p initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{duration:0.7,delay:0.25}}
+            className="max-w-[540px] mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed mb-7">
+            Wujudkan imajinasi, asah kreativitas, dan jalin koneksi bermakna.
+            Di sini, setiap langkahmu adalah bagian dari cerita besar kita bersama.
+          </motion.p>
+
+          {/* Category tags */}
+          <motion.div initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} transition={{duration:0.6,delay:0.32}}
+            className="flex flex-wrap items-center justify-center gap-2 mb-9">
+            {CATEGORIES.slice(0,6).map((c,i)=>(
+              <motion.span key={c.label} initial={{opacity:0,scale:0.85}} animate={{opacity:1,scale:1}} transition={{duration:0.35,delay:0.37+i*0.05}}
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide bg-white/[0.04] border transition-all hover:bg-white/[0.08] cursor-default"
+                style={{color:c.color,borderColor:c.color+"30"}}>
+                {c.label}
+              </motion.span>
+            ))}
+          </motion.div>
+
+          {/* CTA Buttons */}
+          <motion.div initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} transition={{duration:0.6,delay:0.45}}
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-14">
+            {!isLoggedIn&&(
+              <Link href="/register"
+                className="group flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm tracking-wide text-white transition-all hover:scale-[1.03] hover:shadow-[0_0_32px_rgba(79,163,209,0.32)]"
+                style={{background:"linear-gradient(135deg,#4FA3D1 0%,#3a8fbe 100%)"}}>
+                <Sparkles className="h-4 w-4 opacity-90"/>
+                Bergabung Gratis
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1"/>
+              </Link>
+            )}
+            <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm tracking-wide text-foreground/75 bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.09] hover:border-white/[0.18] hover:text-foreground transition-all">
+              <DiscordIcon className="h-4 w-4 text-indigo-400"/> Gabung Discord
+            </a>
+          </motion.div>
+
+          {/* Scroll hint */}
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{duration:1,delay:1}}
+            className="flex flex-col items-center gap-2">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/35">Gulir untuk menjelajahi</span>
+            <motion.div animate={{y:[0,6,0]}} transition={{duration:2,repeat:Infinity,ease:"easeInOut"}}
+              className="w-px h-8 bg-gradient-to-b from-muted-foreground/20 to-transparent"/>
+          </motion.div>
         </div>
       </section>
 
-      {/* ══ MARQUEE ══════════════════════════════════════════════════════════ */}
-      <div className="overflow-hidden border-y border-border/12 py-3">
-        <div className="marquee-track flex gap-12 whitespace-nowrap text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/15">
-          {[...Array(4)].map((_,i)=>["🎌 Anime","📚 Manga","🎵 J-Music","🎭 VTuber","🎨 Fanart","👘 Cosplay","🎮 Gaming","🌸 Culture","🌙 Soraku"].map(item=><span key={`${i}-${item}`}>{item}</span>))}
+      {/* ══ CATEGORY MARQUEE ══ */}
+      <CategoryMarquee/>
+
+      {/* ══════════════════════════════════════════════
+          COMMUNITY SECTION — framer animated
+          ══════════════════════════════════════════════ */}
+      <section ref={communityRef}
+        onMouseMove={e=>{if(!communityRef.current)return;const r=communityRef.current.getBoundingClientRect();setMousePos({x:e.clientX-r.left,y:e.clientY-r.top});}}
+        className="relative py-44 sm:py-56 overflow-hidden">
+        <motion.div className="absolute pointer-events-none rounded-full blur-[140px] bg-primary/5 w-[600px] h-[600px] -z-0"
+          animate={{x:mousePos.x-300,y:mousePos.y-300}} transition={{type:"spring",damping:40,stiffness:150}}/>
+        <div className="pointer-events-none absolute inset-0">
+          <motion.div animate={{scale:[1,1.15,1],opacity:[0.04,0.09,0.04],x:[0,50,0],y:[0,-30,0]}}
+            transition={{duration:20,repeat:Infinity,ease:"easeInOut"}}
+            className="absolute top-1/4 -left-20 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[120px]"/>
+          <motion.div animate={{scale:[1.1,1,1.1],opacity:[0.03,0.06,0.03],x:[0,-40,0],y:[0,40,0]}}
+            transition={{duration:25,repeat:Infinity,ease:"easeInOut",delay:2}}
+            className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[140px]"/>
+        </div>
+
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <motion.div initial={{opacity:0,y:40}} whileInView={{opacity:1,y:0}}
+            viewport={{once:false,amount:0.3}} transition={{duration:1.2,ease:[0.22,1,0.36,1]}}>
+            <motion.p initial={{opacity:0,y:10}} whileInView={{opacity:1,y:0}} transition={{duration:1,delay:0.2}}
+              className="font-script text-4xl sm:text-6xl text-white/18 mb-6 tracking-wide"
+              style={{fontFamily:"var(--font-script,'Style Script',cursive)"}}>
+              Belajar dan Berkembang
+            </motion.p>
+            <h2 className="text-[clamp(3.5rem,10vw,7.5rem)] font-black leading-[0.9] tracking-tighter text-white mb-12">
+              <motion.span initial={{opacity:0,x:-20}} whileInView={{opacity:1,x:0}} transition={{duration:0.8,delay:0.4}} className="inline-block">Temukan</motion.span>{" "}
+              <motion.span initial={{opacity:0,x:20}} whileInView={{opacity:1,x:0}} transition={{duration:0.8,delay:0.6}} className="inline-block">Duniamu</motion.span>{" "}
+              <motion.span initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} transition={{duration:0.8,delay:0.8}} className="inline-block">
+                di{" "}
+                <span className="text-gradient relative">
+                  Soraku
+                  <motion.span className="absolute -inset-2 bg-primary/10 blur-2xl rounded-full -z-10"
+                    animate={{opacity:[0.3,0.7,0.3]}} transition={{duration:3.5,repeat:Infinity}}/>
+                </span>
+              </motion.span>
+            </h2>
+            <motion.p initial={{opacity:0}} whileInView={{opacity:1}} transition={{duration:1,delay:1}}
+              className="max-w-2xl mx-auto text-lg sm:text-xl leading-relaxed text-white/22 font-medium">
+              Dari penggemar, untuk penggemar di seluruh Indonesia.{" "}
+              Tempat kamu ketemu orang-orang yang{" "}
+              <em className="not-italic text-white/45 font-semibold">ngerti duniamu</em>.
+            </motion.p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          PLATFORM — Floating cards with anime character overlay
+          ══════════════════════════════════════════════ */}
+      <section className="py-20 sm:py-24 container mx-auto px-6">
+        <SH eyebrow="Jelajahi" title="Platform Soraku"/>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { href:"/events", label:"Events", desc:"Turnamen & gathering komunitas", icon:Calendar, color:"#4FA3D1", glow:"rgba(79,163,209,0.25)", char:"/logo-full.png" },
+            { href:"/blog",   label:"Blog",   desc:"Artikel & ulasan dari kreator", icon:BookOpen, color:"#a78bfa", glow:"rgba(167,139,250,0.25)", char:"/logo-full.png" },
+            { href:"/gallery",label:"Galeri", desc:"Fanart & karya anggota",         icon:Zap,      color:"#f472b6", glow:"rgba(244,114,182,0.25)", char:"/logo-full.png" },
+            { href:"/vtubers",label:"VTuber", desc:"Virtual YouTuber komunitas",      icon:Users,    color:"#34d399", glow:"rgba(52,211,153,0.25)",  char:"/logo-full.png" },
+          ].map((p,i)=>(
+            <motion.div key={p.href} initial={{opacity:0,y:30}} whileInView={{opacity:1,y:0}}
+              viewport={{once:true}} transition={{duration:0.6,delay:i*0.1}}>
+              <Link href={p.href}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.06] bg-white/[0.02] flex flex-col min-h-[220px] sm:min-h-[260px] transition-all duration-400 hover:-translate-y-2 hover:shadow-2xl hover:border-white/[0.12]"
+                style={{boxShadow:`0 0 0 0 ${p.glow}`}}>
+                {/* Glow on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{background:`radial-gradient(circle at 50% 100%,${p.glow},transparent 70%)`}}/>
+                {/* Anime character — overlay bottom right */}
+                <div className="absolute bottom-0 right-0 h-[70%] w-[50%] opacity-10 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none">
+                  <Image src={p.char} alt="" fill className="object-contain object-right-bottom"/>
+                </div>
+                {/* Content */}
+                <div className="relative z-10 p-5 flex flex-col flex-1">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl mb-auto"
+                    style={{background:p.color+"20",border:`1px solid ${p.color}35`}}>
+                    <p.icon className="h-5 w-5" style={{color:p.color}}/>
+                  </div>
+                  <div className="mt-8">
+                    <h3 className="text-base font-black text-white/90 mb-1 group-hover:text-white transition-colors" style={{color:p.color}}>{p.label}</h3>
+                    <p className="text-[11px] text-white/35 leading-relaxed">{p.desc}</p>
+                  </div>
+                  <div className="mt-3 flex items-center gap-1 text-[10px] font-bold opacity-0 group-hover:opacity-60 transition-opacity" style={{color:p.color}}>
+                    Jelajahi <ArrowRight className="h-3 w-3"/>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══ EVENTS ══ */}
+      <section className="py-12 sm:py-16 container mx-auto px-6">
+        <SH eyebrow="Upcoming" title="Event Komunitas" href="/events"/>
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {[1,2,3,4,5,6].map(i=><div key={i} className="animate-pulse rounded-[20px] bg-white/[0.025] aspect-[4/5]"/>)}
+          </div>
+        ) : data.events.length===0 ? (
+          <div className="py-16 text-center"><Calendar className="mx-auto h-8 w-8 text-white/10 mb-3"/><p className="text-sm text-white/25">Belum ada event</p></div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {data.events.map(e=><EventCard key={e.id} event={e}/>)}
+          </div>
+        )}
+      </section>
+
+      {/* ══ BLOG ══ */}
+      <section className="py-12 sm:py-16 container mx-auto px-6">
+        <SH eyebrow="Komunitas" title="Artikel & Kreasi" href="/blog"/>
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {[1,2,3,4,5,6].map(i=><div key={i} className="animate-pulse rounded-[20px] bg-white/[0.025] aspect-[4/5]"/>)}
+          </div>
+        ) : data.blogs.length===0 ? (
+          <div className="py-16 text-center"><BookOpen className="mx-auto h-8 w-8 text-white/10 mb-3"/><p className="text-sm text-white/25">Belum ada artikel</p></div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {data.blogs.map(b=><BlogCard key={b.id} blog={b}/>)}
+          </div>
+        )}
+      </section>
+
+      {/* ══ DISCORD REALTIME ══ */}
+      <section className="py-12 sm:py-16 container mx-auto px-6">
+        <div className="max-w-sm mx-auto sm:max-w-md">
+          <SH eyebrow="Real-time" title="Discord Server"/>
+          <DiscordLiveCard discord={discord}/>
+        </div>
+      </section>
+
+      {/* ══ SPONSORSHIP & PARTNERSHIP ══ */}
+      {data.partnerships.length>0&&(
+        <section className="py-12 sm:py-16 container mx-auto px-6">
+          <div className="text-center mb-12">
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/45 mb-2">Dukungan</p>
+            <h2 className="text-2xl font-black tracking-tight sm:text-3xl text-white/90">Sponsor &amp; Partner</h2>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+            {data.partnerships.map(p=>(
+              <a key={p.id} href={p.website??"#"} target="_blank" rel="noopener noreferrer"
+                className="group flex flex-col items-center gap-2 transition-all hover:-translate-y-0.5">
+                <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center overflow-hidden rounded-2xl bg-white/[0.04] border border-white/[0.06] group-hover:border-white/[0.14] transition-colors p-2">
+                  {p.logourl
+                    ? <Image src={p.logourl} alt={p.name} width={56} height={56} className="object-contain opacity-45 group-hover:opacity-90 transition-opacity duration-400"/>
+                    : <Handshake className="h-5 w-5 text-white/20"/>
+                  }
+                </div>
+                <p className="text-[9px] font-bold text-white/22 group-hover:text-white/50 transition-colors uppercase tracking-wide">{p.name}</p>
+                {p.category&&<p className="text-[8px] text-white/15 uppercase tracking-wide">{p.category}</p>}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ══ SOSIAL MEDIA — marquee, no heading ══ */}
+      <div className="relative overflow-hidden py-3 border-t border-white/[0.04]">
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#1C1E22] to-transparent z-10"/>
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#1C1E22] to-transparent z-10"/>
+        <div className="marquee-track mb-2 flex gap-4 whitespace-nowrap">
+          {[...Array(4)].map((_,i)=>SOCIAL_LINKS.map(({slug,name,href,Icon,color})=>(
+            <a key={`r1-${i}-${slug}`} href={href} target="_blank" rel="noopener noreferrer"
+              className={cn("group inline-flex items-center gap-2 rounded-full px-4 py-2 hover:bg-white/5 transition-all",color)}>
+              <Icon className="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity"/>
+              <span className="text-sm font-semibold opacity-25 group-hover:opacity-70 transition-opacity">{name}</span>
+            </a>
+          )))}
+        </div>
+        <div className="marquee-track-reverse flex gap-4 whitespace-nowrap">
+          {[...Array(4)].map((_,i)=>[...SOCIAL_LINKS].reverse().map(({slug,name,href,Icon,color})=>(
+            <a key={`r2-${i}-${slug}`} href={href} target="_blank" rel="noopener noreferrer"
+              className={cn("group inline-flex items-center gap-2 rounded-full px-4 py-2 hover:bg-white/5 transition-all",color)}>
+              <Icon className="h-4 w-4 opacity-40 group-hover:opacity-90 transition-opacity"/>
+              <span className="text-sm font-semibold opacity-20 group-hover:opacity-60 transition-opacity">{name}</span>
+            </a>
+          )))}
         </div>
       </div>
 
-      {/* ══ COMMUNITY STATEMENT ═══════════════════════════════════════════════ */}
-      <section className="relative px-4 py-20 sm:py-28 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/3 to-transparent"/>
-          <div className="absolute left-1/4 top-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-primary/5 blur-3xl"/>
-          <div className="absolute right-1/4 top-1/3 h-[400px] w-[400px] rounded-full bg-accent/4 blur-3xl"/>
-        </div>
-        <div className="mx-auto max-w-5xl">
-          <div className="relative flex flex-col items-center text-center">
-            <div className="pointer-events-none absolute inset-0 hidden lg:block">
-              {[
-                {text:"🎌 Anime",  l:"-1rem",   t:"15%",   cls:"community-tag",   d:"0s"  },
-                {text:"🎨 Fanart", r:"-1rem",   t:"10%",   cls:"community-tag-r", d:"0.5s"},
-                {text:"👘 Cosplay",l:"3%",      t:"55%",   cls:"community-tag",   d:"1.2s"},
-                {text:"🎭 VTuber", r:"2%",      t:"50%",   cls:"community-tag-r", d:"0.8s"},
-                {text:"🎮 Gaming", l:"-0.5rem", b:"15%",   cls:"community-tag",   d:"1.8s"},
-                {text:"📚 Manga",  r:"1%",      b:"20%",   cls:"community-tag-r", d:"1.5s"},
-              ].map((t,i)=>(
-                <div key={i} className={cn("absolute",t.cls)} style={{...(t.l?{left:t.l}:{right:t.r}),...(t.t?{top:t.t}:{bottom:t.b}),animationDelay:t.d}}>
-                  <span className="inline-flex items-center rounded-full border border-white/10 bg-background/60 px-4 py-2 text-[12px] font-semibold text-foreground/40 backdrop-blur-sm shadow-sm">{t.text}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-5 py-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary/60"/>
-              <span className="text-[11px] font-black tracking-[0.2em] text-primary/60 uppercase">Komunitas Soraku</span>
-            </div>
-            <div className="space-y-1 sm:space-y-2 mb-7">
-              <p className="text-[clamp(1.1rem,3.5vw,2rem)] font-light text-muted-foreground/35 leading-tight tracking-wide">dari penggemar,</p>
-              <h2 className="text-[clamp(3rem,10vw,7rem)] font-black tracking-tighter leading-[0.88]">
-                <span className="text-foreground/90">untuk </span>
-                <span className="text-shimmer">penggemar</span>
-              </h2>
-              <p className="text-[clamp(1.1rem,3.5vw,2rem)] font-light text-muted-foreground/35 leading-tight tracking-wide">— di seluruh Indonesia</p>
-            </div>
-            <p className="text-sm sm:text-base text-muted-foreground/55 leading-relaxed max-w-lg mx-auto mb-10">
-              Soraku bukan sekadar komunitas. Ini tempat kamu ketemu orang-orang yang <em className="not-italic font-semibold text-foreground/70">ngerti duniamu</em> — yang sama-sama suka anime, ngobrolin manga, dan nonton VTuber sampai pagi.
-            </p>
-            <div className="flex flex-wrap justify-center gap-2 mb-10 lg:hidden">
-              {["🎌 Anime","📚 Manga","🎨 Fanart","🎭 VTuber","👘 Cosplay","🎮 Gaming","🌸 Culture"].map((t,i)=>(
-                <span key={i} className="inline-flex items-center rounded-full border border-border/35 bg-card/30 px-3.5 py-1.5 text-xs font-medium text-muted-foreground/60">{t}</span>
-              ))}
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-              {[
-                {n:"500+",label:"Member aktif",    emoji:"👥"},
-                {n:"20+", label:"Event komunitas", emoji:"🗓️"},
-                {n:"100+",label:"Karya & konten",  emoji:"🎨"},
-                {n:"3+",  label:"Tahun bersama",   emoji:"🌸"},
-              ].map((s,i)=>(
-                <div key={i} className="flex flex-col items-center gap-1 min-w-[80px]">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-base">{s.emoji}</span>
-                    <span className="text-2xl sm:text-3xl font-black text-foreground tabular-nums">{s.n}</span>
-                  </div>
-                  <span className="text-[10px] sm:text-[11px] text-muted-foreground/40">{s.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══ FITUR KOMUNITAS — 6 grid ══════════════════════════════════════════ */}
-      <section className="px-4 pb-20 sm:pb-24 border-t border-border/10 pt-16">
-        <div className="mx-auto max-w-7xl">
-          <SH eyebrow="Platform" title="Semua yang kamu butuhkan"/>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f,i)=>(
-              <Link key={i} href={f.link.startsWith("http")?f.link:f.link} {...(f.link.startsWith("http")?{target:"_blank",rel:"noopener noreferrer"}:{})}
-                className="group relative overflow-hidden rounded-2xl border border-border/12 bg-transparent p-5 transition-all duration-300 hover:border-border/25 hover:-translate-y-0.5">
-                <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300",f.color)}/>
-                <div className="relative">
-                  <div className="mb-4 text-3xl">{f.icon}</div>
-                  <h3 className="text-sm font-black mb-1.5 group-hover:text-foreground transition-colors">{f.title}</h3>
-                  <p className="text-xs text-muted-foreground/50 leading-relaxed">{f.desc}</p>
-                  <div className="mt-4 flex items-center gap-1 text-[10px] text-muted-foreground/25 group-hover:text-primary/60 transition-colors font-semibold">
-                    Jelajahi <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5"/>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ EVENTS ════════════════════════════════════════════════════════════ */}
-      <section className="px-4 pb-16 sm:pb-20 border-t border-border/10 pt-16">
-        <div className="mx-auto max-w-7xl">
-          <SH eyebrow="Event" title="Event Terbaru" href="/events"/>
-          {loading ? (
-            <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-              {[1,2,3,4].map(i=><div key={i} className="animate-pulse rounded-2xl bg-muted/8 aspect-[3/4]"/>)}
-            </div>
-          ) : data.events.length===0 ? (
-            <div className="py-16 text-center"><Calendar className="mx-auto h-8 w-8 text-muted-foreground/10 mb-3"/><p className="text-sm text-muted-foreground/25">Belum ada event</p></div>
-          ) : (
-            <div className="grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {data.events.map(e=>{
-                const st=getStatusInfo(e.status,e.startdate);
-                return <ContentCard key={e.id} href={`/events/${e.slug}`} cover={e.coverurl} title={e.title} meta={fmtDate(e.startdate)}
-                  badge={<span className={cn("flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-black backdrop-blur-sm",st.cls)}><span className={cn("h-1.5 w-1.5 rounded-full",st.dot)}/>{st.label}</span>}/>;
-              })}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ══ BLOG ═════════════════════════════════════════════════════════════ */}
-      <section className="px-4 pb-16 sm:pb-20">
-        <div className="mx-auto max-w-7xl">
-          <SH eyebrow="Komunitas" title="Artikel Terbaru" href="/blog"/>
-          {loading ? (
-            <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-              {[1,2,3,4].map(i=><div key={i} className="animate-pulse rounded-2xl bg-muted/8 aspect-[3/4]"/>)}
-            </div>
-          ) : data.blogs.length===0 ? (
-            <div className="py-16 text-center"><BookOpen className="mx-auto h-8 w-8 text-muted-foreground/10 mb-3"/><p className="text-sm text-muted-foreground/25">Belum ada artikel</p></div>
-          ) : (
-            <div className="grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {data.blogs.map(b=><ContentCard key={b.id} href={`/blog/${b.slug}`} cover={b.coverurl} title={b.title} meta={fmtDate(b.publishedat)}/>)}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ══ DISCORD EMBED ════════════════════════════════════════════════════ */}
-      <section className="px-4 pb-16 sm:pb-20 border-t border-border/10 pt-16">
-        <div className="mx-auto max-w-5xl">
-          <SH eyebrow="Real-time" title="Server Discord"/>
-          <DiscordEmbed discord={discord}/>
-        </div>
-      </section>
-
-      {/* ══ MONETISASI — Dukung Soraku ════════════════════════════════════════ */}
-      <section className="relative px-4 py-20 sm:py-24 overflow-hidden border-t border-border/10">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/2 to-transparent"/>
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[600px] w-[400px] rounded-full bg-primary/4 blur-3xl"/>
-          <div className="absolute right-0 top-1/3 h-[400px] w-[300px] rounded-full bg-amber-500/3 blur-3xl"/>
-        </div>
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-12 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-1.5">
-              <Heart className="h-3.5 w-3.5 text-amber-400"/>
-              <span className="text-[10px] font-black tracking-[0.2em] text-amber-400/70 uppercase">Dukung Soraku</span>
-            </div>
-            <h2 className="text-2xl font-black tracking-tight sm:text-3xl mb-3">Jadilah Bagian yang Lebih Besar</h2>
-            <p className="text-sm text-muted-foreground/50 max-w-md mx-auto leading-relaxed">
-              Soraku tetap gratis selamanya. Tapi dengan dukunganmu, kami bisa bikin komunitas ini makin seru.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-3">
-            {TIERS.map((t)=>(
-              <div key={t.id}
-                className={cn(
-                  "relative overflow-hidden rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1",
-                  t.border,
-                  t.highlight && "tier-vvip-glow",
-                )}>
-                <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br",t.color)}/>
-                {t.highlight && (
-                  <div className="absolute top-3 right-3">
-                    <span className="rounded-full bg-primary/15 border border-primary/25 px-2.5 py-0.5 text-[9px] font-black text-primary uppercase tracking-wider">Populer</span>
-                  </div>
-                )}
-                <div className="relative">
-                  <div className="mb-4">
-                    <span className="text-2xl">{t.emoji}</span>
-                  </div>
-                  <h3 className="text-lg font-black mb-1">{t.name}</h3>
-                  <p className="text-xs text-muted-foreground/50 mb-4 leading-relaxed">{t.desc}</p>
-
-                  <div className="mb-5">
-                    <span className={cn("text-2xl font-black",t.accent)}>{t.price}</span>
-                    {t.period && <span className="text-xs text-muted-foreground/40 ml-1">{t.period}</span>}
-                  </div>
-
-                  <ul className="space-y-2 mb-6">
-                    {t.perks.map((p,i)=>(
-                      <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground/65">
-                        <Check className="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-emerald-400/70"/>
-                        {p}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link href={t.href}
-                    className={cn(
-                      "flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5",
-                      t.highlight
-                        ? "bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90"
-                        : `border ${t.border} ${t.accent} hover:bg-white/5`
-                    )}>
-                    {t.cta} <ArrowRight className="h-3.5 w-3.5"/>
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-6 text-center text-[11px] text-muted-foreground/30">
-            Seluruh hasil dukungan digunakan untuk keberlangsungan platform dan event komunitas.
-            <Link href="/donate/leaderboard" className="ml-1 text-primary/50 hover:text-primary transition-colors">Lihat Top Supporter →</Link>
-          </p>
-        </div>
-      </section>
-
-      {/* ══ SOSIAL MEDIA — dual marquee ══════════════════════════════════════ */}
-      <section className="py-16 sm:py-20 border-t border-border/10">
-        <div className="mx-auto max-w-7xl px-4 mb-10">
-          <div className="flex items-center gap-4">
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-primary/35 mb-1.5">Ikuti Kami</p>
-              <h2 className="text-2xl font-black tracking-tight">Sosial Media</h2>
-            </div>
-            <div className="flex-1 h-px bg-gradient-to-r from-border/25 to-transparent"/>
-          </div>
-        </div>
-        <div className="relative overflow-hidden py-1">
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background to-transparent z-10"/>
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background to-transparent z-10"/>
-          <div className="marquee-track mb-2 flex gap-4 whitespace-nowrap">
-            {[...Array(4)].map((_,i)=>SOCIAL_LINKS.map(({slug,name,href,Icon,color,bg})=>(
-              <a key={`r1-${i}-${slug}`} href={href} target="_blank" rel="noopener noreferrer"
-                className={cn("group inline-flex items-center gap-2.5 rounded-full px-4 py-2 transition-all",bg)}>
-                <Icon className={cn("h-4 w-4 text-muted-foreground/22 transition-colors",`group-hover:${color}`)}/>
-                <span className="text-sm font-semibold text-muted-foreground/30 group-hover:text-foreground/65 transition-colors">{name}</span>
-              </a>
-            )))}
-          </div>
-          <div className="marquee-track-reverse flex gap-4 whitespace-nowrap">
-            {[...Array(4)].map((_,i)=>[...SOCIAL_LINKS].reverse().map(({slug,name,href,Icon,color,bg})=>(
-              <a key={`r2-${i}-${slug}`} href={href} target="_blank" rel="noopener noreferrer"
-                className={cn("group inline-flex items-center gap-2.5 rounded-full px-4 py-2 transition-all",bg)}>
-                <Icon className={cn("h-4 w-4 text-muted-foreground/18 transition-colors",`group-hover:${color}`)}/>
-                <span className="text-sm font-semibold text-muted-foreground/25 group-hover:text-foreground/65 transition-colors">{name}</span>
-              </a>
-            )))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ PARTNERSHIP ═══════════════════════════════════════════════════════ */}
-      {data.partnerships.length>0&&(
-        <section className="px-4 pb-16 sm:pb-20 border-t border-border/10 pt-16">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-10 text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.25em] text-muted-foreground/20 mb-2">Kolaborasi</p>
-              <h2 className="text-2xl font-black tracking-tight">Sponsor &amp; Partner</h2>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14">
-              {data.partnerships.map(p=>(
-                <a key={p.id} href={p.website??"#"} target={p.website?"_blank":undefined} rel="noopener noreferrer"
-                  className="group flex flex-col items-center gap-2 opacity-35 hover:opacity-85 transition-all hover:-translate-y-0.5">
-                  <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-muted/10 border border-border/15 group-hover:border-primary/15 transition-colors">
-                    {p.logourl?<Image src={p.logourl} alt={p.name} width={48} height={48} className="h-full w-full object-contain"/>:<Handshake className="h-5 w-5 text-muted-foreground/15"/>}
-                  </div>
-                  <p className="text-[10px] font-bold text-foreground/35 group-hover:text-primary transition-colors">{p.name}</p>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ══ JOIN CTA — hanya jika belum login ════════════════════════════════ */}
+      {/* ══ JOIN CTA ══ */}
       {!isLoggedIn&&user!=="loading"&&(
-        <section className="relative px-4 pb-28 pt-16 overflow-hidden border-t border-border/10">
-          <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/3 to-transparent"/>
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-primary/4 blur-3xl"/>
-          </div>
-          <div className="mx-auto max-w-xl text-center">
-            <div className="mb-5 text-4xl">🌸</div>
-            <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
-              Jadilah bagian dari <span className="text-primary">Soraku</span>
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground/50 max-w-sm mx-auto">
-              Gratis selamanya. Komunitas yang hangat, supportif, dan penuh semangat untuk semua pecinta anime di Indonesia.
-            </p>
-            <div className="my-7 flex items-center gap-4 max-w-xs mx-auto">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent to-border/18"/>
-              <span className="text-xs text-muted-foreground/18 font-semibold">bergabung sekarang</span>
-              <div className="flex-1 h-px bg-gradient-to-l from-transparent to-border/18"/>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/register"
-                className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-7 py-3.5 text-sm font-bold text-white shadow-xl shadow-primary/18 transition-all hover:-translate-y-0.5">
-                Daftar Gratis <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5"/>
-              </Link>
-              <Link href="/about"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-border/20 px-7 py-3.5 text-sm font-semibold text-muted-foreground/45 hover:border-primary/15 hover:text-foreground/65 transition-all">
-                Tentang Soraku
-              </Link>
-            </div>
+        <section className="py-20 sm:py-28 container mx-auto px-6 text-center">
+          <div className="text-4xl mb-6">🌸</div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-5 text-white">
+            Jadilah bagian dari <span className="text-primary">Soraku</span>
+          </h2>
+          <p className="text-white/25 text-base sm:text-lg leading-relaxed mb-10 max-w-md mx-auto">
+            Gratis selamanya. Komunitas yang hangat, supportif, dan penuh semangat.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/register"
+              className="inline-flex items-center gap-2 rounded-2xl px-9 py-4 text-sm font-bold text-white shadow-xl transition-all hover:scale-[1.03] hover:shadow-[0_0_32px_rgba(79,163,209,0.3)]"
+              style={{background:"linear-gradient(135deg,#4FA3D1 0%,#3a8fbe 100%)"}}>
+              Daftar Gratis <ArrowRight className="h-4 w-4"/>
+            </Link>
+            <Link href="/about"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/[0.08] px-9 py-4 text-sm font-semibold text-white/38 hover:border-white/[0.15] hover:text-white/60 transition-all">
+              Tentang Soraku
+            </Link>
           </div>
         </section>
       )}
-    </>
+    </main>
   );
 }

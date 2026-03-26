@@ -7,7 +7,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.soraku.id'
 
 export const metadata: Metadata = {
   title: { default: 'Soraku Community', template: '%s — Soraku Community' },
-  description: 'Komunitas anime & budaya Jepang non-profit berbasis Indonesia. Est. 2023.',
+  description: 'Komunitas anime & budaya Jepang non-profit pop Indonesia. Est. 2023.',
   metadataBase: new URL(APP_URL),
   openGraph: {
     type: 'website',
@@ -15,15 +15,15 @@ export const metadata: Metadata = {
     url: APP_URL,
     siteName: 'Soraku Community',
     title: 'Soraku Community',
-    description: 'Komunitas anime & budaya Jepang non-profit berbasis Indonesia.',
+    description: 'Komunitas anime & budaya Jepang non-profit pop Indonesia.',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Soraku Community' }],
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@AppSora',
-    creator: '@AppSora',
+    site: '@AppSoraa',
+    creator: '@AppSoraa',
     title: 'Soraku Community',
-    description: 'Komunitas anime & budaya Jepang non-profit berbasis Indonesia.',
+    description: 'Komunitas anime & budaya Jepang non-profit pop Indonesia.',
   },
   keywords: ['soraku', 'anime', 'komunitas', 'indonesia', 'budaya jepang', 'vtuber'],
   authors: [{ name: 'Soraku Community', url: APP_URL }],

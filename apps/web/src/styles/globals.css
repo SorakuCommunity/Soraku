@@ -31,6 +31,7 @@
 
   /* ── Font ── */
   --font-heading: var(--font-heading);
+  --font-script: var(--font-script);
   --font-body: var(--font-body);
   --font-code: var(--font-code);
 }
@@ -401,3 +402,9 @@ kbd {
 }
 .member-scroll { animation: scroll-x 22s linear infinite; }
 .member-scroll:hover { animation-play-state: paused; }
+
+/* ═══ Category marquee ══════════════════════════════════════ */
+@keyframes marquee-cat {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
