@@ -1,5 +1,5 @@
 {
-  "name": "soraku-community",
+  "name": "soraku",
   "version": "0.0.1",
   "private": true,
   "description": "Soraku Community — Platform komunitas anime & budaya Jepang Indonesia",
@@ -18,9 +18,9 @@
     "test": "turbo run test"
   },
   "dependencies": {
-    "next": "16.1.6",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.49.4",

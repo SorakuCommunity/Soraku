@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'
 import { env } from '@/env'
+import { notifyNewEvent } from '@/lib/notify'
 import { sendDiscordWebhook } from '@/lib/discord-webhook'
 
 import { adminDb } from '@/lib/supabase/admin'
@@ -169,7 +170,11 @@ export async function POST(req: NextRequest) {
       .single()
     if (error) return err(error.message)
 
-    if (parsed.data.ispublished) {
+    // Auto-notify saat event dipublish
+      if (parsed.data.ispublished) {
+        notifyNewEvent({ slug: data.slug, title: data.title }).catch(() => {})
+      }
+      if (parsed.data.ispublished) {
       // 1. Discord embed via webhook
       sendDiscordEventEmbed({ ...parsed.data })
       // 2. Bot legacy webhook

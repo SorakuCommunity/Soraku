@@ -1,3 +1,4 @@
+import { notifyBan, notifyRoleChange } from '@/lib/notify'
 import { adminDb } from '@/lib/supabase/admin'
 import { getSession, isStaff, isManager } from '@/lib/auth'
 import { ok, err, FORBIDDEN, SERVER_ERROR } from '@/lib/api'
@@ -67,6 +68,14 @@ export async function PATCH(req: NextRequest) {
       .single()
 
     if (error) return err(error.message)
+    // Auto-notify: ban/unban
+    if (typeof parsed.data.isbanned === 'boolean' && data?.id) {
+      notifyBan({ userid: data.id, banned: parsed.data.isbanned }).catch(() => {})
+    }
+    // Auto-notify: role changed
+    if (parsed.data.role && data?.id) {
+      notifyRoleChange({ userid: data.id, newRole: parsed.data.role }).catch(() => {})
+    }
     return ok(data)
   } catch {
     return SERVER_ERROR()

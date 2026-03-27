@@ -1,112 +1,142 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { SORAKU_SOCIALS } from '@/components/icons/custom-icons'
+import { DiscordIcon, InstagramIcon, FacebookIcon, TikTokIcon } from '@/components/icons/custom-icons'
 
-// 2 kolom di mobile: Komunitas | Informasi
-const FOOTER_COLS = [
-  {
-    title: 'Komunitas',
-    links: [
-      { label: 'Beranda',   href: '/'            },
-      { label: 'Blog',      href: '/blog'         },
-      { label: 'Events',    href: '/events'       },
-      { label: 'Galeri',    href: '/gallery'      },
-      { label: 'VTuber',    href: '/vtubers'      },
-      { label: 'Tentang',   href: '/about'        },
-      { label: 'Donasi',    href: '/donate'       },
-    ],
-  },
-  {
-    title: 'Informasi',
-    links: [
-      { label: 'Privasi',   href: '/privacy'      },
-      { label: 'Ketentuan', href: '/tos'          },
-      { label: 'Lisensi',   href: '/license'      },
-      { label: 'Masukan',   href: '/feedback'     },
-      { label: 'Rekrutmen', href: '/requirements' },
-      { label: 'Premium',   href: '/premium'      },
-    ],
-  },
+// ─── Config ─────────────────────────────────────────────────────────────────
+
+const MOBILE_SOCIALS = [
+  { href:"https://discord.gg/qm3XJvRa6B",               Icon:DiscordIcon,   label:"Discord"   },
+  { href:"https://www.tiktok.com/@soraku.id",            Icon:TikTokIcon,    label:"TikTok"    },
+  { href:"https://www.instagram.com/soraku.moe",         Icon:InstagramIcon, label:"Instagram" },
+  { href:"https://www.facebook.com/share/1HQs9ZZeCw/",   Icon:FacebookIcon,  label:"Facebook"  },
 ]
+
+const COL_KOMUNITAS = [
+  { label:"Beranda",  href:"/"        },
+  { label:"Blog",     href:"/blog"    },
+  { label:"Events",   href:"/events"  },
+  { label:"Galeri",   href:"/gallery" },
+  { label:"VTuber",   href:"/vtubers" },
+  { label:"Tentang",  href:"/about"   },
+  { label:"Donasi",   href:"/donate"  },
+]
+
+const COL_INFORMASI = [
+  { label:"Privasi",   href:"/privacy"      },
+  { label:"Ketentuan", href:"/tos"          },
+  { label:"Lisensi",   href:"/license"      },
+  { label:"Masukan",   href:"/feedback"     },
+  { label:"Rekrutmen", href:"/requirements" },
+  { label:"Premium",   href:"/premium"      },
+]
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/30 mt-20">
+    <footer className="border-t border-white/[0.06] mt-16 sm:mt-20">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
 
-        {/* Top — Brand + 2 kolom links */}
-        <div className="grid grid-cols-3 gap-8 sm:grid-cols-4 lg:grid-cols-4">
-          {/* Brand — hidden on mobile, 1 col on sm+ */}
-          <div className="hidden sm:block sm:col-span-2 lg:col-span-2">
-            <Link href="/" className="group mb-5 inline-flex items-center gap-3">
-              <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-border/60 bg-[#1a1c20]">
+        {/* ── DESKTOP layout: brand col + 2 link cols ── */}
+        <div className="hidden sm:grid sm:grid-cols-4 lg:grid-cols-4 gap-10">
+          {/* Brand — 2 cols on sm */}
+          <div className="sm:col-span-2 lg:col-span-2">
+            <Link href="/" className="group inline-flex items-center gap-3 mb-5">
+              <div className="h-10 w-10 overflow-hidden rounded-xl border border-white/10 bg-[#1a1c20] flex-shrink-0">
                 <Image src="/logo.png" alt="Soraku" width={40} height={40}
-                  className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-110"/>
+                  className="h-full w-full object-cover object-top transition-transform group-hover:scale-110 duration-300"/>
               </div>
-              <span className="text-lg font-black tracking-tight group-hover:text-primary transition-colors">Soraku</span>
+              <div>
+                <p className="text-base font-black group-hover:text-primary transition-colors">Soraku</p>
+                <p className="text-[10px] text-white/30">Community · Est. 2023</p>
+              </div>
             </Link>
-            <p className="text-muted-foreground/55 mb-5 max-w-xs text-sm leading-relaxed">
+            <p className="text-sm text-white/35 leading-relaxed max-w-xs mb-6">
               Komunitas non-profit budaya pop Jepang Indonesia. Ruang kreatif untuk pecinta anime, manga, VTuber, dan cosplay.
             </p>
-            <div className="flex items-center gap-2 flex-wrap">
-              {SORAKU_SOCIALS.map(({ slug, name, href, icon: Icon }) => (
-                <a key={slug} href={href} target="_blank" rel="noopener noreferrer" aria-label={name} title={name}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/45 bg-card/25 text-muted-foreground/55 hover:border-primary/35 hover:bg-primary/8 hover:text-foreground transition-all">
-                  <Icon className="h-[15px] w-[15px]"/>
+            <div className="flex items-center gap-2">
+              {MOBILE_SOCIALS.map(({href,Icon,label})=>(
+                <a key={href} href={href} target="_blank" rel="noopener noreferrer" title={label}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-white/35 hover:border-primary/35 hover:bg-primary/8 hover:text-white/70 transition-all">
+                  <Icon className="h-4 w-4"/>
                 </a>
               ))}
             </div>
           </div>
 
-          {/* 2 kolom links — grid-cols-2 di mobile */}
-          {FOOTER_COLS.map(col=>(
-            <div key={col.title}>
-              <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{col.title}</p>
+          <div>
+            <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Komunitas</p>
+            <ul className="space-y-2.5">
+              {COL_KOMUNITAS.map(l=>(
+                <li key={l.href}><Link href={l.href} className="text-sm text-white/35 hover:text-white/70 transition-colors">{l.label}</Link></li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Informasi</p>
+            <ul className="space-y-2.5">
+              {COL_INFORMASI.map(l=>(
+                <li key={l.href}><Link href={l.href} className="text-sm text-white/35 hover:text-white/70 transition-colors">{l.label}</Link></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* ── MOBILE layout: brand on top, then 2 cols ── */}
+        <div className="sm:hidden space-y-6">
+          {/* 2 col link grid */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-0">
+            <div>
+              <p className="mb-3 text-[9px] font-black uppercase tracking-[0.2em] text-white/25">Komunitas</p>
               <ul className="space-y-2.5">
-                {col.links.map(link=>(
-                  <li key={link.href}>
-                    <Link href={link.href}
-                      className="text-sm text-muted-foreground/55 hover:text-foreground transition-colors">
-                      {link.label}
-                    </Link>
-                  </li>
+                {COL_KOMUNITAS.map(l=>(
+                  <li key={l.href}><Link href={l.href} className="text-sm text-white/40 hover:text-white/70 transition-colors">{l.label}</Link></li>
                 ))}
               </ul>
             </div>
-          ))}
-        </div>
-
-        {/* Mobile brand row */}
-        <div className="mt-8 flex items-center gap-3 sm:hidden border-t border-border/25 pt-6">
-          <div className="h-8 w-8 overflow-hidden rounded-lg border border-border/60 bg-[#1a1c20] flex-shrink-0">
-            <Image src="/logo.png" alt="Soraku" width={32} height={32} className="h-full w-full object-cover object-top"/>
+            <div>
+              <p className="mb-3 text-[9px] font-black uppercase tracking-[0.2em] text-white/25">Informasi</p>
+              <ul className="space-y-2.5">
+                {COL_INFORMASI.map(l=>(
+                  <li key={l.href}><Link href={l.href} className="text-sm text-white/40 hover:text-white/70 transition-colors">{l.label}</Link></li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <span className="font-black text-sm">Soraku Community</span>
-          <div className="ml-auto flex items-center gap-1.5">
-            {SORAKU_SOCIALS.slice(0,4).map(({ slug, name, href, icon: Icon }) => (
-              <a key={slug} href={href} target="_blank" rel="noopener noreferrer" aria-label={name}
-                className="flex h-7 w-7 items-center justify-center rounded-lg border border-border/40 text-muted-foreground/45 hover:text-foreground transition-colors">
-                <Icon className="h-3.5 w-3.5"/>
-              </a>
-            ))}
+
+          {/* Brand row — di bawah kolom (sesuai gambar) */}
+          <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="h-9 w-9 overflow-hidden rounded-lg border border-white/10 bg-[#1a1c20] flex-shrink-0">
+                <Image src="/logo.png" alt="Soraku" width={36} height={36} className="h-full w-full object-cover object-top"/>
+              </div>
+              <span className="text-sm font-black">Soraku Community</span>
+            </Link>
+            <div className="flex items-center gap-2">
+              {MOBILE_SOCIALS.map(({href,Icon,label})=>(
+                <a key={href} href={href} target="_blank" rel="noopener noreferrer" title={label}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] text-white/30 hover:text-white/60 transition-colors">
+                  <Icon className="h-4 w-4"/>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-border/25 mt-8 pt-6 space-y-2">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-muted-foreground/30">
-            <p>© 2023 – {new Date().getFullYear()} Soraku Community</p>
-            <p className="flex items-center gap-1">
-              Dibangun dengan <span className="text-rose-400/55">♥</span> untuk komunitas
-            </p>
+        <div className="border-t border-white/[0.06] mt-8 pt-6 space-y-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-xs text-white/20">
+            <p>© 2023–{new Date().getFullYear()} Soraku Community</p>
+            <p className="flex items-center gap-1">Dibangun dengan ♥ untuk komunitas</p>
           </div>
-          <p className="text-[10px] text-muted-foreground/18 leading-relaxed">
+          <p className="text-[10px] text-white/12 leading-relaxed">
             Dilindungi oleh{" "}
-            <Link href="/license" className="underline underline-offset-2 hover:text-muted-foreground/35 transition-colors">
+            <Link href="/license" className="underline underline-offset-2 hover:text-white/25 transition-colors">
               Soraku Community Source License v1.0
             </Link>{" "}
-            · Hak Cipta (c) 2023–{new Date().getFullYear()} Soraku Community · Riu (Koordinator) ·{" "}
-            <a href="mailto:echo.soraku@gmail.com" className="underline underline-offset-2 hover:text-muted-foreground/35 transition-colors">
+            · Hak Cipta (c) 2023–{new Date().getFullYear()} · Riu (Koordinator) ·{" "}
+            <a href="mailto:echo.soraku@gmail.com" className="underline underline-offset-2 hover:text-white/25 transition-colors">
               echo.soraku@gmail.com
             </a>
           </p>

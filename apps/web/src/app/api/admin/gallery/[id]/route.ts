@@ -1,3 +1,4 @@
+import { notifyGalleryStatus } from '@/lib/notify'
 import { adminDb } from '@/lib/supabase/admin'
 import { getSession, isStaff } from '@/lib/auth'
 import { ok, err, FORBIDDEN, SERVER_ERROR } from '@/lib/api'
@@ -47,6 +48,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       .single()
 
     if (error) return err(error.message)
+    // Auto-notify uploader
+    if (parsed.data.status && data?.uploadedby) {
+      notifyGalleryStatus({ userid: data.uploadedby, imageTitle: data.title, approved: parsed.data.status === 'approved' }).catch(() => {})
+    }
     return ok(data)
   } catch {
     return SERVER_ERROR()
