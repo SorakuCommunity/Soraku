@@ -23,28 +23,28 @@ const CATEGORIES = [
 const PILLARS = [
   {
     icon:'🛡️', title:'Manager', role:'MANAGER',
-    desc:'Tulang punggung operasional Soraku — moderasi konten, pengelolaan event & blog, supervisi kreator.',
+    desc:'Tulang punggung operasional Soraku moderasi konten, pengelolaan event & blog, supervisi kreator.',
     color:'#a78bfa',
   },
   {
     icon:'🎭', title:'Agensi', role:'AGENSI',
-    desc:'Pilar kreativitas — mengelola VTuber & talent lokal Indonesia dari manajemen profil hingga kolaborasi.',
+    desc:'Pilar kreativitas  mengelola VTuber & talent lokal Indonesia dari manajemen profil hingga kolaborasi.',
     color:'#4FA3D1',
   },
   {
     icon:'⚙️', title:'Admin', role:'ADMIN',
-    desc:'Penjaga ekosistem — moderasi member, kurasi galeri karya, dan memastikan setiap kontribusi diakui.',
+    desc:'Penjaga ekosistem moderasi member, kurasi galeri karya, dan memastikan setiap kontribusi diakui.',
     color:'#E8C2A8',
   },
 ]
 
 const TIMELINE = [
-  { year:'2023', label:'Awal',  title:'Lahirnya Sora',             desc:'Dimulai sebagai server Discord kecil — hanya passion, tanpa struktur.',       icon:'🌱', hi:true  },
+  { year:'2023', label:'Awal',  title:'Lahirnya Sora',             desc:'Dimulai sebagai server Discord kecil hanya passion, tanpa struktur.',       icon:'🌱', hi:true  },
   { year:'2023', label:'Mid',   title:'Berkembang jadi Soraku',    desc:'"Sora" + "-ku" = Langitku. Ruang ini milik semua anggotanya.',                  icon:'✨', hi:false },
-  { year:'2023', label:'Akhir', title:'Event Pertama',             desc:'Nonton bareng online pertama — fondasi tradisi gathering komunitas.',           icon:'🎌', hi:false },
+  { year:'2023', label:'Akhir', title:'Event Pertama',             desc:'Nonton bareng online pertama fondasi tradisi gathering komunitas.',           icon:'🎌', hi:false },
   { year:'2024', label:'Q1',    title:'Platform Web Lahir',        desc:'Tim inti terbentuk. Blog, galeri, event, sistem member pertama hadir.',         icon:'🚀', hi:false },
   { year:'2024', label:'Q2',    title:'Soraku Agensi Berdiri',     desc:'VTuber & talent lokal Indonesia punya ruang untuk berkembang.',                 icon:'🎭', hi:false },
-  { year:'2025', label:'Q1',    title:'500+ Member Discord',       desc:'Milestone bersejarah — sistem premium & bot Discord terintegrasi.',             icon:'🏆', hi:false },
+  { year:'2025', label:'Q1',    title:'500+ Member Discord',       desc:'Milestone bersejarah sistem premium & bot Discord terintegrasi.',             icon:'🏆', hi:false },
   { year:'2026', label:'Now',   title:'v1.0 — Platform Penuh',     desc:'Dibangun ulang dengan Next.js 16, Supabase, dan fitur komunitas yang matang.',  icon:'🌸', hi:true  },
 ]
 
@@ -173,7 +173,7 @@ export default function AboutPage() {
       </section>
 
       {/* ══ CATEGORY SCROLLERS ══ */}
-      <AboutScrollers categories={CATEGORIES} socials={SOCIAL_DATA}/>
+      <AboutScrollers type="social" socials={SOCIAL_DATA} />
 
       {/* ══════════════════════════════════════════════
           TIMELINE — perjalanan Soraku
