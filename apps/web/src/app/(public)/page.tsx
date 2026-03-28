@@ -302,95 +302,32 @@ export default function HomePage() {
 
       {/* ══════════════════════════════════════════════
           HERO
-          Mobile: Mascot full-bleed seamless (no card)
-          Desktop: Script + centered heading
+          Mobile: Text centered, NO mascot
+          Desktop: Mascot seamless kanan + teks kiri
           ══════════════════════════════════════════════ */}
       <section className="relative overflow-hidden">
 
-        {/* ── MOBILE HERO — Mascot seamless, no card ── */}
-        <div className="lg:hidden relative w-full h-[100svh] min-h-[600px]">
-          {/* Atmosphere */}
-          <div className="pointer-events-none absolute inset-0 -z-0">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[140px]"/>
-            <div className="absolute bottom-1/4 right-0 h-[300px] w-[300px] rounded-full bg-[#E8C2A8]/6 blur-[100px]"/>
-          </div>
-          {/* Mascot full-bleed — NO card, NO border */}
-          <Image src="/logo-full.png" alt="Soraku" fill className="object-cover object-top" priority/>
-          {/* Fades menyatu ke background */}
-          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#1C1E22] to-transparent z-10"/>
-          <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-[#1C1E22] via-[#1C1E22]/80 to-transparent z-10"/>
-          <div className="absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[#1C1E22]/70 to-transparent z-10"/>
-          <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[#1C1E22]/70 to-transparent z-10"/>
-          {/* Text overlay di bawah */}
-          <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-12 space-y-4">
-            <div>
-              <h1 className="text-[clamp(2.8rem,14vw,4.5rem)] font-black leading-[0.88] tracking-tighter text-white">
-                Soraku
-              </h1>
-              <p className="text-sm font-light text-white/35 tracking-wide mt-1 pl-0.5">
-                Community · 空 · Est. 2023
-              </p>
-            </div>
-            <div className="h-px w-12 bg-gradient-to-r from-primary/50 to-transparent"/>
-            <p className="text-[13px] text-white/55 max-w-xs leading-relaxed">
-              Komunitas non-profit anime & budaya Jepang Indonesia.
-            </p>
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Live badge */}
-              <span className="flex items-center gap-1.5 text-[10px] font-bold text-white/45">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/>
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"/>
-                </span>
-                {discord.loading?"—":`${discord.presence?.toLocaleString("id-ID")??"—"} online`}
-              </span>
-            </div>
-            <div className="flex items-center gap-3 pt-1">
-              {!isLoggedIn&&(
-                <Link href="/register"
-                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white"
-                  style={{background:"linear-gradient(135deg,#4FA3D1 0%,#3a8fbe 100%)"}}>
-                  Bergabung <ArrowRight className="h-3.5 w-3.5"/>
-                </Link>
-              )}
-              <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.05] px-5 py-2.5 text-sm font-bold text-white/60">
-                <DiscordIcon className="h-4 w-4 text-indigo-400"/>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* ── DESKTOP HERO — Script + Centered heading ── */}
-        <div className="hidden lg:flex min-h-[95vh] flex-col items-center justify-center relative pt-20 pb-12">
+        {/* ── MOBILE HERO — Text only, no mascot ── */}
+        <div className="lg:hidden flex min-h-[95svh] flex-col justify-center relative px-6 pt-24 pb-14">
+          {/* Atmosphere orbs */}
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute top-0 left-0 w-[500px] h-[420px] rounded-full blur-[140px] bg-[#4FA3D1]/10"/>
-            <div className="absolute bottom-0 right-0 w-[440px] h-[380px] rounded-full blur-[130px] bg-[#E8C2A8]/7"/>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[340px] rounded-full blur-[180px] bg-[#4FA3D1]/5"/>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[140px]"/>
+            <div className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-[#E8C2A8]/5 blur-[100px]"/>
           </div>
-          {/* Floating petals */}
-          {[
-            {top:"16%",left:"7%",fs:"20px"},{top:"28%",right:"8%",fs:"15px"},
-            {bottom:"28%",left:"5%",fs:"13px"},{bottom:"20%",right:"9%",fs:"17px"},
-          ].map((p,i)=>(
-            <span key={i} className="absolute pointer-events-none select-none text-[#E8C2A8]"
-              style={{opacity:0.14,...(p.left?{left:p.left}:{right:(p as any).right}),...(p.top?{top:p.top}:{bottom:(p as any).bottom}),fontSize:p.fs}}>
-              ✿
-            </span>
-          ))}
-
-          <div className="relative z-10 text-center max-w-[800px] mx-auto px-6">
-            <span className="block mb-4 text-2xl sm:text-3xl tracking-wide text-[#E8C2A8]/75"
+          <div className="relative z-10">
+            {/* Script eyebrow */}
+            <span className="block mb-3 text-xl tracking-wide text-[#E8C2A8]/65"
               style={{fontFamily:"var(--font-script,'Style Script',cursive)"}}>
               Belajar, Berkarya, Bersama
             </span>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] mb-6">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"/>
-              <span className="text-[10px] font-bold tracking-[0.2em] text-white/38 uppercase">
-                {discord.loading?"—":discord.presence?.toLocaleString("id-ID")??"—"} ONLINE SEKARANG
+            {/* Live badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] mb-5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"/>
+              <span className="text-[10px] font-bold tracking-[0.18em] text-white/40 uppercase">
+                {discord.loading?"—":discord.presence?.toLocaleString("id-ID")??"—"} ONLINE
               </span>
             </div>
-            <h1 className="font-black tracking-tighter leading-[1.0] text-foreground text-[clamp(52px,9vw,96px)] mb-0">
+            <h1 className="text-[clamp(3rem,13vw,5rem)] font-black leading-[0.9] tracking-tighter mb-4">
               Temukan Duniamu<br/>
               di{" "}
               <span className="bg-clip-text text-transparent"
@@ -398,36 +335,129 @@ export default function HomePage() {
                 Soraku
               </span>
             </h1>
-            <div className="mx-auto my-5 h-[2px] w-12 rounded-full" style={{background:"linear-gradient(90deg,#4FA3D1,#E8C2A8)",opacity:0.45}}/>
-            <p className="max-w-[520px] mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed mb-7">
+            <div className="h-[2px] w-10 rounded-full mb-4" style={{background:"linear-gradient(90deg,#4FA3D1,#E8C2A8)",opacity:0.5}}/>
+            <p className="text-sm text-white/40 leading-relaxed mb-6 max-w-xs">
+              Wujudkan imajinasi, asah kreativitas, dan jalin koneksi bermakna bersama komunitas anime Indonesia.
+            </p>
+            {/* Category pills */}
+            <div className="flex flex-wrap gap-1.5 mb-8">
+              {CATEGORIES.slice(0,5).map((cat,i)=>(
+                <span key={i} className="px-3 py-1 rounded-full text-[10px] font-semibold bg-white/[0.04] border cursor-default"
+                  style={{color:cat.color,borderColor:cat.color+"30"}}>
+                  {cat.label}
+                </span>
+              ))}
+            </div>
+            <div className="flex items-center gap-3">
+              {!isLoggedIn&&(
+                <Link href="/register"
+                  className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white"
+                  style={{background:"linear-gradient(135deg,#4FA3D1 0%,#3a8fbe 100%)"}}>
+                  Bergabung <ArrowRight className="h-3.5 w-3.5"/>
+                </Link>
+              )}
+              <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-6 py-3 text-sm font-bold text-white/55 hover:bg-white/[0.08] transition-colors">
+                <DiscordIcon className="h-4 w-4 text-indigo-400"/> Discord
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* ── DESKTOP HERO — Mascot seamless kanan + teks kiri ── */}
+        <div className="hidden lg:grid lg:grid-cols-[1fr_520px] xl:grid-cols-[1fr_580px] min-h-[95vh] items-center relative pt-16">
+          {/* Ambient glows */}
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute top-0 left-0 w-[500px] h-[420px] rounded-full blur-[140px] bg-[#4FA3D1]/10"/>
+            <div className="absolute top-1/3 left-1/3 w-[400px] h-[300px] rounded-full blur-[120px] bg-[#E8C2A8]/5"/>
+          </div>
+          {/* LEFT — text */}
+          <div className="relative z-10 px-10 xl:px-16 py-20">
+            <span className="block mb-4 text-2xl xl:text-3xl tracking-wide text-[#E8C2A8]/70"
+              style={{fontFamily:"var(--font-script,'Style Script',cursive)"}}>
+              Belajar, Berkarya, Bersama
+            </span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] mb-7">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"/>
+              <span className="text-[10px] font-bold tracking-[0.2em] text-white/38 uppercase">
+                {discord.loading?"—":discord.presence?.toLocaleString("id-ID")??"—"} ONLINE SEKARANG
+              </span>
+            </div>
+            <h1 className="text-[clamp(3.5rem,6vw,5.5rem)] font-black leading-[0.9] tracking-tighter mb-5">
+              Temukan<br/>Duniamu<br/>
+              di{" "}
+              <span className="bg-clip-text text-transparent"
+                style={{backgroundImage:"linear-gradient(130deg,#4FA3D1 0%,#90c8e8 38%,#E8C2A8 72%,#d4a882 100%)",WebkitBackgroundClip:"text"}}>
+                Soraku
+              </span>
+            </h1>
+            <div className="h-[2px] w-12 rounded-full mb-5" style={{background:"linear-gradient(90deg,#4FA3D1,#E8C2A8)",opacity:0.45}}/>
+            <p className="max-w-md text-base xl:text-lg text-white/35 leading-relaxed mb-8">
               Wujudkan imajinasi, asah kreativitas, dan jalin koneksi bermakna.
               Di sini, setiap langkahmu adalah bagian dari cerita besar kita bersama.
             </p>
             {/* Category pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-9">
-              {CATEGORIES.slice(0,6).map((c,i)=>(
+            <div className="flex flex-wrap gap-2 mb-10">
+              {CATEGORIES.slice(0,6).map((cat,i)=>(
                 <span key={i} className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/[0.04] border cursor-default"
-                  style={{color:c.color,borderColor:c.color+"30"}}>
-                  {c.label}
+                  style={{color:cat.color,borderColor:cat.color+"30"}}>
+                  {cat.label}
                 </span>
               ))}
             </div>
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center gap-3">
               {!isLoggedIn&&(
                 <Link href="/register"
                   className="group flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm text-white transition-all hover:scale-[1.02]"
                   style={{background:"linear-gradient(135deg,#4FA3D1 0%,#3a8fbe 100%)"}}>
-                  <Sparkles className="h-4 w-4"/>Bergabung Gratis<ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform"/>
+                  <Sparkles className="h-4 w-4"/>Bergabung Gratis
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform"/>
                 </Link>
               )}
               <a href="https://discord.gg/qm3XJvRa6B" target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm text-foreground/75 bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.09] transition-all">
+                className="flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm text-white/55 bg-white/[0.04] border border-white/[0.1] hover:bg-white/[0.08] transition-all">
                 <DiscordIcon className="h-4 w-4 text-indigo-400"/> Gabung Discord
               </a>
             </div>
-            <div className="mt-12 flex flex-col items-center gap-2">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/35">Gulir untuk menjelajahi</span>
-              <div className="w-px h-8 bg-gradient-to-b from-muted-foreground/20 to-transparent" style={{animation:"bounce-soft 2s ease-in-out infinite"}}/>
+          </div>
+
+          {/* RIGHT — Mascot seamless, NO card, NO border */}
+          <div className="relative h-full min-h-[95vh]">
+            {/* Glow behind mascot */}
+            <div className="absolute inset-0 -z-0">
+              <div className="absolute right-0 top-1/4 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[120px]"/>
+            </div>
+            <Image src="/logo-full.png" alt="Soraku Mascot" fill
+              className="object-cover object-center" priority/>
+            {/* Seamless fades */}
+            <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#1C1E22] to-transparent z-10"/>
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#1C1E22] via-[#1C1E22]/60 to-transparent z-10"/>
+            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#1C1E22] to-transparent z-10"/>
+            {/* Float badges */}
+            <div className="absolute top-[22%] left-4 z-20 float-badge">
+              <span className="rounded-full border border-white/10 px-3.5 py-1.5 text-[11px] font-semibold text-white/50 backdrop-blur-md bg-black/20">
+                🌸 Komunitas
+              </span>
+            </div>
+            <div className="absolute top-[38%] left-2 z-20 float-badge" style={{animationDelay:"1s"}}>
+              <span className="rounded-full border border-white/10 px-3.5 py-1.5 text-[11px] font-semibold text-white/50 backdrop-blur-md bg-black/20">
+                🎌 Anime &amp; Manga
+              </span>
+            </div>
+            <div className="absolute top-[55%] left-6 z-20 float-badge" style={{animationDelay:"2s"}}>
+              <span className="rounded-full border border-white/10 px-3.5 py-1.5 text-[11px] font-semibold text-white/50 backdrop-blur-md bg-black/20">
+                ✨ Non-profit
+              </span>
+            </div>
+            {/* Info overlay bottom */}
+            <div className="absolute bottom-6 inset-x-0 z-20 px-5 flex items-end justify-between">
+              <div>
+                <p className="text-base font-black text-white/70 drop-shadow-lg">Soraku</p>
+                <p className="text-[10px] text-white/30">Community · 空</p>
+              </div>
+              <span className="flex items-center gap-1 text-[9px] font-black text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"/> Live
+              </span>
             </div>
           </div>
         </div>
@@ -558,12 +588,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ PARTNERSHIP ══ */}
+      {/* ══ PARTNERSHIP & SPONSOR — setelah Discord ══ */}
       {data.partnerships.length>0&&(
-        <section className="py-10 sm:py-14 container mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/45 mb-2">Dukungan</p>
-            <h2 className="text-xl font-black sm:text-2xl text-white/90">Sponsor &amp; Partner</h2>
+        <section className="py-10 sm:py-16 container mx-auto px-4 sm:px-6">
+          <div className="mb-10 flex items-end justify-between">
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/45 mb-1.5">Dukungan</p>
+              <h2 className="text-xl font-black sm:text-2xl lg:text-3xl text-white/90">Sponsor &amp; Partner</h2>
+            </div>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8">
             {data.partnerships.map(p=>(
