@@ -1,4 +1,10 @@
-import { Navbar } from "@/components/layout/navbar";
+import { Navbar } from '@/components/layout/navbar'
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  return <><Navbar /><main className="min-h-screen">{children}</main></>;
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen pb-20">{children}</main>
+    </>
+  )
 }

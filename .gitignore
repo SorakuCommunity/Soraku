@@ -36,3 +36,5 @@ pnpm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
+public/sitemap*.xml
+public/robots.txt
