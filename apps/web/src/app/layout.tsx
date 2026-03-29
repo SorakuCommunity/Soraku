@@ -6,7 +6,7 @@ import '@/styles/globals.css'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.soraku.id'
 
 export const metadata: Metadata = {
-  title: { default: 'Soraku Community', template: '%s — Soraku Community' },
+  title: { default: 'Soraku Community', template: '%s | Soraku Community' },
   description: 'Komunitas anime & budaya Jepang non-profit pop Indonesia. Est. 2023.',
   metadataBase: new URL(APP_URL),
   openGraph: {

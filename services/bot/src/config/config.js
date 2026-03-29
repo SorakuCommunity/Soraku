@@ -86,5 +86,5 @@ export const config = {
   },
 
   watermark: 'Soraku Community',
-  version:   '3.0.0',
+  version:   '2.0.0',
 }

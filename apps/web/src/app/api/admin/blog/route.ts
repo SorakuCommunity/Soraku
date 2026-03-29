@@ -4,6 +4,7 @@ import { adminDb } from '@/lib/supabase/admin'
 import { getSession, isStaff } from '@/lib/auth'
 import { ok, err, FORBIDDEN, SERVER_ERROR } from '@/lib/api'
 import { sendDiscordWebhook } from '@/lib/discord-webhook'
+import { notifyNewBlog } from '@/lib/notify'
 import { env } from '@/env'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
@@ -145,6 +146,9 @@ export async function POST(req: NextRequest) {
         tags: data.tags ?? [],
         authorid: data.authorid,
       }).catch((e) => console.warn('[Discord Blog] Auto-notify failed:', e))
+
+      // Auto in-app notification ke semua user
+      notifyNewBlog({ slug: data.slug, title: data.title }).catch(() => {})
     }
 
     return ok(data, 201)

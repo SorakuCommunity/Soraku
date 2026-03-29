@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
 
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
+
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
 
   images: {

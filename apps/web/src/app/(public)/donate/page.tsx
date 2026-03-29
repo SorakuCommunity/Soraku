@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Heart, ExternalLink, Trophy, Star } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Donasi — Soraku Community',
+  title: 'Donasi | Soraku Community',
   description: 'Dukung Soraku Community dengan donasi sukarela melalui Trakteer.',
 }
 

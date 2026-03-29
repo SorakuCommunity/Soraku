@@ -148,6 +148,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         tags: data.tags ?? [],
         authorid: data.authorid,
       }).catch((e) => console.warn('[Discord Blog] Notify on publish failed:', e))
+
+      // Auto in-app notification ke semua user
+      notifyNewBlog({ slug: data.slug, title: data.title }).catch(() => {})
     }
 
     return ok(data)

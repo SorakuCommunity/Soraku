@@ -44,6 +44,7 @@ export const env = createEnv({
     DISCORD_EVENT_WEBHOOK_URL: z.string().optional(), // Discord webhook untuk announce event
     DISCORD_REGISTRATION_WEBHOOK_URL: z.string().optional(), // Discord webhook untuk notif pendaftaran (channel 1483340741194289172)
     DISCORD_BLOG_WEBHOOK_URL: z.string().optional(), // Discord webhook untuk notif artikel baru
+    DISCORD_FEEDBACK_WEBHOOK_URL: z.string().optional(), // Discord webhook untuk notif feedback
   },
 
   client: {
@@ -71,6 +72,7 @@ export const env = createEnv({
     DISCORD_EVENT_WEBHOOK_URL: process.env.DISCORD_EVENT_WEBHOOK_URL,
     DISCORD_REGISTRATION_WEBHOOK_URL: process.env.DISCORD_REGISTRATION_WEBHOOK_URL,
     DISCORD_BLOG_WEBHOOK_URL: process.env.DISCORD_BLOG_WEBHOOK_URL,
+    DISCORD_FEEDBACK_WEBHOOK_URL: process.env.DISCORD_FEEDBACK_WEBHOOK_URL,
 
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

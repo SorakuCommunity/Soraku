@@ -45,11 +45,11 @@ const TIMELINE = [
   { year:'2024', label:'Q1',    title:'Platform Web Lahir',        desc:'Tim inti terbentuk. Blog, galeri, event, sistem member pertama hadir.',         icon:'🚀', hi:false },
   { year:'2024', label:'Q2',    title:'Soraku Agensi Berdiri',     desc:'VTuber & talent lokal Indonesia punya ruang untuk berkembang.',                 icon:'🎭', hi:false },
   { year:'2025', label:'Q1',    title:'500+ Member Discord',       desc:'Milestone bersejarah sistem premium & bot Discord terintegrasi.',             icon:'🏆', hi:false },
-  { year:'2026', label:'Now',   title:'v1.0 — Platform Penuh',     desc:'Dibangun ulang dengan Next.js 16, Supabase, dan fitur komunitas yang matang.',  icon:'🌸', hi:true  },
+  { year:'2026', label:'Now',   title:'v1.0 | Platform Penuh',     desc:'Dibangun ulang dengan Next.js 16, Supabase, dan fitur komunitas yang matang.',  icon:'🌸', hi:true  },
 ]
 
 export const metadata: Metadata = {
-  title: 'Tentang — Soraku Community',
+  title: 'Tentang | Soraku Community',
   description: 'Kenali visi, pilar, dan perjalanan Soraku Community sejak 2023.',
 }
 
@@ -79,7 +79,7 @@ export default function AboutPage() {
             <div className="h-[1.5px] w-10 mb-4 rounded-full" style={{background:"linear-gradient(90deg,#4FA3D1,#E8C2A8)",opacity:0.5}}/>
             <p className="text-sm text-white/40 leading-relaxed max-w-xs">
               Komunitas non-profit terbuka untuk semua pecinta anime & budaya Jepang di Indonesia.
-              Ruang untuk tumbuh bersama — sejak 2023.
+              Ruang untuk tumbuh bersama sejak 2023.
             </p>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function AboutPage() {
             <div className="h-[2px] w-12 mb-5 rounded-full" style={{background:"linear-gradient(90deg,#4FA3D1,#E8C2A8)",opacity:0.45}}/>
             <p className="max-w-md text-base xl:text-lg text-white/35 leading-relaxed mb-8">
               Komunitas non-profit terbuka untuk semua pecinta anime & budaya Jepang di Indonesia.
-              Ruang untuk tumbuh, berkreasi, dan menemukan teman sefrekuensi — sejak 2023.
+              Ruang untuk tumbuh, berkreasi, dan menemukan teman sefrekuensi sejak 2023.
             </p>
             <div className="flex items-center gap-3">
               <Link href="/register"
@@ -122,7 +122,8 @@ export default function AboutPage() {
               <div className="absolute inset-0 -z-0">
                 <div className="absolute right-0 top-1/4 h-[450px] w-[450px] rounded-full bg-primary/6 blur-[100px]"/>
               </div>
-              <Image src="/logo-full.png" alt="Soraku" fill className="object-cover object-center" priority/>
+              <Image src="/logo-full.png" alt="Soraku" fill sizes="100vw"
+                className="object-cover object-center" priority/>
               <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#1C1E22] to-transparent z-10"/>
               <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#1C1E22] via-[#1C1E22]/60 to-transparent z-10"/>
               <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#1C1E22] to-transparent z-10"/>
@@ -151,7 +152,7 @@ export default function AboutPage() {
                 </div>
               </div>
               <p className="text-sm text-white/40 leading-relaxed">
-                <strong className="text-white/70">Sora</strong> (空) artinya langit dalam bahasa Jepang —
+                <strong className="text-white/70">Sora</strong> (空) artinya langit dalam bahasa Jepang,
                 simbol kebebasan, keluasan, dan kemungkinan tanpa batas.{" "}
                 <strong className="text-white/70">-ku</strong> dalam bahasa Indonesia berarti
                 <em className="not-italic font-semibold text-white/60"> milikku</em>.
@@ -163,7 +164,7 @@ export default function AboutPage() {
                 <span className="text-primary">mengangkat</span>."
               </p>
               <p className="text-sm text-white/35 leading-relaxed">
-                Soraku adalah ruang untuk bermimpi, belajar, berkarya, dan berkembang —
+                Soraku adalah ruang untuk bermimpi, belajar, berkarya, dan berkembang,
                 milik semua anggotanya, bukan satu orang. Sebuah ekosistem tempat ide berkembang
                 dan individu bisa naik setinggi yang mereka mampu.
               </p>
@@ -254,7 +255,7 @@ export default function AboutPage() {
             </span>
           </h2>
           <p className="text-base sm:text-lg text-white/30 leading-relaxed max-w-xl mx-auto mb-10">
-            Soraku bukan sekadar komunitas — ini adalah ruang di mana imajinasi menemukan bentuknya,
+            Soraku bukan sekadar komunitas. Ini adalah ruang di mana imajinasi menemukan bentuknya,
             kreativitas dihargai, dan setiap anggota punya tempat untuk tumbuh.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

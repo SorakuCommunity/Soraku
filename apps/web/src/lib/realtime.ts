@@ -1,12 +1,4 @@
-import { InferRealtimeEvents, Realtime } from '@upstash/realtime'
 import { z } from 'zod'
-import { Redis } from '@upstash/redis'
-
-// Redis client — hanya di server
-export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL ?? '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN ?? '',
-})
 
 // Event schema
 const schema = {
@@ -22,5 +14,52 @@ const schema = {
   },
 }
 
-export const realtime = new Realtime({ schema, redis })
-export type RealtimeEvents = InferRealtimeEvents<typeof realtime>
+// Redis & Realtime - lazy init, null jika ENV tidak di-set
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _redis: any = null
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _realtime: any = null
+let _initialized = false
+
+function init() {
+  if (_initialized) return
+  _initialized = true
+
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  if (!url || !token) return
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Redis } = require('@upstash/redis')
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Realtime } = require('@upstash/realtime')
+    _redis = new Redis({ url, token })
+    _realtime = new Realtime({ schema, redis: _redis })
+  } catch {
+    // Paket tidak tersedia atau Redis error - skip
+  }
+}
+
+export function getRedis() {
+  init()
+  return _redis
+}
+
+export function getRealtime() {
+  init()
+  return _realtime
+}
+
+// Eager export untuk backward compatibility
+export const redis = new Proxy({} as any, {
+  get(_, prop) {
+    return (getRedis() as any)?.[prop]
+  },
+})
+
+export const realtime = new Proxy({} as any, {
+  get(_, prop) {
+    return (getRealtime() as any)?.[prop]
+  },
+})

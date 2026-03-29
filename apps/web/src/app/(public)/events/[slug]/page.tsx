@@ -113,7 +113,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .single()
   if (!data) return { title: 'Event tidak ditemukan' }
   return {
-    title: `${data.title} — Soraku Event`,
+    title: `${data.title} | Soraku Event`,
     description: (data.description ?? '').replace(/\n/g, ' ').slice(0, 160),
     openGraph: { images: data.coverurl ? [data.coverurl] : undefined },
   }

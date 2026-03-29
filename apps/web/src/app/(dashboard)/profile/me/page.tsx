@@ -1,5 +1,4 @@
 'use client'
-export const dynamic = 'force-dynamic'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
@@ -388,7 +387,7 @@ export default function PrivateProfilePage() {
           }}
         >
           {coverurl ? (
-            <Image src={coverurl} alt="" fill className="object-cover" />
+            <Image src={coverurl} alt="" fill sizes="100vw" className="object-cover" />
           ) : (
             <div className="from-primary/20 via-primary/8 to-accent/15 absolute inset-0 bg-gradient-to-br" />
           )}
@@ -419,7 +418,7 @@ export default function PrivateProfilePage() {
             <XpRing pct={xpPct} color={rm.color} size={88} />
             <div className="border-background bg-card absolute inset-[4px] overflow-hidden rounded-2xl border-[3px] shadow-xl">
               {avatarurl ? (
-                <Image src={avatarurl} alt={name} fill className="object-cover" />
+                <Image src={avatarurl} alt={name} fill sizes="128px" className="object-cover" />
               ) : (
                 <div
                   className="flex h-full w-full items-center justify-center text-2xl font-black"

@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .single()
     if (!data) return { title: 'Artikel tidak ditemukan' }
     return {
-      title: `${data.title} — Soraku Blog`,
+      title: `${data.title} | Soraku Blog`,
       description: data.excerpt ?? undefined,
       openGraph: { images: data.coverurl ? [data.coverurl] : undefined },
     }

@@ -414,5 +414,83 @@ kbd {
   50%       { transform: translateY(6px); }
 }
 
+/* ═══ Cyberpunk Hero Animations ══════════════════════════════ */
+@keyframes graffiti-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.333%); }
+}
+
+.graffiti-scroll {
+  animation: graffiti-scroll 30s linear infinite;
+}
+
+@keyframes float-badge {
+  0%, 100% { 
+    transform: translateY(0px) rotate(-1deg); 
+  }
+  25% { 
+    transform: translateY(-8px) rotate(1deg); 
+  }
+  50% { 
+    transform: translateY(-4px) rotate(-0.5deg); 
+  }
+  75% { 
+    transform: translateY(-12px) rotate(0.5deg); 
+  }
+}
+
+.float-badge {
+  animation: float-badge 4s ease-in-out infinite;
+}
+
+@keyframes float-badge-slow {
+  0%, 100% { 
+    transform: translateY(0px) rotate(1deg); 
+  }
+  50% { 
+    transform: translateY(-15px) rotate(-1deg); 
+  }
+}
+
+.float-badge-slow {
+  animation: float-badge-slow 6s ease-in-out infinite;
+}
+
+/* Cyberpunk glow effects */
+.cyber-glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3),
+              0 0 40px rgba(0, 240, 255, 0.1);
+}
+
+.cyber-glow-pink {
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.3),
+              0 0 40px rgba(255, 0, 255, 0.1);
+}
+
+.cyber-glow-purple {
+  box-shadow: 0 0 20px rgba(184, 41, 221, 0.3),
+              0 0 40px rgba(184, 41, 221, 0.1);
+}
+
+/* Glass morphism cards */
+.glass-card-cyber {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-cyber:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 240, 255, 0.2);
+}
+
+/* Text gradient cyberpunk */
+.text-gradient-cyber {
+  background: linear-gradient(135deg, #00f0ff 0%, #b829dd 50%, #ff00ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .scrollbar-hide { scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Check, Star, Zap, Crown, Trophy } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Premium — Soraku Community',
+  title: 'Premium | Soraku Community',
   description:
     'Dukung Soraku Community dengan membership VIP atau VVIP dan dapatkan benefit eksklusif.',
 }

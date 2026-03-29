@@ -80,6 +80,10 @@ export async function GET(_req: NextRequest) {
       .order('sortorder', { ascending: true })
       .limit(12)
 
-    return ok({ events: formattedEvents, blogs, partnerships: partnerships ?? [] })
+    const allPartners = partnerships ?? []
+    const partnersOnly = allPartners.filter(p => p.category !== 'sponsor')
+    const sponsorsOnly = allPartners.filter(p => p.category === 'sponsor')
+
+    return ok({ events: formattedEvents, blogs, partnerships: partnersOnly, sponsorships: sponsorsOnly })
   } catch { return SERVER_ERROR() }
 }

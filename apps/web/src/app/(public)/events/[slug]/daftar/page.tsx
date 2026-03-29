@@ -1,5 +1,4 @@
 'use client'
-export const dynamic = 'force-dynamic'
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
@@ -208,7 +207,7 @@ function PlayerCard({
             {isReserve ? 'Cadangan' : 'Pemain'}
           </span>
           {!isReserve && !filled && (
-            <span className="text-[9px] font-bold text-red-400/70">— Wajib diisi</span>
+            <span className="text-[9px] font-bold text-red-400/70">* Wajib diisi</span>
           )}
         </div>
         {canRemove && (
@@ -618,7 +617,7 @@ export default function EventRegisterPage() {
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               maxLength={500}
-              placeholder="Opsional — ada yang ingin disampaikan ke panitia?"
+              placeholder="Opsional. Ada yang ingin disampaikan ke panitia?"
               className="border-border/40 placeholder:text-foreground/15 focus:border-primary/40 focus:ring-primary/10 w-full resize-none rounded-xl border bg-black/30 px-4 py-3 text-sm transition-all outline-none focus:ring-1"
             />
           </div>
@@ -759,7 +758,7 @@ export default function EventRegisterPage() {
                       <p className="text-sm font-semibold text-amber-400/80">
                         Klik untuk upload screenshot
                       </p>
-                      <p className="text-foreground/30 text-[10px]">JPG, PNG, WebP — maks 5MB</p>
+                      <p className="text-foreground/30 text-[10px]">JPG, PNG, WebP. Maks 5MB</p>
                     </div>
                   )}
                 </label>

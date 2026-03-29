@@ -7,7 +7,7 @@ import { formatRupiah, formatDate } from '@/lib/utils'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Leaderboard Donatur — Soraku Community',
+  title: 'Leaderboard Donatur | Soraku Community',
   description: 'Daftar donatur terbaik yang mendukung Soraku Community.',
 }
 

@@ -1,11 +1,9 @@
 'use client'
-export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Home, User, Image as ImageIcon, Bell, Shield, LogOut, ChevronRight } from 'lucide-react'
+import { Home, User, Image as ImageIcon, Bell, Shield, LogOut, ChevronRight, Sparkles, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SessionUser {
@@ -25,6 +23,21 @@ const SIDEBAR_LINKS = [
   { href: '/notifications', label: 'Notifikasi', icon: Bell },
 ]
 
+// Stats for sidebar - data will be fetched from API
+const USER_STATS = [
+  { label: 'Karya', value: '—', icon: ImageIcon },
+  { label: 'Notif', value: '—', icon: Bell },
+]
+
+// New Color Palette
+const COLORS = {
+  primary: "#4FA3D1",
+  dark: "#1C1E22",
+  secondary: "#6E8FA6",
+  light: "#D9DDE3",
+  accent: "#E8C2A8",
+};
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -43,44 +56,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.refresh()
   }
 
-  const displayName = user?.displayname ?? user?.username ?? 'Member'
-  const initial = displayName.charAt(0).toUpperCase()
-
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl gap-8 px-4 py-8 pb-24 sm:px-6 lg:px-8">
-      {/* Sidebar */}
-      <aside className="hidden w-56 flex-shrink-0 lg:block">
-        <div className="sticky top-24 space-y-2">
-          {/* User card */}
-          <div className="glass-card p-4">
-            <Link href="/profile/me" className="group flex items-center gap-3">
-              <div className="bg-primary/15 text-primary border-primary/20 group-hover:border-primary/40 flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border font-bold transition-colors">
-                {user?.avatarurl ? (
-                  <Image
-                    src={user.avatarurl}
-                    alt={displayName}
-                    width={40}
-                    height={40}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span className="text-sm font-black">{initial}</span>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="group-hover:text-primary truncate text-sm font-bold transition-colors">
-                  {displayName}
-                </p>
-                <p className="text-muted-foreground/50 truncate text-xs">
-                  @{user?.username ?? '—'}
-                </p>
-              </div>
-              <ChevronRight className="text-muted-foreground/30 group-hover:text-primary/60 h-3.5 w-3.5 flex-shrink-0 transition-colors" />
-            </Link>
-          </div>
-
-          {/* Nav */}
-          <div className="glass-card p-3">
+    <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl gap-6 px-4 py-6 pb-24 sm:px-6 lg:px-8">
+      {/* Sidebar - Redesigned without user profile card */}
+      <aside className="hidden w-52 flex-shrink-0 lg:block">
+        <div className="sticky top-24 space-y-4">
+          
+          {/* Navigation */}
+          <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
             <nav className="space-y-0.5">
               {SIDEBAR_LINKS.map(({ href, label, icon: Icon }) => {
                 const active =
@@ -92,13 +75,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     key={href}
                     href={href}
                     className={cn(
-                      'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                      'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                       active
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-muted-foreground hover:bg-primary/8 hover:text-foreground'
+                        ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
+                        : 'text-[#6E8FA6] hover:bg-white/5 hover:text-[#D9DDE3]'
                     )}
                   >
-                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <Icon className={cn("h-4 w-4 flex-shrink-0", active ? "text-[#4FA3D1]" : "text-[#6E8FA6]/60")} />
                     {label}
                   </Link>
                 )
@@ -110,23 +93,50 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link
                   href="/admin"
                   className={cn(
-                    'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                     pathname.startsWith('/admin')
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-primary/8 hover:text-foreground'
+                      ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
+                      : 'text-[#6E8FA6] hover:bg-white/5 hover:text-[#D9DDE3]'
                   )}
                 >
-                  <Shield className="h-4 w-4 flex-shrink-0" /> Admin Panel
+                  <Shield className={cn("h-4 w-4 flex-shrink-0", pathname.startsWith('/admin') ? "text-[#4FA3D1]" : "text-[#6E8FA6]/60")} /> 
+                  Admin Panel
                 </Link>
               )}
 
               <button
                 onClick={handleSignout}
-                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                className="text-[#6E8FA6] hover:bg-red-500/5 hover:text-red-400 flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
               >
                 <LogOut className="h-4 w-4 flex-shrink-0" /> Keluar
               </button>
             </nav>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20 mb-3">Aktivitas</p>
+            <div className="grid grid-cols-2 gap-2">
+              {USER_STATS.map((stat) => (
+                <div key={stat.label} className="flex flex-col items-center p-2 rounded-lg bg-white/[0.02]">
+                  <stat.icon className="h-4 w-4 text-[#6E8FA6] mb-1" />
+                  <p className="text-lg font-black leading-none text-[#D9DDE3]">{stat.value}</p>
+                  <p className="text-[9px] text-[#6E8FA6]">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Upgrade CTA */}
+          <div className="p-3 rounded-xl bg-gradient-to-br from-[#4FA3D1]/10 to-[#E8C2A8]/5 border border-[#4FA3D1]/20">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-4 w-4 text-[#4FA3D1]" />
+              <p className="text-xs font-bold text-[#D9DDE3]">Premium</p>
+            </div>
+            <p className="text-[10px] text-[#6E8FA6] mb-3">Akses fitur eksklusif dan dukung komunitas</p>
+            <Link href="/premium" className="block w-full text-center py-2 rounded-lg bg-[#4FA3D1]/20 text-[#4FA3D1] text-xs font-bold hover:bg-[#4FA3D1]/30 transition-colors">
+              Upgrade
+            </Link>
           </div>
         </div>
       </aside>

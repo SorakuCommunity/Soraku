@@ -1,12 +1,52 @@
-# Catatan Perubahan — Soraku Community Platform
+# Catatan Perubahan - Soraku Community Platform
 
 Semua perubahan signifikan pada platform Soraku dicatat di sini.
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ---
 
-## [v1.5.0] — 21 Maret 2026
-**Sistem Realtime · Redesign Homepage dan Admin**
+## [v1.5.1] - 30 Maret 2026
+**Admin Webhook, Halaman Legal, Konsolidasi Migrasi, Feedback & Kontak**
+
+Ditambahkan:
+- Panel admin Discord Webhooks: kelola URL webhook Blog, Event, Pendaftaran, dan Feedback dari UI
+- Fitur test webhook langsung dari panel admin dengan satu klik
+- Admin panel terpisah dari navbar utama, layout standalone dengan header sendiri
+- Halaman Kebijakan Privasi dengan 10 section (privasi anak, retensi data, hak pengguna)
+- Halaman Ketentuan Penggunaan dengan 12 section (konten terlarang, event, pembatasan tanggung jawab)
+- Halaman Lisensi dengan Soraku Community Source License v1.0 (8 bagian)
+- Auto-notifikasi in-app saat artikel blog dipublikasikan (broadcast ke semua user)
+- Partnership & Sponsorship admin page dengan upload logo dan kategori
+- Halaman Kirim Masukan (/feedback) dengan form dan integrasi Discord webhook
+- Halaman Kontak (/contact) dengan info email, Discord, lokasi, dan peta
+- Link Kontak dan Feedback di footer
+
+Diperbaiki:
+- POST /api/analytics/tiktok gagal 500 jika TIKTOK_ACCESS_TOKEN tidak di-set, sekarang di-skip
+- GET /api/admin/webhooks gagal 500: kolom label dan category tidak ada di DB, ditambah migrasi fix
+- PATCH /api/admin/webhooks gagal 400/500, perbaikan parsing body dan validasi
+- GET /api/admin/partnerships gagal 500, ditambah error logging
+- Upstash Redis error saat ENV tidak di-set, sekarang di-skip dengan graceful
+- Next.js Image fill tanpa prop sizes, ditambah sizes="100vw"
+- Cross-origin warning di dev server, ditambah allowedDevOrigins
+- Notifikasi `notifyNewBlog` tidak ter-trigger saat artikel di-publish
+- Hero section: tombol "Masuk" dihapus, hanya Register + Discord atau Discord + About
+- Semua em-dash di teks publik diganti dengan format yang lebih natural
+- `export const dynamic` dihapus dari client component
+
+Infrastruktur:
+- Migrasi database terkonsolidasi ke satu file: `20260329_soraku_v1_5_1_consolidated.sql`
+- Migrasi tambahan: `20260330_fix_sitesettings_columns.sql` untuk tambah kolom label/category
+- Semua file migration lama dihapus, hanya tersisa file konsolidasi + fix
+- Tabel `sitesettings` untuk konfigurasi webhook (key-value tanpa underscore)
+- Discord webhook mendukung feedback: `discordFeedbackWebhookUrl`
+- `discord-webhook.ts` mendukung format key baru (camelCase) dan lama (snake_case)
+- Route admin dipindah dari `(dashboard)/admin` ke `(admin)/admin`, terpisah dari layout user
+
+---
+
+## [v1.5.0] - 21 Maret 2026
+**Sistem Realtime, Redesign Homepage dan Admin**
 
 Rilis ini membawa sistem notifikasi push berbasis Redis dan renovasi besar
 pada tampilan beranda serta panel admin.
@@ -26,8 +66,8 @@ Diperbaiki:
 
 ---
 
-## [v1.4.0] — 20 Maret 2026
-**Domain Resmi · Sistem Follow · Polesan UI**
+## [v1.4.0] - 20 Maret 2026
+**Domain Resmi, Sistem Follow, Polesan UI**
 
 Ditambahkan:
 - Domain default berpindah ke `www.soraku.id`
@@ -42,8 +82,8 @@ Diperbaiki:
 
 ---
 
-## [v1.3.0] — 19 Maret 2026
-**Sistem Blog — Renovasi Total**
+## [v1.3.0] - 19 Maret 2026
+**Sistem Blog - Renovasi Total**
 
 Ditambahkan:
 - Grid blog didesain ulang dengan cover image dan stats overlay
@@ -64,8 +104,8 @@ Diperbaiki:
 
 ---
 
-## [v1.2.0] — 17 Maret 2026
-**Sistem Event — Pendaftaran Mobile Legends**
+## [v1.2.0] - 17 Maret 2026
+**Sistem Event - Pendaftaran Mobile Legends**
 
 Ditambahkan:
 - Form pendaftaran event 3 langkah: Info Tim, Pemain, Konfirmasi
@@ -84,8 +124,8 @@ Infrastruktur:
 
 ---
 
-## [v1.1.0] — 10 Maret 2026
-**Konfigurasi Type-Safe · Penguatan Autentikasi**
+## [v1.1.0] - 10 Maret 2026
+**Konfigurasi Type-Safe, Penguatan Autentikasi**
 
 Ditambahkan:
 - T3 Env untuk validasi environment variable yang type-safe di semua aplikasi
@@ -101,7 +141,7 @@ Diperbaiki:
 
 ---
 
-## [v1.0.0] — 8 Maret 2026
+## [v1.0.0] - 8 Maret 2026
 **Peluncuran Platform**
 
 Ini adalah rilis publik pertama Soraku Community Platform.
@@ -123,8 +163,8 @@ Sistem:
 
 ---
 
-## [v0.9.0] — 5 Maret 2026
-**Backend Lengkap · Integrasi Data Real**
+## [v0.9.0] - 5 Maret 2026
+**Backend Lengkap, Integrasi Data Real**
 
 Ditambahkan:
 - Trakteer webhook untuk notifikasi donasi masuk
@@ -135,8 +175,8 @@ Ditambahkan:
 
 ---
 
-## [v0.8.0] — 3 Maret 2026
-**Central API · Fondasi Bot Discord**
+## [v0.8.0] - 3 Maret 2026
+**Central API, Fondasi Bot Discord**
 
 Ditambahkan:
 - `services/api`: Next.js App Router sebagai API terpusat
@@ -146,7 +186,7 @@ Ditambahkan:
 
 ---
 
-## [v0.7.0] — 1 Maret 2026
+## [v0.7.0] - 1 Maret 2026
 **Semua Halaman Selesai**
 
 Halaman yang selesai pada rilis ini mencakup beranda, tentang kami, blog, event,
@@ -159,7 +199,7 @@ Ditambahkan:
 
 ---
 
-## [v0.5.0] — 25 Februari 2026
+## [v0.5.0] - 25 Februari 2026
 **Fondasi Backend**
 
 Ditambahkan:
@@ -170,7 +210,7 @@ Ditambahkan:
 
 ---
 
-## [v0.2.0] — 20 Februari 2026
+## [v0.2.0] - 20 Februari 2026
 **Panel Admin**
 
 Ditambahkan:
@@ -180,7 +220,7 @@ Ditambahkan:
 
 ---
 
-## [v0.1.0] — 15 Februari 2026
+## [v0.1.0] - 15 Februari 2026
 **Fondasi UI**
 
 Ditambahkan:
@@ -191,7 +231,7 @@ Ditambahkan:
 
 ---
 
-## [v0.0.1] — 10 Februari 2026
+## [v0.0.1] - 10 Februari 2026
 **Awal Mula**
 
 Ditambahkan:
@@ -203,5 +243,5 @@ Ditambahkan:
 
 ---
 
-*Soraku Community · Est. 2023 · Dibuat dengan penuh semangat oleh Riu, Sora, Kaizo, dan Bubu*
+*Soraku Community. Est. 2023.*
 ```

@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .single()
   if (!data) return { title: 'VTuber Not Found' }
   return {
-    title: `${data.charactername ?? data.name} — Soraku VTubers`,
+    title: `${data.charactername ?? data.name} | Soraku VTubers`,
     description: data.description ?? undefined,
   }
 }
@@ -52,7 +52,7 @@ export default async function VTuberDetailPage({ params }: Props) {
         {/* Cover */}
         {vt.coverurl && (
           <div className="relative h-48 w-full sm:h-64">
-            <Image src={vt.coverurl} alt={vt.name} fill className="object-cover" />
+            <Image src={vt.coverurl} alt={vt.name} fill sizes="100vw" className="object-cover" />
             <div className="from-card/90 absolute inset-0 bg-gradient-to-t to-transparent" />
           </div>
         )}
@@ -111,7 +111,7 @@ export default async function VTuberDetailPage({ params }: Props) {
               rel="noopener noreferrer"
               className="mt-6 inline-flex items-center gap-2 rounded-xl bg-red-500/15 px-4 py-2.5 text-sm font-bold text-red-400 transition-colors hover:bg-red-500/25"
             >
-              🔴 Sedang Live — Tonton Sekarang
+              🔴 Sedang Live | Tonton Sekarang
             </a>
           )}
 

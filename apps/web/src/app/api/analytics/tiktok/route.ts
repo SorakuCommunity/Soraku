@@ -31,10 +31,7 @@ interface EventBody {
 
 export async function POST(req: NextRequest) {
   if (!ACCESS_TOKEN) {
-    return NextResponse.json(
-      { ok: false, error: 'TIKTOK_ACCESS_TOKEN not configured' },
-      { status: 500 }
-    )
+    return NextResponse.json({ ok: true, skipped: true })
   }
 
   try {
