@@ -151,3 +151,54 @@ export const post_comments = soraku.table("post_comments", {
   createdat: timestamp("createdat", { withTimezone: true }).defaultNow(),
   updatedat: timestamp("updatedat", { withTimezone: true }).defaultNow(),
 })
+
+// ============================================================
+// STREAMING DATABASE TABLES (soraku-streaming project)
+// ============================================================
+
+export const watch_history = soraku.table("watch_history", {
+  id:          uuid("id").primaryKey().defaultRandom(),
+  userid:      uuid("userid").notNull(),
+  animeid:     text("animeid").notNull(),
+  animetitle: text("animetitle").notNull(),
+  cover:       text("cover"),
+  episode:     integer("episode").notNull(),
+  progress:    integer("progress").default(0),
+  duration:    integer("duration").default(0),
+  provider:    text("provider").default("hianime"),
+  updatedat:   timestamp("updatedat", { withTimezone: true }).defaultNow(),
+  createdat:    timestamp("createdat", { withTimezone: true }).defaultNow(),
+})
+
+export const favorites = soraku.table("favorites", {
+  id:        uuid("id").primaryKey().defaultRandom(),
+  userid:    uuid("userid").notNull(),
+  animeid:   text("animeid").notNull(),
+  title:     text("title").notNull(),
+  cover:     text("cover"),
+  addedat:   timestamp("addedat", { withTimezone: true }).defaultNow(),
+})
+
+export const user_settings = soraku.table("user_settings", {
+  id:           uuid("id").primaryKey().defaultRandom(),
+  userid:       uuid("userid").notNull().unique(),
+  defaultsource text("defaultsource").default("hianime"),
+  defaultquality text("defaultquality").default("auto"),
+  subtitlesenabled boolean("subtitlesenabled").default(true),
+  autoplay     boolean("autoplay").default(true),
+  notifications boolean("notifications").default(true),
+  createdat:    timestamp("createdat", { withTimezone: true }).defaultNow(),
+  updatedat:    timestamp("updatedat", { withTimezone: true }).defaultNow(),
+})
+
+// ============================================================
+// BOT DATABASE TABLES (soraku-komunitas project)
+// ============================================================
+
+export const bot_config = soraku.table("bot_config", {
+  id:        uuid("id").primaryKey().defaultRandom(),
+  key:       text("key").notNull().unique(),
+  value:     text("value"),
+  createdat: timestamp("createdat", { withTimezone: true }).defaultNow(),
+  updatedat: timestamp("updatedat", { withTimezone: true }).defaultNow(),
+})

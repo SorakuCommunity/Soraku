@@ -11,19 +11,15 @@ export async function GET(req: NextRequest) {
   // Kumpulkan cookies PKCE dulu — baru set ke response setelah URL Discord diketahui
   const pendingCookies: { name: string; value: string; options: CookieOptions }[] = []
 
-  const supabase = createServerClient(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll: () => req.cookies.getAll(),
-        setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
-          // Kumpulkan dulu — jangan set ke response sebelum URL diketahui
-          pendingCookies.push(...cookiesToSet)
-        },
+  const supabase = createServerClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_KEY, {
+    cookies: {
+      getAll: () => req.cookies.getAll(),
+      setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
+        // Kumpulkan dulu — jangan set ke response sebelum URL diketahui
+        pendingCookies.push(...cookiesToSet)
       },
-    }
-  )
+    },
+  })
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'discord',

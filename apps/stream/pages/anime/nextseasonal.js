@@ -1,0 +1,212 @@
+import { ChevronLeftIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
+import Link from "next/link";
+import { Fragment, useEffect, useState } from "react";
+import Skeleton from "react-loading-skeleton";
+import Footer from "@/components/shared/footer";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]";
+import Head from "next/head";
+
+export default function NextSeason({ sessions }) {
+  const [data, setData] = useState(null);
+  const [page, setPage] = useState(1);
+  const [nextPage, setNextPage] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      const res = await fetch("https://graphql.anilist.co", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          query: `query($perPage: Int, $page: Int) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            perPage
+            currentPage
+            lastPage
+            hasNextPage
+        }
+        media (season: WINTER, seasonYear: 2025,sort :POPULARITY_DESC, type : ANIME){
+            id
+            idMal
+            title {
+                romaji
+                english
+                userPreferred
+            }
+            coverImage {
+                large
+                extraLarge
+                color
+            }
+            episodes
+            status
+            duration
+            genres
+            season
+            format
+            averageScore
+            popularity
+            nextAiringEpisode {
+                airingAt
+                episode
+              }
+              seasonYear
+              startDate {
+                year
+                month
+                day
+              }
+              endDate {
+                year
+                month
+                day
+              }
+        }
+    }
+}`,
+          variables: {
+            page: page,
+            perPage: 20,
+          },
+        }),
+      });
+      const get = await res.json();
+      if (get?.data?.Page?.media?.length === 0) {
+        setNextPage(false);
+      } else if (get !== null && page > 1) {
+        setData((prevData) => {
+          return [...(prevData ?? []), ...get?.data?.Page?.media];
+        });
+        setNextPage(get?.data?.Page?.pageInfo.hasNextPage);
+      } else {
+        setData(get?.data?.Page?.media);
+      }
+      setNextPage(get?.data?.Page?.pageInfo.hasNextPage);
+      setLoading(false);
+    };
+    fetchData();
+  }, [page]);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (page > 5 || !nextPage) {
+        window.removeEventListener("scroll", handleScroll);
+        return;
+      }
+
+      if (
+        window.innerHeight + window.pageYOffset >=
+        document.body.offsetHeight - 3
+      ) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [page, nextPage]);
+
+  return (
+    <Fragment>
+      <Head>
+        <title>1Anime - Next Season: Anime</title>
+        <meta name="title" content="Next Season: Anime" />
+        <meta
+          name="description"
+          content="Explore Anime coming out next season - Dive into the latest and most popular anime series on 1Anime. From thrilling action to heartwarming romance, discover the buzzworthy shows that have everyone talking. Stream now and stay up-to-date with the hottest anime trends!"
+        />
+      </Head>
+      
+      <main className="flex flex-col gap-2 items-center min-h-screen w-screen px-2 relative pb-10">
+        <div className="z-50 bg-primary pt-3 pb-2 shadow-md shadow-primary w-full fixed px-2">
+          <Link href="/" className="flex gap-1 items-center font-Archivo">
+            <ChevronLeftIcon className="w-4 h-4" />
+            <h1 className="text-lg">Next Season</h1>
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6 gap-2 max-w-6xl pt-12">
+          {data?.map((i, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center w-[120px] lg:w-[150px]"
+            >
+              <Link
+                href={`/anime/${i.id}`}
+                className="p-1"
+                title={i.title.romaji}
+              >
+                <Image
+                  src={i.coverImage.large}
+                  alt={i.title.romaji}
+                  width={500}
+                  height={500}
+                  className="w-[100px] h-[140px] lg:w-[130px] lg:h-[180px] object-cover rounded hover:scale-105 scale-100 transition-all duration-200 ease-out"
+                />
+              </Link>
+              <Link
+                href={`/anime/${i.id}`}
+                className="w-full px-1"
+                title={i.title.romaji}
+              >
+                <h1 className="font-Archivo font-bold xl:text-sm text-[12px] line-clamp-2">
+                  {i.status === "RELEASING" ? (
+                    <span className="dots bg-green-500" />
+                  ) : i.status === "NOT_YET_RELEASED" ? (
+                    <span className="dots bg-red-500" />
+                  ) : null}
+                  {i.title.romaji}
+                </h1>
+              </Link>
+            </div>
+          ))}
+
+          {loading && (
+            <>
+              {[1, 2, 4, 5, 6, 7, 8].map((item) => (
+                <div
+                  key={item}
+                  className="flex flex-col items-center w-[120px] lg:w-[150px]"
+                >
+                  <div className="w-full p-1">
+                    <Skeleton className="w-[100px] h-[140px] lg:w-[130px] lg:h-[180px] rounded" />
+                  </div>
+                  <div className="w-full px-1">
+                    <Skeleton width={60} height={15} />
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+        {!loading && page > 5 && nextPage && (
+          <button
+            onClick={() => setPage((p) => p + 1)}
+            className="bg-secondary xl:w-[30%] w-[80%] h-8 rounded-md mt-4"
+          >
+            Load More
+          </button>
+        )}
+      </main>
+      <Footer />
+    </Fragment>
+  );
+}
+
+export async function getServerSideProps(context) {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  return {
+    props: {
+      sessions: session,
+    },
+  };
+}

@@ -20,7 +20,7 @@ const Schema = z.object({
 export async function POST(req: NextRequest) {
   // Auth: hanya OWNER / MANAGER / ADMIN atau internal secret
   const secret = req.headers.get('x-soraku-secret')
-  const isInternal = secret === env.SORAKU_API_SECRET
+  const isInternal = secret === env.SORAKU_SECRET
 
   if (!isInternal) {
     const supabase = await createClient()

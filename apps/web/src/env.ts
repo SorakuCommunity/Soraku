@@ -4,8 +4,13 @@
  *
  * Import: import { env } from '@/env'
  *
- * ▸ Server : DATABASE_URL, SUPABASE_SERVICE_ROLE_KEY, API_URL, XENDIT_*, TRAKTEER_*, BOT_*
- * ▸ Client : NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SITE_URL
+ * Naming Convention:
+ * - NEXT_PUBLIC_* = Client-side (Next.js)
+ * - SUPABASE_* = Supabase
+ * - SORAKU_* = Soraku API
+ * - DB_* = Database
+ * - XENDIT_* = Payment
+ * - TRAKTEER_* = Donation
  *
  * @see https://env.t3.gg/docs/nextjs
  */
@@ -13,71 +18,80 @@
 import { createEnv } from '@t3-oss/env-nextjs'
 import { z } from 'zod'
 
-// Helper: terima URL dengan atau tanpa https://, trim whitespace
 const urlString = z.string().transform((s) => s.trim())
 
 export const env = createEnv({
   server: {
-    // Drizzle ORM — Supabase Transaction Pooler (port 6543)
-    DATABASE_URL: z.string().optional(),
+    // Database
+    DB_URL: z.string().optional(),
 
-    // Supabase — server only
-    SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-    SUPABASE_SERVICE_KEY: z.string().optional(), // legacy alias
+    // Supabase (Server)
+    SUPABASE_SERVICE_KEY: z.string().min(1),
 
-    // Central API (services/api)
-    // Contoh: https://apisoraku-git-master-www.soraku.id
-    API_URL: z.string().optional().default('http://localhost:4000'),
-    TIKTOK_ACCESS_TOKEN: z.string().optional(),
+    // Soraku API
+    SORAKU_SECRET: z.string().optional(),
 
-    // Payment (opsional)
-    XENDIT_SECRET_KEY: z.string().optional(),
-    XENDIT_WEBHOOK_TOKEN: z.string().optional(),
-    TRAKTEER_WEBHOOK_SECRET: z.string().optional(),
-
-    // Bot + internal
-    SORAKU_API_SECRET: z.string().optional(),
+    // Bot Communication
     BOT_WEBHOOK_URL: z.string().optional(),
     BOT_WEBHOOK_SECRET: z.string().optional(),
-    OWNER_DISCORD_IDS: z.string().optional(),
-    DISCORD_INVITE_CODE: z.string().optional(),
-    DISCORD_EVENT_WEBHOOK_URL: z.string().optional(), // Discord webhook untuk announce event
-    DISCORD_REGISTRATION_WEBHOOK_URL: z.string().optional(), // Discord webhook untuk notif pendaftaran (channel 1483340741194289172)
-    DISCORD_BLOG_WEBHOOK_URL: z.string().optional(), // Discord webhook untuk notif artikel baru
-    DISCORD_FEEDBACK_WEBHOOK_URL: z.string().optional(), // Discord webhook untuk notif feedback
+
+    // Tiktok
+    TIKTOK_TOKEN: z.string().optional(),
+
+    // Payment
+    XENDIT_KEY: z.string().optional(),
+    XENDIT_WEBHOOK: z.string().optional(),
+    TRAKTEER_SECRET: z.string().optional(),
+
+    // Discord (Server-side)
+    OWNER_IDS: z.string().optional(),
+    DISCORD_INVITE: z.string().optional(),
+    D_EVENT_WEBHOOK: z.string().optional(),
+    D_REGISTRATION_WEBHOOK: z.string().optional(),
+    D_BLOG_WEBHOOK: z.string().optional(),
+    D_FEEDBACK_WEBHOOK: z.string().optional(),
   },
 
   client: {
+    // Supabase (Client)
     NEXT_PUBLIC_SUPABASE_URL: urlString.pipe(z.string().url()),
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+    NEXT_PUBLIC_SUPABASE_KEY: z.string().min(1),
+
+    // Site
     NEXT_PUBLIC_SITE_URL: urlString.pipe(z.string().url()),
-    NEXT_PUBLIC_APP_URL: z.string().optional(),
+    NEXT_PUBLIC_APP_URL: urlString.optional(),
+
+    // Soraku API
+    NEXT_PUBLIC_SORAKU_URL: z.string().url().optional(),
+
+    // Discord (Client)
     NEXT_PUBLIC_DISCORD_INVITE: z.string().optional(),
   },
 
   runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    // Server
+    DB_URL: process.env.DB_URL,
     SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
-    API_URL: process.env.API_URL,
-    TIKTOK_ACCESS_TOKEN: process.env.TIKTOK_ACCESS_TOKEN,
-    XENDIT_SECRET_KEY: process.env.XENDIT_SECRET_KEY,
-    XENDIT_WEBHOOK_TOKEN: process.env.XENDIT_WEBHOOK_TOKEN,
-    TRAKTEER_WEBHOOK_SECRET: process.env.TRAKTEER_WEBHOOK_SECRET,
-    SORAKU_API_SECRET: process.env.SORAKU_API_SECRET,
+    SORAKU_SECRET: process.env.SORAKU_SECRET,
     BOT_WEBHOOK_URL: process.env.BOT_WEBHOOK_URL,
     BOT_WEBHOOK_SECRET: process.env.BOT_WEBHOOK_SECRET,
-    OWNER_DISCORD_IDS: process.env.OWNER_DISCORD_IDS,
-    DISCORD_INVITE_CODE: process.env.DISCORD_INVITE_CODE,
-    DISCORD_EVENT_WEBHOOK_URL: process.env.DISCORD_EVENT_WEBHOOK_URL,
-    DISCORD_REGISTRATION_WEBHOOK_URL: process.env.DISCORD_REGISTRATION_WEBHOOK_URL,
-    DISCORD_BLOG_WEBHOOK_URL: process.env.DISCORD_BLOG_WEBHOOK_URL,
-    DISCORD_FEEDBACK_WEBHOOK_URL: process.env.DISCORD_FEEDBACK_WEBHOOK_URL,
+    TIKTOK_TOKEN: process.env.TIKTOK_TOKEN,
+    XENDIT_KEY: process.env.XENDIT_KEY,
+    XENDIT_WEBHOOK: process.env.XENDIT_WEBHOOK,
+    TRAKTEER_SECRET: process.env.TRAKTEER_SECRET,
+    OWNER_IDS: process.env.OWNER_IDS,
+    DISCORD_INVITE: process.env.DISCORD_INVITE,
+    D_EVENT_WEBHOOK: process.env.D_EVENT_WEBHOOK,
+    D_REGISTRATION_WEBHOOK: process.env.D_REGISTRATION_WEBHOOK,
+    D_BLOG_WEBHOOK: process.env.D_BLOG_WEBHOOK,
+    D_FEEDBACK_WEBHOOK: process.env.D_FEEDBACK_WEBHOOK,
 
+    // Client
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_SUPABASE_KEY: process.env.NEXT_PUBLIC_SUPABASE_KEY,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_SORAKU_URL: process.env.NEXT_PUBLIC_SORAKU_URL,
     NEXT_PUBLIC_DISCORD_INVITE: process.env.NEXT_PUBLIC_DISCORD_INVITE,
   },
 

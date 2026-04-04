@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 const OWNER_DISCORD_IDS = new Set([
   '1020644780075659356', // Riu
-  ...(env.OWNER_DISCORD_IDS ?? '')
+  ...(env.OWNER_IDS ?? '')
     .split(',')
     .map((s: string) => s.trim())
     .filter(Boolean),
@@ -33,21 +33,17 @@ export async function GET(req: NextRequest) {
   // Response yang akan kita kembalikan — session cookies ditulis langsung ke sini
   const response = NextResponse.redirect(new URL(next, origin))
 
-  const supabase = createServerClient(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll: () => req.cookies.getAll(),
-        setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
-          cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value))
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
+  const supabase = createServerClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_KEY, {
+    cookies: {
+      getAll: () => req.cookies.getAll(),
+      setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
+        cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value))
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        )
       },
-    }
-  )
+    },
+  })
 
   // Exchange code → session (membutuhkan PKCE code_verifier dari cookie)
   const { data, error } = await supabase.auth.exchangeCodeForSession(code)

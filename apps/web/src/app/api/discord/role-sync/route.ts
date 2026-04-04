@@ -14,7 +14,7 @@ const Schema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const secret = req.headers.get('x-soraku-secret')
-    if (secret !== env.SORAKU_API_SECRET)
+    if (secret !== env.SORAKU_SECRET)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const body = await req.json()

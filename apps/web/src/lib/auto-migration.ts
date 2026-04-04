@@ -246,7 +246,7 @@ END $$;
 
 export async function runAutoMigration() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SERVICE_KEY
+  const key = process.env.SUPABASE_SERVICE_KEY
   if (!url || !key) {
     console.warn('[auto-migration] Missing Supabase ENV — skip')
     return

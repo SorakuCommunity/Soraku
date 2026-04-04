@@ -73,16 +73,16 @@ export async function getWebhookUrl(key: WebhookKey): Promise<string | null> {
   let envUrl: string | undefined
   switch (normalizedKey) {
     case 'discordEventWebhookUrl':
-      envUrl = env.DISCORD_EVENT_WEBHOOK_URL
+      envUrl = env.D_EVENT_WEBHOOK
       break
     case 'discordBlogWebhookUrl':
-      envUrl = env.DISCORD_BLOG_WEBHOOK_URL
+      envUrl = env.D_BLOG_WEBHOOK
       break
     case 'discordRegistrationWebhookUrl':
-      envUrl = env.DISCORD_REGISTRATION_WEBHOOK_URL
+      envUrl = env.D_REGISTRATION_WEBHOOK
       break
     case 'discordFeedbackWebhookUrl':
-      envUrl = env.DISCORD_FEEDBACK_WEBHOOK_URL
+      envUrl = env.D_FEEDBACK_WEBHOOK
       break
   }
 

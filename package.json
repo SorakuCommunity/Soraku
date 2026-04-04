@@ -1,0 +1,39 @@
+{
+  "name": "soraku",
+  "version": "1.5.0",
+  "private": true,
+  "description": "Soraku Ecosystem — Build once, connect everything.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SorakuCommunity/Soraku"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:web": "pnpm --filter @soraku/web dev",
+    "dev:stream": "pnpm --filter @soraku/stream dev",
+    "dev:api": "pnpm --filter @soraku/api dev",
+    "dev:bot": "pnpm --filter soraku-bot dev",
+    "build": "turbo build",
+    "build:web": "pnpm --filter @soraku/web build",
+    "build:stream": "pnpm --filter @soraku/stream build",
+    "build:api": "pnpm --filter @soraku/api build",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "test": "turbo test",
+    "clean": "turbo clean",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "turbo": "^2.5.0",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

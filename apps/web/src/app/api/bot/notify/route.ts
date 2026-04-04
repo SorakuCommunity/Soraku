@@ -18,7 +18,7 @@ const Schema = z.object({
 export async function POST(req: NextRequest) {
   // Hanya bisa dipanggil dari dalam (server-side atau dengan secret)
   const secret = req.headers.get('x-soraku-secret')
-  const isInternal = secret === env.SORAKU_API_SECRET
+  const isInternal = secret === env.SORAKU_SECRET
 
   // Atau dari admin yang sudah login
   if (!isInternal) {

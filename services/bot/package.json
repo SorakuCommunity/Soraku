@@ -1,7 +1,7 @@
 {
   "name": "soraku-bot",
   "version": "1.0.0",
-  "description": "SorakuBot \u2014 Discord bot resmi Soraku Community, based on AeroX AIO V3",
+  "description": "SorakuBot — Discord bot resmi Soraku Community, based on AeroX AIO V3",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
@@ -34,8 +34,12 @@
   "author": "Soraku Community",
   "license": "MIT",
   "dependencies": {
+    "@soraku/types": "workspace:*",
+    "@soraku/utils": "workspace:*",
+    "@soraku/database": "workspace:*",
+    "@soraku/config": "workspace:*",
     "@napi-rs/canvas": "^0.1.82",
-    "@supabase/supabase-js": "^2.49.4",
+    "@supabase/supabase-js": "^2.99.0",
     "axios": "^1.13.2",
     "chalk": "^5.6.2",
     "discord-giveaways": "^4.4.3",

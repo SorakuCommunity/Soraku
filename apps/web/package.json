@@ -23,6 +23,13 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@soraku/types": "workspace:*",
+    "@soraku/utils": "workspace:*",
+    "@soraku/api-client": "workspace:*",
+    "@soraku/auth": "workspace:*",
+    "@soraku/database": "workspace:*",
+    "@soraku/config": "workspace:*",
+    "@soraku/ui": "workspace:*",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.14",

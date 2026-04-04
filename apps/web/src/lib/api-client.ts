@@ -123,14 +123,27 @@ function createApiClient(baseUrl: string, token?: string, internalSecret?: strin
 // ── Exported clients ──────────────────────────────────────────
 
 /** Client publik — untuk data yang tidak perlu auth */
-export const api = createApiClient(env.API_URL)
+export const api = createApiClient(env.NEXT_PUBLIC_SORAKU_URL ?? 'http://localhost:4000')
 
 /** Client dengan Supabase JWT user — untuk data private/premium */
 export function apiWithToken(token: string | undefined) {
-  return createApiClient(env.API_URL, token)
+  return createApiClient(env.NEXT_PUBLIC_SORAKU_URL ?? 'http://localhost:4000', token)
 }
 
 /** Client internal — untuk komunikasi web ↔ bot via secret */
 export function apiInternal() {
-  return createApiClient(env.API_URL, undefined, env.SORAKU_API_SECRET ?? '')
+  return createApiClient(
+    env.NEXT_PUBLIC_SORAKU_URL ?? 'http://localhost:4000',
+    undefined,
+    env.SORAKU_SECRET ?? ''
+  )
+}
+
+/** Client internal — untuk komunikasi web ↔ bot via secret */
+export function apiInternal() {
+  return createApiClient(
+    env.NEXT_PUBLIC_SA_URL ?? 'http://localhost:4000',
+    undefined,
+    env.SA_SECRET ?? ''
+  )
 }
