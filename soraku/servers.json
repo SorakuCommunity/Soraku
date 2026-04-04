@@ -1,0 +1,64 @@
+{
+	"info": {
+		"_postman_id": "6082a73b-2cb9-4eb7-a5f3-3859c8a4ee83",
+		"name": "Soraku",
+		"description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "web",
+			"item": [],
+			"id": "e8e0980b-6562-49cc-8c90-ffb1a49a6169"
+		},
+		{
+			"name": "stream",
+			"item": [],
+			"id": "4a3380af-9ca8-4ed1-b68e-89c7478be7fa"
+		},
+		{
+			"name": "mobile",
+			"item": [],
+			"id": "ca0a3efe-9dfd-47e6-9f9a-7fd706b7f86b"
+		},
+		{
+			"name": "core",
+			"item": [],
+			"id": "b9954c67-92a6-4613-8c6a-b191d1fa24eb"
+		},
+		{
+			"name": "Post data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"id": "6495657d-4a37-44aa-8b77-89367269780c",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "postman-echo.com/post",
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		}
+	]
+}
