@@ -33,6 +33,7 @@ pnpm-debug.log*
 
 # Vercel
 .vercel
+.kilo
 
 # TypeScript
 *.tsbuildinfo
