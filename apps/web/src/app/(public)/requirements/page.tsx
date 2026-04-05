@@ -1,10 +1,19 @@
 import Link from 'next/link'
-import { ArrowRight, ExternalLink, Users, Briefcase, Star } from 'lucide-react'
+import {
+  ArrowRight,
+  ExternalLink,
+  Users,
+  Briefcase,
+  Star,
+  Gift,
+  TrendingUp,
+  Zap,
+} from 'lucide-react'
 
 export const metadata = {
-  title: 'Requirements – Open Recruitment | Soraku Community',
+  title: 'Become a Contributor | Soraku Community',
   description:
-    'Soraku Open Recruitment Batch 01 – Bergabung sebagai Writer, Social Media, atau Community Team.',
+    'Join Soraku as a Contributor - Earn extra income while contributing to the anime & pop culture community.',
 }
 
 const POSITIONS = [
@@ -82,65 +91,153 @@ const REQUIREMENTS = [
   'Bersedia berkoordinasi melalui Discord',
 ]
 
+const BENEFITS = [
+  {
+    icon: '💰',
+    title: 'Cuan Tambahan',
+    desc: 'Dapatkan income tambahan dari setiap konten yang kamu hasilkan',
+  },
+  {
+    icon: '📈',
+    title: 'Portofolio Publik',
+    desc: 'Hasilkan portofolio nyata dalam penulisan & pengelolaan komunitas',
+  },
+  {
+    icon: '🤝',
+    title: 'Networking',
+    desc: 'Connect dengan sesama penggemar pop culture Jepang',
+  },
+  {
+    icon: '🚀',
+    title: 'Pengembangan Karir',
+    desc: 'Kesempatan berkembang jadi core team Soraku',
+  },
+  {
+    icon: '🎮',
+    title: 'Akses Eksklusif',
+    desc: 'Nikmati benefit khusus untuk contributor aktif',
+  },
+  {
+    icon: '🌟',
+    title: 'Komunitas Aktif',
+    didesc: 'Join komunitas kreatif yang selalu bergerak',
+  },
+]
+
 export default function RequirementsPage() {
   return (
     <main className="min-h-screen px-4 py-16 sm:py-20">
       <div className="mx-auto max-w-4xl">
-        {/* Header */}
-        <div className="mb-12 text-center">
-          <div className="border-primary/20 bg-primary/8 text-primary/80 mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-bold tracking-[0.18em] uppercase">
-            <span className="bg-primary/70 h-1.5 w-1.5 animate-pulse rounded-full" />
-            Open Recruitment · Batch 01
-          </div>
-          <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">
-            Soraku Open
-            <br />
-            <span className="text-primary">Recruitment</span>
-          </h1>
-          <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-sm leading-relaxed">
-            Soraku membuka kesempatan bagi individu yang ingin berkembang bersama dalam membangun
-            media digital dan komunitas pop culture Jepang yang terstruktur, konsisten, dan
-            berdampak.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="https://discord.gg/qm3XJvRa6B"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-primary shadow-primary/25 flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-0.5"
-            >
-              Daftar Sekarang <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-            <a
-              href="https://discord.gg/qm3XJvRa6B"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-2xl border border-indigo-500/30 bg-indigo-500/8 px-6 py-3 text-sm font-semibold text-indigo-300 transition-all hover:-translate-y-0.5"
-            >
-              Info via Discord <ArrowRight className="h-3.5 w-3.5" />
-            </a>
+        {/* Hero Header */}
+        <div className="relative mb-12 overflow-hidden rounded-3xl bg-gradient-to-br from-violet-900/40 via-indigo-900/30 to-purple-900/40 p-8 sm:p-12">
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          <div className="bg-primary/20 absolute -top-20 -right-20 h-64 w-64 rounded-full blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-rose-500/20 blur-3xl" />
+
+          <div className="relative text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-[11px] font-bold tracking-[0.18em] text-amber-400 uppercase">
+              <Zap className="h-3.5 w-3.5" />
+              Buka Setiap Bulan
+            </div>
+            <h1 className="text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
+              Jadi{' '}
+              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+                Contributor
+              </span>
+              <br />
+              Soraku
+            </h1>
+            <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-base leading-relaxed">
+              Bergabung dengan Soraku dan{' '}
+              <span className="font-semibold text-amber-400">hasilkan cuan tambahan</span> sambil
+              membangun komunitas anime & pop culture Jepang terbesar di Indonesia.
+            </p>
+
+            {/* Stats */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+              <div className="text-center">
+                <p className="text-3xl font-black text-white">50+</p>
+                <p className="text-muted-foreground text-xs">Kontributor Aktif</p>
+              </div>
+              <div className="h-12 w-px bg-white/10" />
+              <div className="text-center">
+                <p className="text-3xl font-black text-white">1000+</p>
+                <p className="text-muted-foreground text-xs">Konten Dibuat</p>
+              </div>
+              <div className="h-12 w-px bg-white/10" />
+              <div className="text-center">
+                <p className="text-3xl font-black text-white">50K+</p>
+                <p className="text-muted-foreground text-xs">Pengikut</p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <a
+                href="https://forms.gle/NXwq7v6zpphKLfdKA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-amber-500/25 transition-all hover:-translate-y-1 hover:shadow-xl"
+              >
+                Daftar Sekarang{' '}
+                <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </a>
+              <a
+                href="https://discord.gg/qm3XJvRa6B"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-white/10"
+              >
+                Tanya di Discord <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* About Soraku */}
-        <section className="glass-card mb-8 rounded-2xl p-6">
-          <h2 className="mb-3 text-lg font-black">Tentang Soraku</h2>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            Soraku adalah platform media digital dan komunitas yang berfokus pada anime, manga, dan
-            pop culture Jepang. Ekosistem Soraku terdiri dari website berita & artikel, distribusi
-            konten sosial media, server komunitas Discord, dan platform diskusi & interaksi antar
-            member.
-          </p>
-          <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-            Tujuan Soraku adalah membangun ruang komunitas yang aktif, kreatif, dan berkelanjutan
-            bagi para penggemar pop culture Jepang.
-          </p>
+        {/* Why Join Soraku */}
+        <section className="mb-8">
+          <h2 className="mb-6 flex items-center gap-2 text-xl font-black">
+            <Gift className="h-5 w-5 text-amber-400" /> Mengapa Jadi Contributor?
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {BENEFITS.map((benefit, i) => (
+              <div
+                key={i}
+                className="group glass-card relative overflow-hidden rounded-2xl border border-white/5 bg-gradient-to-br from-white/5 to-white/0 p-5 transition-all hover:border-amber-500/30"
+              >
+                <div className="absolute -top-4 -right-4 text-5xl opacity-10 transition-transform group-hover:scale-110 group-hover:rotate-12">
+                  {benefit.icon}
+                </div>
+                <div className="relative">
+                  <h3 className="text-base font-bold text-white">{benefit.title}</h3>
+                  <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+                    {benefit.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Income Info */}
+        <section className="glass-card mb-8 overflow-hidden rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-orange-500/5 p-6">
+          <div className="flex flex-col items-center gap-4 sm:flex-row">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-500/20 text-3xl">
+              💵
+            </div>
+            <div className="text-center sm:text-left">
+              <h3 className="text-lg font-black text-white">Sistem Pendapatan Contributor</h3>
+              <p className="text-muted-foreground text-sm">
+                Setiap konten yang kamu hasilkan berpotensi menghasilkan income. Semakin banyak
+                berkualitas, semakin besar kesempatan earningmu!
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* Positions */}
         <section className="mb-8 space-y-4">
           <h2 className="flex items-center gap-2 text-xl font-black">
-            <Briefcase className="text-primary h-5 w-5" /> Posisi yang Dibuka
+            <Briefcase className="text-primary h-5 w-5" /> Posisi yang Tersedia
           </h2>
           {POSITIONS.map((pos) => (
             <div
@@ -199,7 +296,7 @@ export default function RequirementsPage() {
           ))}
         </section>
 
-        {/* General Requirements */}
+        {/* Requirements */}
         <section className="glass-card mb-8 rounded-2xl p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-black">
             <Star className="text-primary h-5 w-5" /> Persyaratan Umum
@@ -214,49 +311,37 @@ export default function RequirementsPage() {
           </ul>
         </section>
 
-        {/* Benefits */}
-        <section className="glass-card mb-8 rounded-2xl p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-black">
-            <Users className="text-primary h-5 w-5" /> Benefit Kontributor
-          </h2>
-          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {[
-              'Pengalaman dalam dunia media digital',
-              'Portofolio publik dalam penulisan atau pengelolaan komunitas',
-              'Pengalaman bekerja dalam tim komunitas kreatif',
-              'Networking dengan sesama penggemar pop culture Jepang',
-              'Kesempatan berkembang menjadi bagian dari core team Soraku',
-            ].map((b, i) => (
-              <li key={i} className="text-muted-foreground flex items-start gap-2 text-sm">
-                <span className="bg-accent/60 mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" />
-                {b}
-              </li>
-            ))}
-          </ul>
-        </section>
-
         {/* CTA */}
-        <div className="border-primary/20 bg-primary/5 rounded-2xl border p-8 text-center">
-          <p className="text-lg font-black">Soraku bukan sekadar media.</p>
-          <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
-            Soraku adalah ekosistem komunitas yang dibangun bersama oleh para penggemar anime dan
-            pop culture Jepang.
-          </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="https://discord.gg/qm3XJvRa6B"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-primary shadow-primary/20 flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-0.5"
-            >
-              Baca Requirement Lengkap <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-            <Link
-              href="/"
-              className="border-border text-muted-foreground hover:border-primary/40 hover:text-foreground flex items-center gap-2 rounded-2xl border px-6 py-3 text-sm font-medium transition-all"
-            >
-              Kembali ke Beranda
-            </Link>
+        <div className="glass-card relative overflow-hidden rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-900/20 to-indigo-900/10 p-8 text-center">
+          <div className="absolute -top-16 -right-16 h-32 w-32 rounded-full bg-violet-500/20 blur-3xl" />
+          <div className="absolute -bottom-16 -left-16 h-32 w-32 rounded-full bg-indigo-500/20 blur-3xl" />
+
+          <div className="relative">
+            <p className="text-2xl font-black text-white">Siap Mulai Earn Sekarang?</p>
+            <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
+              Daftar sekarang dan mulai menghasilkan dari passionmu!
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+              <a
+                href="https://forms.gle/NXwq7v6zpphKLfdKA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-primary flex items-center gap-2 rounded-2xl px-8 py-3 text-sm font-bold text-white transition-all hover:-translate-y-1"
+              >
+                Daftar via Google Form <ExternalLink className="h-4 w-4" />
+              </a>
+              <a
+                href="https://discord.gg/qm3XJvRa6B"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-white/10"
+              >
+                Tanya di Discord
+              </a>
+            </div>
+            <p className="text-muted-foreground/50 mt-4 text-xs">
+              Punya pertanyaan? Silakan langsung tanyakan di server Discord Soraku
+            </p>
           </div>
         </div>
       </div>
