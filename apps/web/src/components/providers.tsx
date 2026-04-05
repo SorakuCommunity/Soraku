@@ -8,11 +8,15 @@ import { useEffect, useState } from 'react'
 
 // Dynamic import RealtimeProvider agar tidak crash saat prerender
 function RealtimeWrapper({ children }: { children: ReactNode }) {
-  const [Provider, setProvider] = useState<React.ComponentType<{ children: ReactNode }> | null>(null)
+  const [Provider, setProvider] = useState<React.ComponentType<{ children: ReactNode }> | null>(
+    null
+  )
 
   useEffect(() => {
     import('@upstash/realtime/client')
-      .then((mod) => setProvider(() => mod.RealtimeProvider))
+      .then((mod) =>
+        setProvider(mod.RealtimeProvider as React.ComponentType<{ children: ReactNode }>)
+      )
       .catch(() => null)
   }, [])
 
