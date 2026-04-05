@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { env } from '@/env'
 
-const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 const SERVICE_KEY = env.SUPABASE_SERVICE_KEY ?? ''
 
 if (!SERVICE_KEY) {

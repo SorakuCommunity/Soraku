@@ -8,17 +8,21 @@ export async function POST(req: NextRequest) {
   // Buat response redirect dulu agar cookies bisa di-set ke sini
   const response = NextResponse.json({ signedOut: true })
 
-  const supabase = createServerClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_KEY, {
-    cookies: {
-      getAll: () => req.cookies.getAll(),
-      setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
-        // Tulis semua cookie (termasuk yang di-clear) ke response
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
-        )
+  const supabase = createServerClient(
+    env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    env.NEXT_PUBLIC_SUPABASE_KEY ?? '',
+    {
+      cookies: {
+        getAll: () => req.cookies.getAll(),
+        setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
+          // Tulis semua cookie (termasuk yang di-clear) ke response
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
       },
-    },
-  })
+    }
+  )
 
   await supabase.auth.signOut()
 
