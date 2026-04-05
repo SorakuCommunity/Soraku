@@ -26,7 +26,7 @@ export const env = createEnv({
     DB_URL: z.string().optional(),
 
     // Supabase (Server)
-    SUPABASE_SERVICE_KEY: z.string().min(1),
+    SUPABASE_SERVICE_KEY: z.string().optional(),
 
     // Soraku API
     SORAKU_SECRET: z.string().optional(),
@@ -54,8 +54,8 @@ export const env = createEnv({
 
   client: {
     // Supabase (Client)
-    NEXT_PUBLIC_SUPABASE_URL: urlString.pipe(z.string().url()),
-    NEXT_PUBLIC_SUPABASE_KEY: z.string().min(1),
+    NEXT_PUBLIC_SUPABASE_URL: urlString.pipe(z.string().url()).optional(),
+    NEXT_PUBLIC_SUPABASE_KEY: z.string().optional(),
 
     // Site
     NEXT_PUBLIC_SITE_URL: urlString.pipe(z.string().url()),
