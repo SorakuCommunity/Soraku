@@ -138,12 +138,3 @@ export function apiInternal() {
     env.SORAKU_SECRET ?? ''
   )
 }
-
-/** Client internal — untuk komunikasi web ↔ bot via secret */
-export function apiInternal() {
-  return createApiClient(
-    env.NEXT_PUBLIC_SA_URL ?? 'http://localhost:4000',
-    undefined,
-    env.SA_SECRET ?? ''
-  )
-}
