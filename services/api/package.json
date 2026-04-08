@@ -1,6 +1,6 @@
 {
   "name": "@soraku/api",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 4000",
@@ -16,7 +16,8 @@
     "@soraku/database": "workspace:*",
     "@soraku/auth": "workspace:*",
     "@soraku/config": "workspace:*",
-    "next": "^15.1.0",
+    "@soraku/api-client": "workspace:*",
+    "next": "^16.2.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "@supabase/supabase-js": "^2.47.0",

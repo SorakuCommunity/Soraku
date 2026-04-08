@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import axios from "axios";
-import { redis } from "@/lib/redis";
+import { redis, safeRedisGet, safeRedisSet } from "@/lib/redis";
 import appendMetaToEpisodes from "@/utils/appendMetaToEpisodes";
 import { NextApiRequest, NextApiResponse } from "next";
 import { AnifyEpisode, ConsumetInfo, EpisodeData } from "types";
@@ -55,7 +55,7 @@ async function fetchConsumet(id?: string | string[] | undefined) {
   try {
     const fetchData = async (dub?: any) => {
       const data = await getAnimeEpisode(id, dub);
-      
+
       if (data?.message === "Anime not found" && data?.length < 1) {
         return [];
       }
@@ -83,8 +83,8 @@ async function fetchConsumet(id?: string | string[] | undefined) {
 
     if (subData.every((i) => i.id?.includes("dub"))) {
       subData.forEach((item) => {
-        item.id = item.id?.replace("dub", "anime"); 
-      }); 
+        item.id = item.id?.replace("dub", "anime");
+      });
     }
 
     const array = [

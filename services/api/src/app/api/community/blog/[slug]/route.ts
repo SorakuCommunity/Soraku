@@ -13,12 +13,24 @@ const CommentSchema = z.object({
   guestname: z.string().optional(),
 });
 
+function getDb() {
+  if (!db) throw new Error("Database not configured");
+  return db;
+}
+
 // GET /api/community/blog/:slug
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
+
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
 
   const [post] = await db
     .select()
@@ -104,6 +116,14 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
+
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
+
   const body = await req.json();
   const parsed = CommentSchema.safeParse(body);
 

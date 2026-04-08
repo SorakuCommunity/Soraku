@@ -13,7 +13,7 @@ function emptySSE() {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
     },
   })
 }
@@ -22,8 +22,8 @@ function emptySSE() {
 let handler: any = null
 
 export async function GET(req: Request) {
-  const url = process.env.UPSTASH_REDIS_REST_URL
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  const url = process.env.REDIS_URL
+  const token = process.env.REDIS_TOKEN
   if (!url || !token) return emptySSE()
 
   try {

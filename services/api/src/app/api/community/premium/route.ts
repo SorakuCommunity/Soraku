@@ -9,6 +9,12 @@ export const dynamic = "force-dynamic";
 // GET /api/community/premium — status subscriber user yang login
 // GET /api/community/premium?leaderboard=true — top donatur publik
 export async function GET(req: NextRequest) {
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
   const { searchParams } = new URL(req.url);
 
   // Leaderboard — publik, tidak perlu auth

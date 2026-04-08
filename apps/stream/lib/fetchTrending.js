@@ -1,7 +1,6 @@
 // lib/fetchTrending.js
-import fetch from 'node-fetch';
 
-const ANILIST_API_URL = 'https://graphql.anilist.co';
+const ANILIST_API_URL = "https://graphql.anilist.co";
 
 export const fetchTrendingAnime = async () => {
   const query = `
@@ -20,11 +19,11 @@ export const fetchTrendingAnime = async () => {
   `;
 
   const response = await fetch(ANILIST_API_URL, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ query })
   });
 
   const { data } = await response.json();

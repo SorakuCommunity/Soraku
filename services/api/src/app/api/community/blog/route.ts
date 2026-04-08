@@ -8,6 +8,13 @@ export const dynamic = "force-dynamic";
 
 // GET /api/community/blog
 export async function GET(req: NextRequest) {
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
+
   const { searchParams } = new URL(req.url);
   const parsed = BlogQuerySchema.safeParse(Object.fromEntries(searchParams));
 

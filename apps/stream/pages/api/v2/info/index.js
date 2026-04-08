@@ -1,4 +1,4 @@
-import { redis } from "@/lib/redis";
+import { redis, safeRedisGet, safeRedisSet } from "@/lib/redis";
 import axios from "axios";
 
 const API_KEY = process.env.API_KEY;
@@ -10,7 +10,7 @@ export async function fetchInfo(id) {
       .get(`https://anify.eltik.cc/info/${id}`)
       .catch((err) => {
         return {
-          data: null,
+          data: null
         };
       });
 
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
     let cached;
     // const data = await fetchInfo(id);
     if (redis) {
-      cached = await redis.get(`manga:${id}`);
+      cached = await safeRedisGet(`manga:${id}`);
 
       if (cached) {
         return res.status(200).json(JSON.parse(cached));
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     }
 
     if (redis)
-      await redis.set(`manga:${id}`, JSON.stringify(manga), "ex", 60 * 60 * 24);
+      await safeRedisSet(`manga:${id}`, JSON.stringify(manga), 60 * 60 * 24);
 
     res.status(200).json(manga);
   } catch (error) {

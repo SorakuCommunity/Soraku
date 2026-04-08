@@ -15,6 +15,7 @@ import { getSession } from '@/lib/auth'
 const PIXEL_ID = 'D6UQBU3C77UFTE0HO0R0'
 const ACCESS_TOKEN = process.env.TIKTOK_ACCESS_TOKEN
 const API_URL = 'https://business-api.tiktok.com/open_api/v1.3/event/track/'
+const EVENT_SOURCE_ID = 'MULTI' // Use MULTI for web events (works for all event types)
 
 interface EventBody {
   event: string
@@ -89,6 +90,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         pixel_code: PIXEL_ID,
+        event_source_id: EVENT_SOURCE_ID,
         data,
         test_event_code: process.env.NODE_ENV !== 'production' ? 'TEST12345' : undefined,
       }),

@@ -79,6 +79,7 @@ export const AVAILABLE_SOURCES: AnimeSource[] = [
   "hianime",
   "gogoanime",
   "animekai",
+  "anify",
   "anibaru",
   "samehadaku",
   "otakudesu",

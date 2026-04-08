@@ -41,7 +41,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning data-scroll-behavior="smooth">
       <body className="bg-background font-body min-h-screen antialiased">
         <Providers>{children}</Providers>
         <TikTokPixel />

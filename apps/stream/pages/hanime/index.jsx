@@ -9,7 +9,7 @@ import { signOut, useSession } from "next-auth/react";
 import getUpcomingAnime from "@/lib/anilist/getUpcomingAnime";
 import GetMedia from "@/lib/anilist/getMedia";
 import MobileNav from "@/components/shared/MobileNav";
-import { redis } from "@/lib/redis";
+import { redis, safeRedisGet, safeRedisSet } from "@/lib/redis";
 import { Navbar } from "@/components/shared/NavBar";
 import AgeVerificationModal from "@/components/shared/AgeRequirements";
 import { aniListData } from "@/lib/anilist/AniList";
@@ -17,7 +17,7 @@ import { aniListData } from "@/lib/anilist/AniList";
 export async function getServerSideProps() {
   let cachedData;
   if (redis) {
-    cachedData = await redis.get("index_server");
+    cachedData = await safeRedisGet("index_server");
   }
   if (cachedData) {
     const { genre, detail, populars } = JSON.parse(cachedData);
@@ -27,29 +27,28 @@ export async function getServerSideProps() {
         genre,
         detail,
         populars,
-        upComing,
-      },
+        upComing
+      }
     };
   } else {
     const trendingDetail = await aniListData({
       sort: "TRENDING_DESC",
-      page: 1,
+      page: 1
     });
     const popularDetail = await aniListData({
       sort: "POPULARITY_DESC",
-      page: 1,
+      page: 1
     });
     const genreDetail = await aniListData({ sort: "TYPE", page: 1 });
     if (redis) {
-      await redis.set(
-          "index_server",
-          JSON.stringify({
-            genre: genreDetail.props,
-            detail: trendingDetail.props,
-            populars: popularDetail.props,
-          }), // set cache for 2 hours
-          "EX",
-          60 * 60 * 2
+      await safeRedisSet(
+        "index_server",
+        JSON.stringify({
+          genre: genreDetail.props,
+          detail: trendingDetail.props,
+          populars: popularDetail.props
+        }),
+        60 * 60 * 2
       );
     }
     const upComing = await getUpcomingAnime();
@@ -58,18 +57,19 @@ export async function getServerSideProps() {
         genre: genreDetail.props,
         detail: trendingDetail.props,
         populars: popularDetail.props,
-        upComing,
-      },
+        upComing
+      }
     };
   }
 }
 
 export default function Home({ detail, populars, upComing }) {
-  const [isAgeVerificationModalOpen, setIsAgeVerificationModalOpen] = useState(true);
+  const [isAgeVerificationModalOpen, setIsAgeVerificationModalOpen] =
+    useState(true);
   const { data: sessions } = useSession();
-  const [ data1, setData] = useState(null);
+  const [data1, setData] = useState(null);
   const { anime: currentAnime } = GetMedia(sessions, {
-    stats: "CURRENT",
+    stats: "CURRENT"
   });
   const { anime: plan } = GetMedia(sessions, { stats: "PLANNING" });
   const { anime: release } = GetMedia(sessions);
@@ -80,7 +80,9 @@ export default function Home({ detail, populars, upComing }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch("https://hanime-api-plum.vercel.app/trending/day/1");
+        const response = await fetch(
+          "https://hanime-api-plum.vercel.app/trending/day/1"
+        );
         const result = await response.json();
         setData(result.results[0]);
       } catch (error) {
@@ -91,8 +93,8 @@ export default function Home({ detail, populars, upComing }) {
   }, [setData]);
   async function getRecent() {
     const data = await fetch(`/api/v2/etc/recent/1`)
-        .then((res) => res.json())
-        .catch((err) => console.log(err));
+      .then((res) => res.json())
+      .catch((err) => console.log(err));
     setRecentAdded(data?.results);
   }
   useEffect(() => {
@@ -122,8 +124,8 @@ export default function Home({ detail, populars, upComing }) {
       release.map((list) => {
         list.entries.map((entry) => {
           if (
-              entry.media.status === "RELEASING" &&
-              !seenIds.has(entry.media.id)
+            entry.media.status === "RELEASING" &&
+            !seenIds.has(entry.media.id)
           ) {
             releasingAnime.push(entry.media);
             seenIds.add(entry.media.id);
@@ -138,77 +140,80 @@ export default function Home({ detail, populars, upComing }) {
   }, [release]);
 
   return (
-      <Fragment>
-        <Head>
-          <title>1Hentai.net</title>
-          <meta charSet="UTF-8"></meta>
-        </Head>
-        <MobileNav sessions={sessions} hideProfile={true} />
-        <Navbar paddingY="pt-2 lg:pt-10" withNav={true} home={true} />
-        {isAgeVerificationModalOpen && (
-            <AgeVerificationModal isOpen={isAgeVerificationModalOpen} setIsOpen={setIsAgeVerificationModalOpen} />
-        )}
-        <div className="h-auto w-screen bg-[#100C11] text-[#dbdcdd]">
-          <div className=" hidden justify-center lg:flex my-16">
-            <div className="relative grid grid-rows-2 items-center lg:flex lg:h-[467px] lg:w-[80%] lg:justify-between">
-              <div className="row-start-2 flex h-full flex-col gap-7 lg:w-[55%] lg:justify-center">
-                <h1 className="w-[85%] font-outfit font-extrabold lg:text-[34px] line-clamp-2">
-                  {data1?.name}
-                </h1>
-                <p
-                    className="font-roboto font-light lg:text-[18px] line-clamp-5"
-                    dangerouslySetInnerHTML={{ __html: `Views: ${data1?.views}` }}
-                />
-                <div className="lg:pt-5 flex">
-                  <Link
-                      href={`/hanime/video/${data1?.id}`}
-                      className="rounded-sm rounded-tl-[4px] rounded-tr-[4px] rounded-bl-[4px] rounded-br-[4px] p-3 text-[#66ccff] border border-[#66ccff] hover:bg-[#66ccff] hover:text-white hover:ring-2 hover:ring-[#66ccff] transition-all duration-300 text-md font-karla font-light m-3"
-                  >
-                    START WATCHING
-                  </Link>
-                </div>
+    <Fragment>
+      <Head>
+        <title>1Hentai.net</title>
+        <meta charSet="UTF-8"></meta>
+      </Head>
+      <MobileNav sessions={sessions} hideProfile={true} />
+      <Navbar paddingY="pt-2 lg:pt-10" withNav={true} home={true} />
+      {isAgeVerificationModalOpen && (
+        <AgeVerificationModal
+          isOpen={isAgeVerificationModalOpen}
+          setIsOpen={setIsAgeVerificationModalOpen}
+        />
+      )}
+      <div className="h-auto w-screen bg-[#100C11] text-[#dbdcdd]">
+        <div className=" hidden justify-center lg:flex my-16">
+          <div className="relative grid grid-rows-2 items-center lg:flex lg:h-[467px] lg:w-[80%] lg:justify-between">
+            <div className="row-start-2 flex h-full flex-col gap-7 lg:w-[55%] lg:justify-center">
+              <h1 className="w-[85%] font-outfit font-extrabold lg:text-[34px] line-clamp-2">
+                {data1?.name}
+              </h1>
+              <p
+                className="font-roboto font-light lg:text-[18px] line-clamp-5"
+                dangerouslySetInnerHTML={{ __html: `Views: ${data1?.views}` }}
+              />
+              <div className="lg:pt-5 flex">
+                <Link
+                  href={`/hanime/video/${data1?.id}`}
+                  className="rounded-sm rounded-tl-[4px] rounded-tr-[4px] rounded-bl-[4px] rounded-br-[4px] p-3 text-[#66ccff] border border-[#66ccff] hover:bg-[#66ccff] hover:text-white hover:ring-2 hover:ring-[#66ccff] transition-all duration-300 text-md font-karla font-light m-3"
+                >
+                  START WATCHING
+                </Link>
               </div>
-              <div className="z-10 row-start-1 flex justify-center ">
-                <div className="relative  lg:h-[467px] lg:w-[322px] lg:scale-100">
-                  <div className="absolute bg-gradient-to-t from-[#100C11] to-transparent lg:h-[467px] lg:w-[322px]" />
-                  <Image
-                      src={data1?.cover_url}
-                      alt={data1?.name}
-                      width={1200}
-                      height={1200}
-                      priority
-                      className="rounded-tl-xl rounded-tr-xl object-cover bg-blend-overlay lg:h-[467px] lg:w-[322px]"
-                  />
-                </div>
+            </div>
+            <div className="z-10 row-start-1 flex justify-center ">
+              <div className="relative  lg:h-[467px] lg:w-[322px] lg:scale-100">
+                <div className="absolute bg-gradient-to-t from-[#100C11] to-transparent lg:h-[467px] lg:w-[322px]" />
+                <Image
+                  src={data1?.cover_url}
+                  alt={data1?.name}
+                  width={1200}
+                  height={1200}
+                  priority
+                  className="rounded-tl-xl rounded-tr-xl object-cover bg-blend-overlay lg:h-[467px] lg:w-[322px]"
+                />
               </div>
             </div>
           </div>
-          <div className="lg:mt-16 mt-5 flex flex-col items-center">
-            <motion.div
-                className="w-screen flex-none lg:w-[87%]"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, staggerChildren: 0.2 }}
-            >
-              {recentAdded?.length > 0 && (
-                  <motion.section
-                      key="recentAdded"
-                      initial={{ y: 20, opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      whileInView={{ y: 0, opacity: 1 }}
-                      viewport={{ once: true }}
-                  >
-                    <Content
-                        ids="recentAdded"
-                        section="Trending Today"
-                        data={recentAdded}
-                    />
-                  </motion.section>
-              )}
-            </motion.div>
-          </div>
         </div>
-        <Footer />
-      </Fragment>
+        <div className="lg:mt-16 mt-5 flex flex-col items-center">
+          <motion.div
+            className="w-screen flex-none lg:w-[87%]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, staggerChildren: 0.2 }}
+          >
+            {recentAdded?.length > 0 && (
+              <motion.section
+                key="recentAdded"
+                initial={{ y: 20, opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <Content
+                  ids="recentAdded"
+                  section="Trending Today"
+                  data={recentAdded}
+                />
+              </motion.section>
+            )}
+          </motion.div>
+        </div>
+      </div>
+      <Footer />
+    </Fragment>
   );
 }

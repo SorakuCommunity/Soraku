@@ -83,18 +83,23 @@ export async function POST(req: NextRequest) {
   );
 }
 
-// DELETE /api/stream/favorites/:animeId
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ animeId: string }> },
-) {
+// DELETE /api/stream/favorites?animeId=xxx
+export async function DELETE(req: NextRequest) {
   const auth = await verifyAuth(req);
   if ("error" in auth) return unauthorized();
 
   const userId = "userId" in auth ? auth.userId : null;
   if (!userId) return unauthorized();
 
-  const { animeId } = await params;
+  const { searchParams } = new URL(req.url);
+  const animeId = searchParams.get("animeId");
+
+  if (!animeId) {
+    return NextResponse.json(
+      { data: null, error: "animeId is required" },
+      { status: 400 },
+    );
+  }
 
   if (streamDb) {
     await streamDb

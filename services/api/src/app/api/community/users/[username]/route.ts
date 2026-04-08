@@ -12,6 +12,12 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ username: string }> },
 ) {
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
   const { username } = await params;
   const [user] = await db
     .select({
@@ -50,6 +56,12 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ username: string }> },
 ) {
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
   const auth = await verifyAuth(req);
   if ("error" in auth) return unauthorized(auth.error);
 

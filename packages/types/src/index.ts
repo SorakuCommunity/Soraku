@@ -196,6 +196,7 @@ export type AnimeSource =
   | "gogoanime" // Sub English — gogoanime
   | "hianime" // Sub English — HiAnime / Aniwatch
   | "animekai" // Sub English — Animekai
+  | "anify" // Multi-language — Anify API
   | "anibaru" // Sub Indonesia — AniBaru.id
   | "samehadaku" // Sub Indonesia — Samehadaku
   | "otakudesu"; // Sub Indonesia — Otakudesu

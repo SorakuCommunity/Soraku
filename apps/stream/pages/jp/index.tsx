@@ -17,7 +17,7 @@ import getUpcomingAnime from "@/lib/anilist/getUpcomingAnime";
 
 import GetMedia from "@/lib/anilist/getMedia";
 
-import { redis } from "@/lib/redis";
+import { redis, safeRedisGet, safeRedisSet } from "@/lib/redis";
 import { Navbar } from "@/components/shared/NavBar";
 import UserRecommendation from "@/components/home/recommendation";
 import { useRouter } from "next/router";
@@ -46,7 +46,7 @@ export async function getServerSideProps() {
   let cachedData;
 
   if (redis) {
-    cachedData = await redis.get("index_server");
+    cachedData = await safeRedisGet("index_server");
   }
 
   if (cachedData) {
@@ -108,7 +108,7 @@ export async function getServerSideProps() {
 
     if (redis) {
       const trendData = trendingDetail.props.data.slice(0, MAX_TRENDS) || [];
-      await redis.set(
+      await safeRedisSet(
         "index_server",
         JSON.stringify({
           genre: genreDetail.props,
@@ -118,8 +118,7 @@ export async function getServerSideProps() {
           nextSeasonal: nextSeasonDetail.props,
           popularMovies: popularMovieDetail.props,
           trendData: trendData
-        }), // set cache for 2 hours
-        "EX",
+        }),
         60 * 60 * 2
       );
     }

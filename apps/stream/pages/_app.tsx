@@ -15,16 +15,16 @@ import { unixTimestampToRelativeTime } from "@/utils/getTimes";
 import { Toaster, toast } from "sonner";
 import ChangeLogs from "../components/shared/changelogs";
 import type { AppProps } from "next/app";
-import ThemeManager from './ThemeManager';
-import Head from 'next/head';
-import { FiX, FiDownload } from 'react-icons/fi';
+import ThemeManager from "./ThemeManager";
+import Head from "next/head";
+import { FiX, FiDownload } from "react-icons/fi";
 import Events from "../components/shared/events";
 import axios from "axios";
-import Skeleton from 'react-loading-skeleton'; // Import Skeleton
+import Skeleton from "react-loading-skeleton"; // Import Skeleton
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => void;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
 export default function App({
@@ -32,7 +32,9 @@ export default function App({
   pageProps: { session, ...pageProps }
 }: AppProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingTimeout, setLoadingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [loadingTimeout, setLoadingTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  );
   const [showRefreshButton, setShowRefreshButton] = useState(false);
   const [randomFact, setRandomFact] = useState<string | null>(null);
   const router = useRouter();
@@ -74,8 +76,9 @@ export default function App({
     try {
       const { data } = await axios.get(url, {
         headers: {
-          Authorization: "MTI5NzY5NTYwNjEzOTEyOTkxMQ--.MTcyOTY3NDQ3NQ--.aaed1db1de",
-        },
+          Authorization:
+            "MTI5NzY5NTYwNjEzOTEyOTkxMQ--.MTcyOTY3NDQ3NQ--.aaed1db1de"
+        }
       });
       setRandomFact(data.fact);
     } catch (err) {
@@ -97,11 +100,13 @@ export default function App({
         });
         const data = await res.json();
         const lastBroadcast = localStorage.getItem("lastBroadcastMessage");
-        
-        if (data?.show === true && (!lastBroadcast || lastBroadcast !== data.message)) {
+
+        if (
+          data?.show === true &&
+          (!lastBroadcast || lastBroadcast !== data.message)
+        ) {
           toast.message(`Announcement`, {
             position: "bottom-right",
-            important: true,
             duration: Infinity,
             className: "font-Archivo",
             description: `${data.message} ${data?.startAt ? unixTimestampToRelativeTime(data.startAt) : ""}`,
@@ -109,7 +114,7 @@ export default function App({
               localStorage.setItem("updateNoticeDismissed", "true");
             }
           });
-          localStorage.setItem("lastBroadcastMessage", data.message); // Store the latest broadcast message
+          localStorage.setItem("lastBroadcastMessage", data.message);
         }
       } catch (err) {
         console.log(err);
@@ -127,10 +132,16 @@ export default function App({
       }
     };
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
+    window.addEventListener(
+      "beforeinstallprompt",
+      handleBeforeInstallPrompt as EventListener
+    );
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt as EventListener
+      );
     };
   }, []);
 
@@ -151,19 +162,20 @@ export default function App({
   };
 
   useEffect(() => {
-    const storedIncognitoMode = localStorage.getItem('incognitoMode');
-    setIsIncognitoMode(storedIncognitoMode === 'true');
+    const storedIncognitoMode = localStorage.getItem("incognitoMode");
+    setIsIncognitoMode(storedIncognitoMode === "true");
   }, []);
 
   useEffect(() => {
     if (isIncognitoMode) {
-      document.title = '1Anime';
+      document.title = "1Anime";
     }
   }, [isIncognitoMode]);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+    const script = document.createElement("script");
+    script.src =
+      "https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1";
     script.async = true;
     document.body.appendChild(script);
 
@@ -178,9 +190,17 @@ export default function App({
         <div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70 z-50">
           <div className="planet mt-4"></div>
           {isFactLoading ? ( // Show skeleton while loading fact
-            <Skeleton count={1} height={20} className="text-white text-sm mt-2" />
+            <Skeleton
+              count={1}
+              height={20}
+              className="text-white text-sm mt-2"
+            />
           ) : (
-            randomFact && <div className="text-white text-sm mt-2">Did you know: {randomFact}</div>
+            randomFact && (
+              <div className="text-white text-sm mt-2">
+                Did you know: {randomFact}
+              </div>
+            )
           )}
           {showRefreshButton && (
             <button
@@ -194,7 +214,7 @@ export default function App({
       )}
 
       <Head>
-        <title>{isIncognitoMode ? '1Anime' : '1Anime'}</title>
+        <title>{isIncognitoMode ? "1Anime" : "1Anime"}</title>
       </Head>
       <ThemeManager />
       <SessionProvider session={pageProps.session}>
@@ -206,12 +226,19 @@ export default function App({
                 {showInstallPopup && (
                   <div className="fixed sm:bottom-4 sm:right-4 sm:max-w-sm w-full sm:w-auto top-0 left-0 right-0 sm:top-auto bg-primary p-4 rounded-b-lg sm:rounded-lg shadow-lg z-50">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-white font-semibold">Install 1Anime</h3>
-                      <button onClick={handleClosePopup} className="text-gray-400 hover:text-white sm:block hidden">
+                      <h3 className="text-white font-semibold">
+                        Install 1Anime
+                      </h3>
+                      <button
+                        onClick={handleClosePopup}
+                        className="text-gray-400 hover:text-white sm:block hidden"
+                      >
                         <FiX size={20} />
                       </button>
                     </div>
-                    <p className="text-gray-300 mb-4">Get a faster, full-screen experience with our app.</p>
+                    <p className="text-gray-300 mb-4">
+                      Get a faster, full-screen experience with our app.
+                    </p>
                     <div className="flex justify-end space-x-2">
                       <button
                         onClick={handleInstallClick}
@@ -260,7 +287,7 @@ export default function App({
                   <Component {...pageProps} isIncognitoMode={isIncognitoMode} />
                 </m.div>
                 <ChangeLogs />
-               {/* <Events /> */}
+                {/* <Events /> */}
               </SkeletonTheme>
             </AnimatePresence>
           </WatchPageProvider>

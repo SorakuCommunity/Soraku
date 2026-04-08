@@ -20,7 +20,7 @@ import Link from "next/link";
 import pls from "@/utils/request/index";
 import Reviews from "@/components/anime/reviews";
 import Characters from "@/components/anime/charactersCard";
-import { redis } from "@/lib/redis";
+import { redis, safeRedisGet, safeRedisSet } from "@/lib/redis";
 import { toast } from "sonner";
 import { Navbar } from "@/components/shared/NavBar";
 import { AniListInfoTypes } from "types/info/AnilistInfoTypes";
@@ -507,7 +507,7 @@ export default function Info({ info, color, chapterNotFound }: InfoTypes) {
 export async function getServerSideProps(ctx: any) {
   const { id, notfound } = ctx.query;
 
-  const API_URI = process.env.NEXT_PUBLIC_API_URL || null;
+  const API_URI = process.env.NEXT_PUBLIC_SORAKU_URL || null;
 
   let cache, chapterNotFound;
   // Check if notfound is defined and truthy before using it
@@ -519,7 +519,7 @@ export async function getServerSideProps(ctx: any) {
   }
 
   if (redis) {
-    cache = await redis.get(`anime:${id}`);
+    cache = await safeRedisGet(`anime:${id}`);
   }
 
   if (cache) {
@@ -567,13 +567,12 @@ export async function getServerSideProps(ctx: any) {
     };
 
     if (redis) {
-      await redis.set(
+      await safeRedisSet(
         `anime:${id}`,
         JSON.stringify({
           info: data,
           color: color
         }),
-        "EX",
         cacheTime
       );
     }

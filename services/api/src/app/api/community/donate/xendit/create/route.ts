@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const auth = await verifyAuth(req);
   if ("error" in auth) return unauthorized();
 
-  if (!env.XENDIT_SECRET_KEY) {
+  if (!env.XENDIT_KEY) {
     return NextResponse.json(
       { data: null, error: "Payment not configured" },
       { status: 503 },
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Basic ${Buffer.from(env.XENDIT_SECRET_KEY + ":").toString("base64")}`,
+      Authorization: `Basic ${Buffer.from(env.XENDIT_KEY + ":").toString("base64")}`,
     },
     body: JSON.stringify({
       external_id: externalId,

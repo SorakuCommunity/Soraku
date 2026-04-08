@@ -1,9 +1,10 @@
 {
   "extends": "next/core-web-vitals",
-  // ignore react-hooks/exhaustive-deps
+  "ignorePatterns": ["**/node_modules/**", "**/.next/**"],
   "rules": {
     "react-hooks/exhaustive-deps": "off",
     "react/no-unescaped-entities": 0,
-    "react/no-unknown-property": ["error", { "ignore": ["css"] }]
+    "react/no-unknown-property": ["error", { "ignore": ["css"] }],
+    "no-unused-vars": "off"
   }
 }

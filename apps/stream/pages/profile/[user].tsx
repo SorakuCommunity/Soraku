@@ -8,7 +8,13 @@ import { Navbar } from "@/components/shared/NavBar";
 import pls from "@/utils/request";
 import { CurrentMediaTypes } from "..";
 import Modal from "@/components/shared/Modal"; // Import Modal component
-import { FaUserCog, FaCheckCircle, FaDonate, FaStar, FaUserShield } from 'react-icons/fa'; // Importing react-icons
+import {
+  FaUserCog,
+  FaCheckCircle,
+  FaDonate,
+  FaStar,
+  FaUserShield
+} from "react-icons/fa"; // Importing react-icons
 
 type User = {
   bannerImage: string;
@@ -17,7 +23,7 @@ type User = {
   createdAt: number;
   about: string;
   statistics: any;
-  setting?: any; 
+  setting?: any;
 };
 
 type MyListProps = {
@@ -45,7 +51,7 @@ export default function MyList({
   sessions,
   user,
   time,
-  userSettings,
+  userSettings
 }: MyListProps) {
   const [listFilter, setListFilter] = useState("all");
   const [visible, setVisible] = useState(false);
@@ -58,14 +64,14 @@ export default function MyList({
     silverDonators: [],
     goldDonators: [],
     diamondDonators: [],
-    staffUsers: [],
+    staffUsers: []
   });
 
   useEffect(() => {
-    fetch('/verified.json')
-      .then(response => response.json())
-      .then(data => setUserLists(data))
-      .catch(error => console.error('Error fetching user lists:', error));
+    fetch("/verified.json")
+      .then((response) => response.json())
+      .then((data) => setUserLists(data))
+      .catch((error) => console.error("Error fetching user lists:", error));
   }, []);
 
   const filterMedia = (status: string) => {
@@ -82,7 +88,8 @@ export default function MyList({
     switch (type) {
       case "developer":
         title = "Developer";
-        content = "This user is a developer of our platform. (They are very cool)";
+        content =
+          "This user is a developer of our platform. (They are very cool)";
         break;
       case "verified":
         title = "Verified User";
@@ -136,12 +143,13 @@ export default function MyList({
   return (
     <>
       <Head>
-        <meta name="description" content={`View ${user.name}'s anime and manga list, statistics, and achievements on 1Anime.`} />
+        <meta
+          name="description"
+          content={`View ${user.name}'s anime and manga list, statistics, and achievements on 1Anime.`}
+        />
         <meta property="og:image" content={user.avatar.large} />
       </Head>
-
       <Navbar withNav toTop shrink bgHover scrollP={110} paddingY={"py-1"} />
-
       <div className="w-screen lg:flex justify-between lg:px-10 xl:px-32 py-5 relative bg-primary">
         <div className="lg:w-[50%] h-full mt-12 lg:mr-10 grid gap-5 mx-3 lg:mx-0 antialiased">
           <div className="flex items-center gap-5">
@@ -170,21 +178,30 @@ export default function MyList({
                 {user.name}
               </h1>
               <div className="flex flex-wrap bg-secondary rounded-lg items-center mt-2">
-  {userLists.developers.includes(user.name) && (
-    <div onClick={() => handleBadgeClick("developer")} className="cursor-pointer flex items-center mr-2 mb-2 text-3xl">
-      <FaUserCog className="text-green-500" />
-    </div>
-  )}
-  {userLists.verifiedUsers.includes(user.name) && (
-    <div onClick={() => handleBadgeClick("verified")} className="cursor-pointer flex items-center mr-2 mb-2 text-3xl">
-      <FaCheckCircle className="text-purple-500" />
-    </div>
-  )}
-  {userLists.staffUsers.includes(user.name) && (
-    <div onClick={() => handleBadgeClick("staff")} className="cursor-pointer flex items-center mr-2 mb-2 text-3xl">
-      <FaUserShield className="text-blue-500" />
-    </div>
-  )}
+                {userLists.developers.includes(user.name) && (
+                  <div
+                    onClick={() => handleBadgeClick("developer")}
+                    className="cursor-pointer flex items-center mr-2 mb-2 text-3xl"
+                  >
+                    <FaUserCog className="text-green-500" />
+                  </div>
+                )}
+                {userLists.verifiedUsers.includes(user.name) && (
+                  <div
+                    onClick={() => handleBadgeClick("verified")}
+                    className="cursor-pointer flex items-center mr-2 mb-2 text-3xl"
+                  >
+                    <FaCheckCircle className="text-purple-500" />
+                  </div>
+                )}
+                {userLists.staffUsers.includes(user.name) && (
+                  <div
+                    onClick={() => handleBadgeClick("staff")}
+                    className="cursor-pointer flex items-center mr-2 mb-2 text-3xl"
+                  >
+                    <FaUserShield className="text-blue-500" />
+                  </div>
+                )}
                 {userLists.donatorUsers.includes(user.name) && (
                   <div className="cursor-pointer flex items-center mr-2 mb-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-full py-1 px-3 animate-pulse">
                     <span className="font-semibold">Donator</span>
@@ -222,8 +239,19 @@ export default function MyList({
                 }}
                 className="flex items-center gap-2 p-1 px-2 ring-[1px] antialiased ring-txt rounded text-xs font-Archivo hover:bg-txt hover:shadow-lg group"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 group-hover:stroke-black">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4 group-hover:stroke-black"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
+                  />
                 </svg>
                 <span className="group-hover:text-black">Share Profile</span>
               </button>
@@ -266,60 +294,147 @@ export default function MyList({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {user && (
                 <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-yellow-500">
-                    <path fillRule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z" clipRule="evenodd" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-8 h-8 text-yellow-500"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z"
+                      clipRule="evenodd"
+                    />
                   </svg>
-                  <span className="font-semibold">Otaku on 1Anime: Created a profile on 1Anime!</span>
+                  <span className="font-semibold">
+                    Otaku on 1Anime: Created a profile on 1Anime!
+                  </span>
                 </div>
               )}
               {userLists.developers.includes(user.name) && (
                 <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-blue-500">
-                    <path fillRule="evenodd" d="M14.447 3.027a.75.75 0 01.527.92l-4.5 16.5a.75.75 0 01-1.448-.394l4.5-16.5a.75.75 0 01.921-.526zM16.72 6.22a.75.75 0 011.06 0l5.25 5.25a.75.75 0 010 1.06l-5.25 5.25a.75.75 0 11-1.06-1.06L21.44 12l-4.72-4.72a.75.75 0 010-1.06zm-9.44 0a.75.75 0 010 1.06L2.56 12l4.72 4.72a.75.75 0 11-1.06 1.06L.97 12.53a.75.75 0 010-1.06l5.25-5.25a.75.75 0 011.06 0z" clipRule="evenodd" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-8 h-8 text-blue-500"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M14.447 3.027a.75.75 0 01.527.92l-4.5 16.5a.75.75 0 01-1.448-.394l4.5-16.5a.75.75 0 01.921-.526zM16.72 6.22a.75.75 0 011.06 0l5.25 5.25a.75.75 0 010 1.06l-5.25 5.25a.75.75 0 11-1.06-1.06L21.44 12l-4.72-4.72a.75.75 0 010-1.06zm-9.44 0a.75.75 0 010 1.06L2.56 12l4.72 4.72a.75.75 0 11-1.06 1.06L.97 12.53a.75.75 0 010-1.06l5.25-5.25a.75.75 0 011.06 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
-                  <span className="font-semibold">1Anime Developer: Contributed to the development of 1Anime!</span>
+                  <span className="font-semibold">
+                    1Anime Developer: Contributed to the development of 1Anime!
+                  </span>
                 </div>
               )}
-              {typeof user.statistics === 'object' && user.statistics.anime && user.statistics.anime.count >= 25 && (
-                <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-green-500">
-                    <path fillRule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z" clipRule="evenodd" />
-                  </svg>
-                  <span className="font-semibold">Anime Weeb: Watched 25+ anime</span>
-                </div>
-              )}
-              {typeof user.statistics === 'object' && user.statistics.anime && user.statistics.anime.count >= 50 && (
-                <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-purple-500">
-                    <path fillRule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z" clipRule="evenodd" />
-                  </svg>
-                  <span className="font-semibold">Anime Enthusiast: Watched 50+ anime</span>
-                </div>
-              )}
-              {typeof user.statistics === 'object' && user.statistics.anime && user.statistics.anime.count >= 100 && (
-                <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-red-500">
-                    <path fillRule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z" clipRule="evenodd" />
-                  </svg>
-                  <span className="font-semibold">Basement Dweller: Watched 100+ anime</span>
-                </div>
-              )}
-              {typeof user.statistics === 'object' && user.statistics.anime && user.statistics.anime.episodesWatched >= 1000 && (
-                <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-pink-500">
-                    <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm14.024-.983a1.125 1.125 0 010 1.966l-5.603 3.113A1.125 1.125 0 019 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113z" clipRule="evenodd" />
-                  </svg>
-                  <span className="font-semibold">Episode Master: Watched 1000+ episodes</span>
-                </div>
-              )}
-              {typeof user.statistics === 'object' && user.statistics.anime && user.statistics.anime.minutesWatched >= 100000 && (
-                <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-orange-500">
-                    <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clipRule="evenodd" />
-                  </svg>
-                  <span className="font-semibold">Time Lord: Watched for 100,000+ minutes</span>
-                </div>
-              )}
+              {typeof user.statistics === "object" &&
+                user.statistics.anime &&
+                user.statistics.anime.count >= 25 && (
+                  <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-8 h-8 text-green-500"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="font-semibold">
+                      Anime Weeb: Watched 25+ anime
+                    </span>
+                  </div>
+                )}
+              {typeof user.statistics === "object" &&
+                user.statistics.anime &&
+                user.statistics.anime.count >= 50 && (
+                  <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-8 h-8 text-purple-500"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="font-semibold">
+                      Anime Enthusiast: Watched 50+ anime
+                    </span>
+                  </div>
+                )}
+              {typeof user.statistics === "object" &&
+                user.statistics.anime &&
+                user.statistics.anime.count >= 100 && (
+                  <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-8 h-8 text-red-500"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 00-.584.859 6.753 6.753 0 006.138 5.6 6.73 6.73 0 002.743 1.346A6.707 6.707 0 019.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 00-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 00.75-.75 2.25 2.25 0 00-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 01-1.112-3.173 6.73 6.73 0 002.743-1.347 6.753 6.753 0 006.139-5.6.75.75 0 00-.585-.858 47.077 47.077 0 00-3.07-.543V2.62a.75.75 0 00-.658-.744 49.22 49.22 0 00-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 00-.657.744zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 013.16 5.337a45.6 45.6 0 012.006-.343v.256zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 01-2.863 3.207 6.72 6.72 0 00.857-3.294z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="font-semibold">
+                      Basement Dweller: Watched 100+ anime
+                    </span>
+                  </div>
+                )}
+              {typeof user.statistics === "object" &&
+                user.statistics.anime &&
+                user.statistics.anime.episodesWatched >= 1000 && (
+                  <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-8 h-8 text-pink-500"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm14.024-.983a1.125 1.125 0 010 1.966l-5.603 3.113A1.125 1.125 0 019 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="font-semibold">
+                      Episode Master: Watched 1000+ episodes
+                    </span>
+                  </div>
+                )}
+              {typeof user.statistics === "object" &&
+                user.statistics.anime &&
+                user.statistics.anime.minutesWatched >= 100000 && (
+                  <div className="flex items-center gap-2 p-2 rounded hover:bg-gray-700 transition-colors duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-8 h-8 text-orange-500"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="font-semibold">
+                      Time Lord: Watched for 100,000+ minutes
+                    </span>
+                  </div>
+                )}
             </div>
           </div>
 
@@ -349,21 +464,21 @@ export default function MyList({
             )}
           </div>
           {media.length !== 0 && (
-              <div className="font-Archivo grid gap-4">
-                <div className="flex md:justify-normal justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-white">Lists Filter</h1>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-[20px] h-[20px] text-white"
-                    >
-                      <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+            <div className="font-Archivo grid gap-4">
+              <div className="flex md:justify-normal justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-white">Lists Filter</h1>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-[20px] h-[20px] text-white"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
                     />
                   </svg>
@@ -425,7 +540,9 @@ export default function MyList({
         <div className="lg:w-[70%] grid grid-cols-1 md:grid-cols-2 gap-10 my-5 lg:my-12 lg:pt-16">
           {/* Anime List */}
           <div>
-            <h2 className="font-Archivo font-bold text-2xl mb-5 text-white">Anime List</h2>
+            <h2 className="font-Archivo font-bold text-2xl mb-5 text-white">
+              Anime List
+            </h2>
             {media.length !== 0 ? (
               filterMedia(listFilter).map((item, index) => {
                 return (
@@ -434,15 +551,21 @@ export default function MyList({
                     id={item.status?.toLowerCase()}
                     className="flex flex-col gap-5 mx-3"
                   >
-                    <h1 className="font-Archivo font-bold text-xl text-white">{item.name}</h1>
+                    <h1 className="font-Archivo font-bold text-xl text-white">
+                      {item.name}
+                    </h1>
                     <table className="bg-secondary rounded">
                       <thead>
                         <tr>
                           <th className="font-bold text-xs py-3 text-start pl-10 lg:w-[75%] w-[65%] text-white">
                             Title
                           </th>
-                          <th className="font-bold text-xs py-3 text-white">Score</th>
-                          <th className="font-bold text-xs py-3 text-white">Progress</th>
+                          <th className="font-bold text-xs py-3 text-white">
+                            Score
+                          </th>
+                          <th className="font-bold text-xs py-3 text-white">
+                            Progress
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="">
@@ -456,7 +579,8 @@ export default function MyList({
                                 <div className="flex items-center gap-2">
                                   {entry.media.status === "RELEASING" ? (
                                     <span className="dot group-hover:invisible bg-green-500 shrink-0" />
-                                  ) : entry.media.status === "NOT_YET_RELEASED" ? (
+                                  ) : entry.media.status ===
+                                    "NOT_YET_RELEASED" ? (
                                     <span className="dot group-hover:invisible bg-red-500 shrink-0" />
                                   ) : (
                                     <span className="dot group-hover:invisible shrink-0" />
@@ -516,7 +640,9 @@ export default function MyList({
 
           {/* Manga List */}
           <div>
-            <h2 className="font-Archivo font-bold text-2xl mb-5 text-white">Manga List</h2>
+            <h2 className="font-Archivo font-bold text-2xl mb-5 text-white">
+              Manga List
+            </h2>
             {mangaMedia.length !== 0 ? (
               filterMangaMedia(mangaListFilter).map((item, index) => {
                 return (
@@ -525,15 +651,21 @@ export default function MyList({
                     id={item.status?.toLowerCase()}
                     className="flex flex-col gap-5 mx-3"
                   >
-                    <h1 className="font-Archivo font-bold text-xl text-white">{item.name}</h1>
+                    <h1 className="font-Archivo font-bold text-xl text-white">
+                      {item.name}
+                    </h1>
                     <table className="bg-secondary rounded">
                       <thead>
                         <tr>
                           <th className="font-bold text-xs py-3 text-start pl-10 lg:w-[75%] w-[65%] text-white">
                             Title
                           </th>
-                          <th className="font-bold text-xs py-3 text-white">Score</th>
-                          <th className="font-bold text-xs py-3 text-white">Progress</th>
+                          <th className="font-bold text-xs py-3 text-white">
+                            Score
+                          </th>
+                          <th className="font-bold text-xs py-3 text-white">
+                            Progress
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="">
@@ -589,15 +721,12 @@ export default function MyList({
           </div>
         </div>
         {isModalOpen && (
-          <Modal
-          isOpen={true}
-          onClose={closeModal}
-          title={modalContent.title}
-        >
-          {modalContent.content}
-        </Modal>
+          <Modal isOpen={true} onClose={closeModal} title={modalContent.title}>
+            {modalContent.content}
+          </Modal>
         )}
-</div>    </>
+      </div>{" "}
+    </>
   );
 }
 
@@ -713,9 +842,9 @@ export async function getServerSideProps(context: any) {
         }
       `,
         variables: {
-          username: query.user,
-        },
-      }),
+          username: query.user
+        }
+      })
     },
     context
   );
@@ -725,7 +854,7 @@ export async function getServerSideProps(context: any) {
 
   if (!sectionOrder) {
     return {
-      notFound: true,
+      notFound: true
     };
   }
 
@@ -752,7 +881,8 @@ export async function getServerSideProps(context: any) {
   const time = convertMinutesToDays(user.statistics.anime.minutesWatched);
 
   const mangaGet = data?.data?.MangaListCollection;
-  const mangaSectionOrder = mangaGet?.user.mediaListOptions.mangaList.sectionOrder;
+  const mangaSectionOrder =
+    mangaGet?.user.mediaListOptions.mangaList.sectionOrder;
 
   const mangaProg = mangaGet.lists;
 
@@ -772,9 +902,8 @@ export async function getServerSideProps(context: any) {
       mangaMedia: mangaProg,
       sessions: session,
       user: user,
-      time: time,
-      
-    },
+      time: time
+    }
   };
 }
 
@@ -791,11 +920,11 @@ function convertMinutesToDays(minutes: number) {
 
   if (days >= 1) {
     return days % 1 === 0
-        ? { days: `${days}` }
-        : { days: `${days.toFixed(1)}` };
+      ? { days: `${days}` }
+      : { days: `${days.toFixed(1)}` };
   } else {
     return hours % 1 === 0
-        ? { hours: `${hours}` }
-        : { hours: `${hours.toFixed(1)}` };
+      ? { hours: `${hours}` }
+      : { hours: `${hours.toFixed(1)}` };
   }
 }

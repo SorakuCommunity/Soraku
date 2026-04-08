@@ -11,6 +11,14 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
+
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
+
   const [event] = await db
     .select()
     .from(events)

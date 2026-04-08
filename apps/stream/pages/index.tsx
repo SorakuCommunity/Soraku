@@ -15,7 +15,7 @@ import Schedule from "@/components/home/schedule";
 import getUpcomingAnime from "@/lib/anilist/getUpcomingAnime";
 import GetMedia from "@/lib/anilist/getMedia";
 import { getGreetings } from "@/utils/getGreetings";
-import { redis } from "@/lib/redis";
+import { redis, safeRedisGet } from "@/lib/redis";
 import { Navbar } from "@/components/shared/NavBar";
 import UserRecommendation from "@/components/home/recommendation";
 import FeaturedSection from "@/components/home/featured";
@@ -32,10 +32,10 @@ const MAX_TRENDS = 7;
 
 export async function getServerSideProps() {
   let cachedData;
-  let error = false; // Initialize error flag
+  let error = false;
 
   if (redis) {
-    cachedData = await redis.get("index_server");
+    cachedData = await safeRedisGet("index_server");
   }
 
   if (cachedData) {

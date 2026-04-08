@@ -7,6 +7,12 @@ export const dynamic = "force-dynamic";
 
 // GET /api/community/vtubers
 export async function GET(_req: NextRequest) {
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
   const rows = await db
     .select()
     .from(vtubers)

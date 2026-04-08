@@ -11,6 +11,12 @@ export const dynamic = "force-dynamic";
 
 // GET /api/stream - Anime search OR Soraku internal streaming
 export async function GET(req: NextRequest) {
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
   const { searchParams } = new URL(req.url);
 
   // Anime search mode

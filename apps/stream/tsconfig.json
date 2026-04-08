@@ -1,11 +1,6 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-      "ES2020.Promise"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext", "ES2020.Promise"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -16,21 +11,13 @@
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/components/*": [
-        "components/*"
-      ],
-      "@/utils/*": [
-        "utils/*"
-      ],
-      "@/lib/*": [
-        "lib/*"
-      ],
-      "@/prisma/*": [
-        "prisma/*"
-      ]
+      "@/components/*": ["components/*"],
+      "@/utils/*": ["utils/*"],
+      "@/lib/*": ["lib/*"],
+      "@/prisma/*": ["lib/prisma-stub.ts"]
     },
     "target": "ES2017"
   },
@@ -52,8 +39,5 @@
     "pages/api/sitemap.js",
     "pages/manga/random.js"
   ],
-  "exclude": [
-    "node_modules",
-    "lib/mal/malAdvanceSearch.ts"
-  ]
+  "exclude": ["node_modules", "lib/mal/malAdvanceSearch.ts"]
 }

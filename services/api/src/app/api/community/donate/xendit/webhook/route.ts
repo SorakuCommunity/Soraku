@@ -8,8 +8,15 @@ export const dynamic = "force-dynamic";
 // POST /api/community/donate/xendit/webhook
 export async function POST(req: NextRequest) {
   const token = req.headers.get("x-callback-token");
-  if (!env.XENDIT_SECRET_KEY || token !== env.XENDIT_SECRET_KEY) {
+  if (!env.XENDIT_KEY || token !== env.XENDIT_KEY) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  }
+
+  if (!db) {
+    return NextResponse.json(
+      { error: "Database not configured" },
+      { status: 503 },
+    );
   }
 
   const body = await req.json();

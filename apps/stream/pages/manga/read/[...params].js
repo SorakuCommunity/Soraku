@@ -17,7 +17,7 @@ import { mediaInfoQuery } from "@/lib/graphql/query";
 import getConsumetChapters from "@/lib/consumet/manga/getChapters";
 import { toast } from "sonner";
 import axios from "axios";
-import { redis } from "@/lib/redis";
+import { redis, safeRedisGet, safeRedisSet } from "@/lib/redis";
 import getAnifyInfo from "@/lib/anify/info";
 
 export default function Read({
@@ -28,7 +28,7 @@ export default function Read({
   sessions,
   provider,
   mangaDexId,
-  number,
+  number
 }) {
   const [chapter, setChapter] = useState([]);
   const [layout, setLayout] = useState(1);
@@ -59,7 +59,7 @@ export default function Read({
     toast.message("This page is still under development", {
       description: "If you found any bugs, please report it to us!",
       position: "top-center",
-      duration: 10000,
+      duration: 10000
     });
   }, []);
 
@@ -67,15 +67,22 @@ export default function Read({
     toast.message("Want a better experience reading Manga?", {
       description: (
         <span>
-          Try MangaPin now! Works with 1Anime, FREE and EASY to use! <a href="https://mangapin.com" target="_blank" rel="noopener noreferrer" style={{ color: '#cd6308', textDecoration: 'underline' }}>Learn more</a>
+          Try MangaPin now! Works with 1Anime, FREE and EASY to use!{" "}
+          <a
+            href="https://mangapin.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#cd6308", textDecoration: "underline" }}
+          >
+            Learn more
+          </a>
         </span>
       ),
       position: "bottom-right",
-      duration: 25000,
+      duration: 25000
     });
   }, []);
 
-  
   useEffect(() => {
     hasRun.current = false;
     const chapters = chaptersData.find((x) => x.providerId === provider);
@@ -289,7 +296,7 @@ async function fetchAnifyPages(id, number, provider, readId, key) {
   try {
     let cached;
 
-    if (redis) cached = await redis.get(`pages:${readId}`);
+    if (redis) cached = await safeRedisGet(`pages:${readId}`);
 
     if (cached) {
       return JSON.parse(cached);
@@ -306,10 +313,9 @@ async function fetchAnifyPages(id, number, provider, readId, key) {
     }
 
     if (redis)
-      await redis.set(
+      await safeRedisSet(
         `pages:${readId}`,
         JSON.stringify(data),
-        "EX",
         60 * 60 * 24 * 7
       );
 
@@ -332,7 +338,7 @@ export async function getServerSideProps(context) {
   const session = await getServerSession(context.req, context.res, authOptions);
   const accessToken = session?.user?.token || null;
 
- const data = await getConsumetPages(mediaId, providerId, chapterId, key);
+  const data = await getConsumetPages(mediaId, providerId, chapterId, key);
   // const chapters = await getConsumetChapters(mediaId, redis);
 
   const dataManga = await fetchAnifyPages(
@@ -351,15 +357,15 @@ export async function getServerSideProps(context) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+        ...(accessToken && { Authorization: `Bearer ${accessToken}` })
       },
       body: JSON.stringify({
         query: mediaInfoQuery,
         variables: {
           id: parseInt(anilistId),
-          type: "MANGA",
-        },
-      }),
+          type: "MANGA"
+        }
+      })
     });
     const json = await response.json();
     info = json?.data?.Media;
@@ -377,8 +383,8 @@ export async function getServerSideProps(context) {
   if ((dataManga && dataManga?.error) || dataManga?.length === 0) {
     return {
       redirect: {
-        destination: `/manga/${anilistId}?chapter=404`,
-      },
+        destination: `/manga/${anilistId}?chapter=404`
+      }
     };
   }
 
@@ -405,7 +411,7 @@ export async function getServerSideProps(context) {
       chaptersData: chapters,
       currentId: chapterId,
       sessions: session,
-      provider: providerId,
-    },
+      provider: providerId
+    }
   };
 }

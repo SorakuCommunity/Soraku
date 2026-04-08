@@ -50,6 +50,10 @@ export const env = createEnv({
     D_REGISTRATION_WEBHOOK: z.string().optional(),
     D_BLOG_WEBHOOK: z.string().optional(),
     D_FEEDBACK_WEBHOOK: z.string().optional(),
+
+    // Contact Emails (Public)
+    CONTACT_EMAIL: z.string().email().optional(),
+    ADMIN_EMAIL: z.string().email().optional(),
   },
 
   client: {
@@ -85,6 +89,8 @@ export const env = createEnv({
     D_REGISTRATION_WEBHOOK: process.env.D_REGISTRATION_WEBHOOK,
     D_BLOG_WEBHOOK: process.env.D_BLOG_WEBHOOK,
     D_FEEDBACK_WEBHOOK: process.env.D_FEEDBACK_WEBHOOK,
+    CONTACT_EMAIL: process.env.CONTACT_EMAIL,
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
 
     // Client
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

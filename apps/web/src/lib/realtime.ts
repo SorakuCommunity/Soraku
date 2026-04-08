@@ -25,8 +25,8 @@ function init() {
   if (_initialized) return
   _initialized = true
 
-  const url = process.env.UPSTASH_REDIS_REST_URL
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  const url = process.env.REDIS_URL
+  const token = process.env.REDIS_TOKEN
   if (!url || !token) return
 
   try {

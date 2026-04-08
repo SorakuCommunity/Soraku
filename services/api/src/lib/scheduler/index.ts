@@ -2,7 +2,7 @@
 // Usage:
 //   import { registerJob, getAllJobs } from "@/lib/scheduler"
 
-import type { SorakuApiClient } from "@soraku/api-client";
+import type { SorakuApiClient } from "@soraku/utils";
 
 // ── Job Interface ──────────────────────────────────────────────────
 

@@ -5,10 +5,81 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ---
 
+## [v1.6.0] - 7 April 2026
+
+**Admin Dashboard v2, Stream Dashboard, Mobile Refactor, Billing & Bot Control**
+
+### apps/web - Web Komunitas (1.5.0 → 1.6.0)
+
+Ditambahkan:
+
+- Dashboard admin baru: Analytics, Premium, Billing, Discord Bot Control, Settings
+- Halaman Settings admin untuk profile dan akun
+- Analytics page dengan periode 7/30/90 hari dan top pages
+- Billing page dengan Paddle integration (placeholder)
+- Premium page dengan perbandingan plan
+- Discord Bot control panel dengan status, modules toggle, dan quick actions
+- Navigation baru: Analytics, Premium, Billing, Bot, Settings
+
+Diperbaiki:
+
+- Email kontak di footer: contact@soraku.id dan admin@soraku.id
+- Email di halaman Lisensi, TOS, Privacy, Contact diperbarui
+- Email di SECURITY.md diperbarui ke admin@soraku.id
+- Footer menggunakan CONTACT_EMAILS.contact вместо CONTACT_EMAILS.general
+
+### apps/stream - Web Streaming (0.0.0 → 0.1.0)
+
+Ditambahkan:
+
+- Dashboard streaming di /dashboard dengan stats dan anime sources
+- Anime sources: Consumet, AniList, MyAnimeList, Anify, Samehadaku, Otakudesu
+- Stats: total anime, episodes, images, active sources, cache size, uptime
+
+Infrastruktur:
+
+- Prisma dihapus, gunakan Drizzle ORM
+- Konfigurasi Next.js dengan ignoreBuildErrors dan ignoreDuringBuilds
+
+### apps/mobile (0.0.0 → 0.0.1)
+
+Ditambahkan:
+
+- Struktur dasar mobile app dengan Expo
+- Package workspace: @soraku/types, @soraku/utils, @soraku/api-client, @soraku/config
+- Dipindahkan dari apps/stream/mobile ke apps/mobile
+
+### services/api (0.1.0 → 1.0.0)
+
+Ditambahkan:
+
+- API endpoints untuk community: blog, events, gallery, vtubers
+- API endpoints untuk stream: favorites, watch history, sources
+- API endpoints untuk donation: Trakteer, Xendit
+- Premium subscription API
+- Konfigurasi CORS yang fleksibel
+- Next.js 16.2.2 dengan ignoreBuildErrors
+
+### services/bot - Discord Bot (1.0.0)
+
+Ditambahkan:
+
+- Sharding dengan discord-hybrid-sharding
+- Music system dengan Lavalink
+- Command handlers: Info, Developer, Giveaway, Welcome, Pfps, Owner, Invites, Extra
+- Database repos: User, Guild, Moderation, Premium, Playlists, Invites, Ticket, SorakuUser
+- Event handlers: player, node, discord
+- Auto-reply dan autoreact system
+- Invite tracking dan ranks
+
+---
+
 ## [v1.5.1] - 30 Maret 2026
+
 **Admin Webhook, Halaman Legal, Konsolidasi Migrasi, Feedback & Kontak**
 
 Ditambahkan:
+
 - Panel admin Discord Webhooks: kelola URL webhook Blog, Event, Pendaftaran, dan Feedback dari UI
 - Fitur test webhook langsung dari panel admin dengan satu klik
 - Admin panel terpisah dari navbar utama, layout standalone dengan header sendiri
@@ -22,6 +93,7 @@ Ditambahkan:
 - Link Kontak dan Feedback di footer
 
 Diperbaiki:
+
 - POST /api/analytics/tiktok gagal 500 jika TIKTOK_ACCESS_TOKEN tidak di-set, sekarang di-skip
 - GET /api/admin/webhooks gagal 500: kolom label dan category tidak ada di DB, ditambah migrasi fix
 - PATCH /api/admin/webhooks gagal 400/500, perbaikan parsing body dan validasi
@@ -35,6 +107,7 @@ Diperbaiki:
 - `export const dynamic` dihapus dari client component
 
 Infrastruktur:
+
 - Migrasi database terkonsolidasi ke satu file: `20260329_soraku_v1_5_1_consolidated.sql`
 - Migrasi tambahan: `20260330_fix_sitesettings_columns.sql` untuk tambah kolom label/category
 - Semua file migration lama dihapus, hanya tersisa file konsolidasi + fix
@@ -46,12 +119,14 @@ Infrastruktur:
 ---
 
 ## [v1.5.0] - 21 Maret 2026
+
 **Sistem Realtime, Redesign Homepage dan Admin**
 
 Rilis ini membawa sistem notifikasi push berbasis Redis dan renovasi besar
 pada tampilan beranda serta panel admin.
 
 Ditambahkan:
+
 - Integrasi Upstash Redis dan Realtime untuk notifikasi push instan tanpa polling
 - Hook `useRealtime` dengan `RealtimeProvider` yang membungkus seluruh aplikasi
 - Helper `createNotification()` yang otomatis meneruskan event ke semua client aktif
@@ -60,6 +135,7 @@ Ditambahkan:
 - Panel admin didesain ulang: sidebar terkelompok, metrik besar di depan, tanpa glass card
 
 Diperbaiki:
+
 - Properti `cfg.icon` dan `cfg.border` yang hilang di notifikasi dan navbar
 - Tanda tangan `markRead(string[])` tidak sesuai tipe
 - Conflict markers di lebih dari sepuluh file blog yang menyebabkan build gagal
@@ -67,15 +143,18 @@ Diperbaiki:
 ---
 
 ## [v1.4.0] - 20 Maret 2026
+
 **Domain Resmi, Sistem Follow, Polesan UI**
 
 Ditambahkan:
+
 - Domain default berpindah ke `www.soraku.id`
 - Sistem follow dan unfollow antar pengguna dengan counter real-time
 - Notifikasi bell di navbar dengan ikon emoji per kategori notifikasi
 - Peningkatan UI menyeluruh pada tipografi, spacing, dan navigasi
 
 Diperbaiki:
+
 - Error tipe ikon notifikasi
 - Halaman registrasi event
 - Resolusi conflict hasil merge blog
@@ -83,9 +162,11 @@ Diperbaiki:
 ---
 
 ## [v1.3.0] - 19 Maret 2026
+
 **Sistem Blog - Renovasi Total**
 
 Ditambahkan:
+
 - Grid blog didesain ulang dengan cover image dan stats overlay
 - Like dan dislike dengan counter yang tersimpan per pengguna (wajib login)
 - Komentar dengan dukungan Markdown, sistem balas bertingkat, dan persistensi otomatis
@@ -97,6 +178,7 @@ Ditambahkan:
 - Editor blog admin: toolbar Markdown, tab pratinjau, komponen ImageUrlInput
 
 Diperbaiki:
+
 - Ketidakcocokan nama tabel `post_comments` dan `post_likes`
 - Kolom `guestname` tidak sesuai skema DB yang menggunakan `username`
 - Kompatibilitas `RefObject<HTMLTextAreaElement>` di React 19 strict mode
@@ -105,9 +187,11 @@ Diperbaiki:
 ---
 
 ## [v1.2.0] - 17 Maret 2026
+
 **Sistem Event - Pendaftaran Mobile Legends**
 
 Ditambahkan:
+
 - Form pendaftaran event 3 langkah: Info Tim, Pemain, Konfirmasi
 - Dukungan event gratis dan berbayar dengan upload bukti bayar dan info rekening
 - Admin dapat meninjau, menerima, atau menolak pendaftaran dengan notifikasi Discord
@@ -119,21 +203,25 @@ Ditambahkan:
 - Embed card Discord saat mempublikasikan event baru
 
 Infrastruktur:
+
 - `lib/discord-webhook.ts`: baca URL dari DB `sitesettings`, fallback ke ENV, cache 60 detik
 - Migrasi: `eventregistrations`, `ispaid`, `price`, `registrationopen`, `paymentmethods`
 
 ---
 
 ## [v1.1.0] - 10 Maret 2026
+
 **Konfigurasi Type-Safe, Penguatan Autentikasi**
 
 Ditambahkan:
+
 - T3 Env untuk validasi environment variable yang type-safe di semua aplikasi
 - Auto migration runner untuk menerapkan migrasi SQL secara otomatis
 - Self-edit username dari halaman profil
 - Tab navbar dan animasi swipe di `/profile/me`
 
 Diperbaiki:
+
 - Propagasi cookie PKCE pada Discord OAuth
 - Logout kini menghapus cookie sesi dengan benar menggunakan hard-refresh
 - Dukungan nama ENV fallback `SUPABASE_SERVICE_KEY`
@@ -142,11 +230,13 @@ Diperbaiki:
 ---
 
 ## [v1.0.0] - 8 Maret 2026
+
 **Peluncuran Platform**
 
 Ini adalah rilis publik pertama Soraku Community Platform.
 
 Ditambahkan:
+
 - Login dan registrasi dengan validasi lengkap, Discord OAuth, dan Google OAuth
 - Profil publik dengan role badge, XP ring, sistem level, dan pratinjau galeri
 - Profil pribadi `/profile/me`: edit semua field, social links, dan pengaturan privasi
@@ -156,6 +246,7 @@ Ditambahkan:
 - Upload galeri ke Supabase Storage dengan sistem review admin
 
 Sistem:
+
 - Trigger auto-create `soraku.users` saat pengguna baru mendaftar via Discord atau Google
 - Perbaikan PGRST106 pada schema exposure Supabase PostgREST
 - Arsitektur route yang bersih: `/admin/*` dan `/profile/me` tanpa prefix `/dash`
@@ -164,9 +255,11 @@ Sistem:
 ---
 
 ## [v0.9.0] - 5 Maret 2026
+
 **Backend Lengkap, Integrasi Data Real**
 
 Ditambahkan:
+
 - Trakteer webhook untuk notifikasi donasi masuk
 - Notification API: list, mark read, counter bell
 - Delapan halaman terhubung ke data Supabase secara langsung
@@ -176,9 +269,11 @@ Ditambahkan:
 ---
 
 ## [v0.8.0] - 3 Maret 2026
+
 **Central API, Fondasi Bot Discord**
 
 Ditambahkan:
+
 - `services/api`: Next.js App Router sebagai API terpusat
 - Halaman landing API dengan dokumentasi endpoint
 - Tiga slash command Discord pertama
@@ -187,12 +282,14 @@ Ditambahkan:
 ---
 
 ## [v0.7.0] - 1 Maret 2026
+
 **Semua Halaman Selesai**
 
 Halaman yang selesai pada rilis ini mencakup beranda, tentang kami, blog, event,
 galeri, login, register, profil publik dan pribadi, VTubers, serta sosial media.
 
 Ditambahkan:
+
 - Navbar dengan dropdown Komunitas dan Agensi
 - Footer dua kolom dengan enam tautan sosial media
 - Notifikasi bell dengan badge counter
@@ -200,9 +297,11 @@ Ditambahkan:
 ---
 
 ## [v0.5.0] - 25 Februari 2026
+
 **Fondasi Backend**
 
 Ditambahkan:
+
 - Semua API route dasar: auth, profil, blog, event, galeri, admin
 - Supabase client untuk server, client, dan admin
 - Helper: `getSession()`, `adminDb()`, `ok()`, `err()`, `NOT_FOUND()`
@@ -211,9 +310,11 @@ Ditambahkan:
 ---
 
 ## [v0.2.0] - 20 Februari 2026
+
 **Panel Admin**
 
 Ditambahkan:
+
 - Layout admin dengan sidebar navigasi
 - CRUD lengkap untuk Blog, Event, Galeri, dan Pengguna
 - Semua halaman admin menggunakan data real dari Supabase
@@ -221,9 +322,11 @@ Ditambahkan:
 ---
 
 ## [v0.1.0] - 15 Februari 2026
+
 **Fondasi UI**
 
 Ditambahkan:
+
 - Navbar dengan state autentikasi real
 - Footer dengan tautan sosial
 - Music player persisten via React Context
@@ -232,9 +335,11 @@ Ditambahkan:
 ---
 
 ## [v0.0.1] - 10 Februari 2026
+
 **Awal Mula**
 
 Ditambahkan:
+
 - Scaffold monorepo: `apps/web`, `services/api`, `services/bot`
 - Next.js 16 App Router dengan TypeScript dan Tailwind CSS v4
 - Setup proyek Supabase dengan skema awal
@@ -243,5 +348,8 @@ Ditambahkan:
 
 ---
 
-*Soraku Community. Est. 2023.*
+_Soraku Community. Est. 2023._
+
+```
+
 ```

@@ -31,7 +31,7 @@ type DataType = {
 };
 
 export async function getServerSideProps() {
-  const API = process.env.NEXT_PUBLIC_API_URL;
+  const API = process.env.NEXT_PUBLIC_SORAKU_URL;
   return {
     props: {
       API

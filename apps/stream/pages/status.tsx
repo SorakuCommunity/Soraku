@@ -25,7 +25,7 @@ interface ServerStatus {
 
 export default function Status() {
   const servers: Server[] = [
-    { url: `${process.env.NEXT_PUBLIC_API_URL}/`, altName: "Soraku API" },
+    { url: `${process.env.NEXT_PUBLIC_SORAKU_URL}/`, altName: "Soraku API" },
     { url: "https://soraku.vercel.app", altName: "Soraku Web" },
     { url: "https://apisoraku.vercel.app", altName: "API Server" }
   ];

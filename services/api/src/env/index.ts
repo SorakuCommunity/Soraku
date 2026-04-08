@@ -4,15 +4,15 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     // Database
-    DB_URL: z.string(), // Komunitas DB
+    DB_URL: z.string().optional(), // Komunitas DB (optional for dev)
     DB_STREAM_URL: z.string().optional(), // Streaming DB
 
     // Supabase
-    SUPABASE_URL: z.string().url(),
-    SUPABASE_SERVICE_KEY: z.string().min(1),
+    SUPABASE_URL: z.string().url().optional(),
+    SUPABASE_SERVICE_KEY: z.string().optional(),
 
     // Soraku API Secret (shared)
-    SORAKU_SECRET: z.string().min(32),
+    SORAKU_SECRET: z.string().min(32).optional(),
 
     // Payment
     XENDIT_KEY: z.string().optional(),
@@ -23,6 +23,9 @@ export const env = createEnv({
 
     // Consumet API
     CONSUMET_API_URL: z.string().url().optional(),
+
+    // Anify API
+    ANIFY_API_URL: z.string().url().optional(),
 
     // Redis
     REDIS_URL: z.string().url().optional(),
@@ -43,6 +46,7 @@ export const env = createEnv({
     TRAKTEER_SECRET: process.env.TRAKTEER_SECRET,
     CORS_ORIGINS: process.env.CORS_ORIGINS,
     CONSUMET_API_URL: process.env.CONSUMET_API_URL,
+    ANIFY_API_URL: process.env.ANIFY_API_URL,
     REDIS_URL: process.env.REDIS_URL,
     REDIS_TOKEN: process.env.REDIS_TOKEN,
     NODE_ENV: process.env.NODE_ENV,

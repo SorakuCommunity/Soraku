@@ -1,9 +1,9 @@
-import { redis } from "@/lib/redis";
+import { redis, safeRedisGet, safeRedisSet } from "@/lib/redis";
 import { AnifyRecentEpisode } from "types";
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || null;
+const API_URL = process.env.NEXT_PUBLIC_SORAKU_URL || null;
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,7 +13,7 @@ export default async function handler(
     let cache;
 
     if (redis) {
-      cache = await redis.get(`recent-episode`);
+      cache = await safeRedisGet(`recent-episode`);
     }
 
     if (cache) {
@@ -55,7 +55,7 @@ export default async function handler(
       await fetchData(page);
 
       if (redis) {
-        await redis.set(`recent-episode`, JSON.stringify(datas), "EX", 60 * 60);
+        await safeRedisSet(`recent-episode`, JSON.stringify(datas), 60 * 60);
       }
 
       return res.status(200).json({ results: datas });

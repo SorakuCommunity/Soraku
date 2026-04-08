@@ -4,17 +4,16 @@
 
 Kebijakan ini berlaku untuk seluruh komponen platform Soraku yang aktif:
 
-| Komponen         | Domain atau Lokasi                     | Status          |
-|------------------|----------------------------------------|-----------------|
-| Web Application  | https://www.soraku.id                  | Aktif           |
-| API              | https://apisoraku.vercel.app           | Aktif           |
-| Discord Bot      | Railway (layanan internal)             | Aktif           |
-| Supabase Backend | Database dan Auth (jrgknsxqwuygcoocnnnb) | Aktif         |
+| Komponen         | Domain atau Lokasi                       | Status |
+| ---------------- | ---------------------------------------- | ------ |
+| Web Application  | https://www.soraku.id                    | Aktif  |
+| API              | https://apisoraku.vercel.app             | Aktif  |
+| Discord Bot      | Railway (layanan internal)               | Aktif  |
+| Supabase Backend | Database dan Auth (jrgknsxqwuygcoocnnnb) | Aktif  |
 
 Komponen di luar daftar di atas, termasuk layanan pihak ketiga yang
 diintegrasikan (Discord, Upstash, Supabase Auth), tunduk pada kebijakan
 keamanan masing-masing penyedia.
-
 
 ## Melaporkan Kerentanan
 
@@ -26,7 +25,7 @@ menanganinya.**
 
 Kirimkan laporan melalui salah satu jalur berikut:
 
-1. Surel langsung: echo.soraku@gmail.com
+1. Surel langsung: admin@soraku.id
    Gunakan subjek: [SECURITY] Nama Singkat Kerentanan
 
 2. Discord DM kepada koordinator (Riu) di server Soraku:
@@ -40,20 +39,18 @@ Sertakan informasi berikut dalam laporan:
 - Dampak potensial terhadap pengguna atau data
 - Bukti konsep jika tersedia (screenshot, log, kode minimal)
 
-
 ## Waktu Respons
 
-| Tahap                         | Target Waktu     |
-|-------------------------------|------------------|
-| Konfirmasi penerimaan laporan | 48 jam           |
-| Penilaian awal kerentanan     | 3 hari kerja     |
-| Pembaruan status kepada pelapor | Setiap 7 hari  |
-| Penerapan perbaikan kritis    | 14 hari          |
-| Penerapan perbaikan non-kritis | 30 hari         |
+| Tahap                           | Target Waktu  |
+| ------------------------------- | ------------- |
+| Konfirmasi penerimaan laporan   | 48 jam        |
+| Penilaian awal kerentanan       | 3 hari kerja  |
+| Pembaruan status kepada pelapor | Setiap 7 hari |
+| Penerapan perbaikan kritis      | 14 hari       |
+| Penerapan perbaikan non-kritis  | 30 hari       |
 
 Waktu respons dapat bervariasi tergantung pada kompleksitas kerentanan dan
 kapasitas tim saat ini.
-
 
 ## Tingkat Keparahan
 
@@ -75,7 +72,6 @@ sensitif, atau kebocoran informasi sistem yang dapat dimanfaatkan lebih lanjut.
 Kerentanan dengan dampak terbatas, termasuk informasi versi yang terekspos
 atau misconfiguration minor yang tidak langsung membahayakan pengguna.
 
-
 ## Kebijakan Pengungkapan
 
 Soraku Community mengadopsi kebijakan pengungkapan terkoordinasi
@@ -95,35 +91,37 @@ Soraku Community mengadopsi kebijakan pengungkapan terkoordinasi
 Kami memohon pelapor untuk memberikan waktu minimal 30 hari setelah
 perbaikan diterapkan sebelum mengungkapkan detail teknis secara publik.
 
-
 ## Praktik Keamanan Platform
 
 Berikut adalah langkah-langkah keamanan yang saat ini kami terapkan:
 
 Autentikasi dan Sesi:
+
 - OAuth 2.0 dengan PKCE untuk Discord dan Google
 - Cookie sesi dengan flag HttpOnly dan Secure
 - Validasi sesi di setiap API route menggunakan `getSession()`
 - Service Role Key Supabase tidak pernah terekspos ke client
 
 Basis Data:
+
 - Row Level Security (RLS) aktif di seluruh tabel Supabase
 - Schema `soraku` terpisah dari schema publik
 - Semua input divalidasi menggunakan Zod sebelum menyentuh database
 - Admin API menggunakan `adminDb()` yang hanya berjalan di sisi server
 
 API:
+
 - Semua endpoint sensitif memerlukan sesi yang valid
 - Rate limiting diterapkan pada endpoint autentikasi
 - CORS dikonfigurasi hanya untuk domain resmi Soraku
 - Environment variable sensitif tidak pernah dikirim ke client
 
 Infrastruktur:
+
 - Deployment via Vercel dengan HTTPS enforced
 - Database Supabase dengan enkripsi data at-rest
 - Secret disimpan sebagai environment variable, tidak pernah di-commit
 - Dependabot aktif untuk pembaruan dependensi otomatis
-
 
 ## Kerentanan yang Tidak Masuk Lingkup
 
@@ -136,7 +134,6 @@ Laporan berikut tidak akan diproses dalam program ini:
 - Missing security headers dengan dampak yang dapat diabaikan
 - Kebijakan rate limiting yang bersifat minor
 
-
 ## Penghargaan
 
 Kami sangat menghargai kontribusi komunitas dalam menjaga keamanan platform.
@@ -147,16 +144,14 @@ Bagi pelapor yang menemukan dan melaporkan kerentanan valid dengan itikad baik:
 - Pelapor kerentanan kritis atau tinggi dapat mendapatkan status khusus
   di server Discord Soraku
 
-
 ## Pembaruan Kebijakan
 
 Kebijakan ini dapat diperbarui sewaktu-waktu. Perubahan signifikan akan
 diumumkan melalui server Discord Soraku.
 
 Versi saat ini: 1.0
-Berlaku sejak:  21 Maret 2026
-Pemilik:        Soraku Community, Indonesia
-
+Berlaku sejak: 21 Maret 2026
+Pemilik: Soraku Community, Indonesia
 
 Terima kasih telah membantu menjaga Soraku tetap aman untuk semua anggota.
 

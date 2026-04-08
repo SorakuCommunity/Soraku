@@ -10,6 +10,12 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  if (!db) {
+    return NextResponse.json(
+      { data: null, error: "Database not configured" },
+      { status: 503 },
+    );
+  }
   const { slug } = await params;
   const [vtuber] = await db
     .select()

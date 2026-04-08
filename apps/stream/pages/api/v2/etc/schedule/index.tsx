@@ -1,6 +1,5 @@
 import axios from "axios";
-import cron from "cron";
-import { redis } from "@/lib/redis";
+import { redis, safeRedisGet, safeRedisSet } from "@/lib/redis";
 import { NextApiRequest, NextApiResponse } from "next";
 
 // Function to fetch new data
@@ -21,22 +20,11 @@ async function refreshCache() {
   const newData = await fetchData();
   if (newData) {
     if (redis) {
-      await redis.set(
-        "schedule",
-        JSON.stringify(newData),
-        "EX",
-        60 * 60 * 24 * 7
-      );
+      await safeRedisSet("schedule", JSON.stringify(newData), 60 * 60 * 24 * 7);
     }
     console.log("Cache refreshed successfully.");
   }
 }
-
-// Schedule cache refresh every Monday at 00:00 AM (local time)
-const job = new cron.CronJob("0 0 * * 1", () => {
-  refreshCache();
-});
-job.start();
 
 interface Title {
   romaji: string;
@@ -60,7 +48,7 @@ export default async function handler(
   try {
     let cached: CachedData | null = null;
     if (redis) {
-      const cachedData = await redis.get("schedule");
+      const cachedData = await safeRedisGet("schedule");
       cached = cachedData ? JSON.parse(cachedData) : null;
     }
 
@@ -71,10 +59,9 @@ export default async function handler(
 
       if (data) {
         if (redis) {
-          await redis.set(
+          await safeRedisSet(
             "schedule",
             JSON.stringify(data),
-            "EX",
             60 * 60 * 24 * 7
           );
         }
