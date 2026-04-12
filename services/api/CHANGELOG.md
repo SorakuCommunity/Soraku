@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.0.2] - 9 April 2026
+
+### Added
+
+- **API Docs Endpoint** (`GET /api/docs`): Returns info about the Wotaku-based docs structure located in `services/api/src/app/docs/`
+
+### Note
+
+- The actual docs are in `services/api/src/app/docs/` - a clone of Wotaku wiki
+- To deploy docs: `cd services/api/src/app/docs && pnpm docs:build`
+
+## [v1.0.1] - 9 April 2026
+
+### Updated
+
+- **Community Blog API**: Now used by stream app for announcement fetching
+- **Endpoints**: More detailed API documentation at `/api` health check
+
+### Note
+
+- This API serves as the backend for Soraku Stream announcements
+- Used by: `https://stream.soraku.id` for blog/content data
+
 ## [v1.0.0] - 7 April 2026
 
 ### Core Features

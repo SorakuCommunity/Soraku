@@ -12,13 +12,14 @@ import {
   ChevronDown,
   ChevronUp,
   BookOpen,
-  Twitter,
-  Facebook,
+  // Twitter, // moved to custom-icons
+  // Facebook,
   X,
   CheckCircle2,
   AlertCircle,
   Lock,
 } from 'lucide-react'
+import { XIcon, FacebookIcon } from '@/components/icons/custom-icons'
 import { cn } from '@/lib/utils'
 import MarkdownRenderer from '@/components/blog/MarkdownRenderer'
 
@@ -279,12 +280,12 @@ function ShareModal({ url, title, onClose }: { url: string; title: string; onClo
           {[
             {
               label: 'Twitter/X',
-              icon: <Twitter className="h-5 w-5 text-[#1DA1F2]" />,
+              icon: <XIcon className="h-5 w-5 text-[#1DA1F2]" />,
               href: `https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}`,
             },
             {
               label: 'Facebook',
-              icon: <Facebook className="h-5 w-5 text-[#1877F2]" />,
+              icon: <FacebookIcon className="h-5 w-5 text-[#1877F2]" />,
               href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`,
             },
             {

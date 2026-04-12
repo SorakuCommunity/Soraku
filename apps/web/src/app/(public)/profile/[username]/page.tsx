@@ -11,9 +11,9 @@ import {
   Calendar,
   AlertCircle,
   Pencil,
-  Instagram,
-  Twitter,
-  Youtube,
+  // Instagram, // moved to custom-icons
+  // Twitter,
+  // Youtube,
   ExternalLink,
   Share2,
   Check,
@@ -24,7 +24,7 @@ import {
   UserCheck,
   ChevronRight,
 } from 'lucide-react'
-import { DiscordIcon } from '@/components/icons/custom-icons'
+import { DiscordIcon, InstagramIcon, YouTubeIcon, XIcon } from '@/components/icons/custom-icons'
 import { cn } from '@/lib/utils'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -104,19 +104,19 @@ const SOCIAL_CONFIG = [
   {
     key: 'instagram',
     label: 'Instagram',
-    Icon: Instagram,
+    Icon: InstagramIcon,
     getHref: (v: string) => `https://instagram.com/${v.replace('@', '')}`,
   },
   {
     key: 'x',
     label: 'X',
-    Icon: Twitter,
+    Icon: XIcon,
     getHref: (v: string) => `https://x.com/${v.replace('@', '')}`,
   },
   {
     key: 'youtube',
     label: 'YouTube',
-    Icon: Youtube,
+    Icon: YouTubeIcon,
     getHref: (v: string) => (v.startsWith('http') ? v : `https://youtube.com/${v}`),
   },
   {
@@ -336,7 +336,9 @@ export default function PublicProfilePage() {
 
       {/* ── COVER ── */}
       <div className="from-primary/20 via-primary/8 to-accent/15 relative h-40 overflow-hidden rounded-3xl bg-gradient-to-br sm:h-52">
-        {profile.coverurl && <Image src={profile.coverurl} alt="" fill sizes="100vw" className="object-cover" />}
+        {profile.coverurl && (
+          <Image src={profile.coverurl} alt="" fill sizes="100vw" className="object-cover" />
+        )}
         {/* Bottom fade */}
         <div className="from-background absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t to-transparent" />
         {/* Role ambient glow */}
@@ -368,7 +370,13 @@ export default function PublicProfilePage() {
           <XpRing pct={xpPct} color={rm.color} size={88} />
           <div className="border-background bg-card absolute inset-[4px] overflow-hidden rounded-2xl border-[3px] shadow-xl">
             {profile.avatarurl ? (
-              <Image src={profile.avatarurl} alt={name} fill sizes="96px" className="object-cover" />
+              <Image
+                src={profile.avatarurl}
+                alt={name}
+                fill
+                sizes="96px"
+                className="object-cover"
+              />
             ) : (
               <div
                 className="flex h-full w-full items-center justify-center text-2xl font-black"

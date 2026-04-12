@@ -3,7 +3,23 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Home, User, Image as ImageIcon, Bell, Shield, LogOut, ChevronRight, Sparkles, TrendingUp } from 'lucide-react'
+import {
+  Home,
+  User,
+  Image as ImageIcon,
+  Bell,
+  Shield,
+  LogOut,
+  ChevronLeft,
+  Menu,
+  X,
+  TrendingUp,
+  Award,
+  Heart,
+  FileText,
+  Settings,
+  Compass,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SessionUser {
@@ -12,36 +28,26 @@ interface SessionUser {
   displayname: string | null
   avatarurl: string | null
   role: string
+  supporterrole?: string | null
 }
 
 const IS_ADMIN = (r: string) => ['OWNER', 'MANAGER', 'ADMIN'].includes(r.toUpperCase())
 
-const SIDEBAR_LINKS = [
-  { href: '/', label: 'Beranda', icon: Home },
-  { href: '/profile/me', label: 'Profil', icon: User },
-  { href: '/gallery/upload', label: 'Unggah Karya', icon: ImageIcon },
-  { href: '/notifications', label: 'Notifikasi', icon: Bell },
+const SIDEBAR_ITEMS = [
+  { href: '/', label: 'Dashboard', icon: Home },
+  { href: '/explore', label: 'Explore', icon: Compass },
+  { href: '/profile/me', label: 'Profile', icon: User },
+  { href: '/posts', label: 'Posts', icon: FileText },
+  { href: '/notifications', label: 'Notifications', icon: Bell },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ]
-
-// Stats for sidebar - data will be fetched from API
-const USER_STATS = [
-  { label: 'Karya', value: '—', icon: ImageIcon },
-  { label: 'Notif', value: '—', icon: Bell },
-]
-
-// New Color Palette
-const COLORS = {
-  primary: "#4FA3D1",
-  dark: "#1C1E22",
-  secondary: "#6E8FA6",
-  light: "#D9DDE3",
-  accent: "#E8C2A8",
-};
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const [user, setUser] = useState<SessionUser | null>(null)
+  const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
     fetch('/api/auth/me', { cache: 'no-store' })
@@ -50,99 +56,207 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       .catch(() => setUser(null))
   }, [])
 
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
+
   const handleSignout = async () => {
     await fetch('/api/auth/signout', { method: 'POST' }).catch(() => {})
     router.push('/')
     router.refresh()
   }
 
-  return (
-    <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl gap-6 px-4 py-6 pb-24 sm:px-6 lg:px-8">
-      {/* Sidebar - Redesigned without user profile card */}
-      <aside className="hidden w-52 flex-shrink-0 lg:block">
-        <div className="sticky top-24 space-y-4">
-          
-          {/* Navigation */}
-          <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-            <nav className="space-y-0.5">
-              {SIDEBAR_LINKS.map(({ href, label, icon: Icon }) => {
-                const active =
-                  href === '/'
-                    ? pathname === '/'
-                    : pathname === href || pathname.startsWith(href + '/')
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={cn(
-                      'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                      active
-                        ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
-                        : 'text-[#6E8FA6] hover:bg-white/5 hover:text-[#D9DDE3]'
-                    )}
-                  >
-                    <Icon className={cn("h-4 w-4 flex-shrink-0", active ? "text-[#4FA3D1]" : "text-[#6E8FA6]/60")} />
-                    {label}
-                  </Link>
-                )
-              })}
+  const sidebarContent = (
+    <>
+      {/* Logo & Collapse Toggle */}
+      <div className="border-border/40 flex items-center justify-between border-b p-4">
+        {!collapsed && (
+          <Link href="/" className="flex items-center gap-2">
+            <div className="bg-primary/20 flex h-8 w-8 items-center justify-center rounded-lg">
+              <span className="text-primary font-bold">空</span>
+            </div>
+            <span className="text-foreground font-bold">Soraku</span>
+          </Link>
+        )}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className={cn(
+            'rounded-lg p-2 transition-colors hover:bg-white/5',
+            collapsed && 'mx-auto'
+          )}
+        >
+          {collapsed ? (
+            <ChevronLeft className="text-muted-foreground h-4 w-4 rotate-180" />
+          ) : (
+            <ChevronLeft className="text-muted-foreground h-4 w-4" />
+          )}
+        </button>
+      </div>
 
-              <div className="border-border/40 my-1.5 border-t" />
-
-              {user && IS_ADMIN(user.role) && (
-                <Link
-                  href="/admin"
-                  className={cn(
-                    'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                    pathname.startsWith('/admin')
-                      ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
-                      : 'text-[#6E8FA6] hover:bg-white/5 hover:text-[#D9DDE3]'
-                  )}
-                >
-                  <Shield className={cn("h-4 w-4 flex-shrink-0", pathname.startsWith('/admin') ? "text-[#4FA3D1]" : "text-[#6E8FA6]/60")} /> 
-                  Admin Panel
-                </Link>
+      {/* Navigation */}
+      <nav className="space-y-1 p-3">
+        {SIDEBAR_ITEMS.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                isActive
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
               )}
-
-              <button
-                onClick={handleSignout}
-                className="text-[#6E8FA6] hover:bg-red-500/5 hover:text-red-400 flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
-              >
-                <LogOut className="h-4 w-4 flex-shrink-0" /> Keluar
-              </button>
-            </nav>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20 mb-3">Aktivitas</p>
-            <div className="grid grid-cols-2 gap-2">
-              {USER_STATS.map((stat) => (
-                <div key={stat.label} className="flex flex-col items-center p-2 rounded-lg bg-white/[0.02]">
-                  <stat.icon className="h-4 w-4 text-[#6E8FA6] mb-1" />
-                  <p className="text-lg font-black leading-none text-[#D9DDE3]">{stat.value}</p>
-                  <p className="text-[9px] text-[#6E8FA6]">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Upgrade CTA */}
-          <div className="p-3 rounded-xl bg-gradient-to-br from-[#4FA3D1]/10 to-[#E8C2A8]/5 border border-[#4FA3D1]/20">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-4 w-4 text-[#4FA3D1]" />
-              <p className="text-xs font-bold text-[#D9DDE3]">Premium</p>
-            </div>
-            <p className="text-[10px] text-[#6E8FA6] mb-3">Akses fitur eksklusif dan dukung komunitas</p>
-            <Link href="/premium" className="block w-full text-center py-2 rounded-lg bg-[#4FA3D1]/20 text-[#4FA3D1] text-xs font-bold hover:bg-[#4FA3D1]/30 transition-colors">
-              Upgrade
+              title={collapsed ? item.label : undefined}
+            >
+              <item.icon
+                className={cn(
+                  'h-5 w-5 flex-shrink-0',
+                  isActive ? 'text-primary' : 'text-muted-foreground/60'
+                )}
+              />
+              {!collapsed && <span>{item.label}</span>}
             </Link>
+          )
+        })}
+
+        {user && IS_ADMIN(user.role) && (
+          <>
+            <div className="border-border/40 my-3 border-t" />
+            <Link
+              href="/admin"
+              className={cn(
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                pathname.startsWith('/admin')
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+              )}
+            >
+              <Shield
+                className={cn(
+                  'h-5 w-5 flex-shrink-0',
+                  pathname.startsWith('/admin') ? 'text-primary' : 'text-muted-foreground/60'
+                )}
+              />
+              {!collapsed && <span>Admin</span>}
+            </Link>
+          </>
+        )}
+      </nav>
+
+      {/* User Profile Card */}
+      {user && (
+        <div className="border-border/40 border-t p-3">
+          <div
+            className={cn(
+              'flex items-center gap-3 rounded-xl bg-white/[0.02] p-2',
+              collapsed && 'justify-center'
+            )}
+          >
+            {user.avatarurl ? (
+              <img
+                src={user.avatarurl}
+                alt={user.displayname || user.username || 'User'}
+                className="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="bg-primary/20 flex h-10 w-10 items-center justify-center rounded-full">
+                <User className="text-primary h-5 w-5" />
+              </div>
+            )}
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="text-foreground truncate text-sm font-medium">
+                  {user.displayname || user.username || 'User'}
+                </p>
+                <p className="text-muted-foreground text-xs capitalize">
+                  {user.role?.toLowerCase() || 'member'}
+                </p>
+              </div>
+            )}
           </div>
         </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className="border-border/40 space-y-2 border-t p-3">
+        <button
+          onClick={handleSignout}
+          className={cn(
+            'text-muted-foreground flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all hover:bg-red-500/10 hover:text-red-400',
+            collapsed && 'justify-center'
+          )}
+        >
+          <LogOut className="h-5 w-5 flex-shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
+      </div>
+    </>
+  )
+
+  return (
+    <div className="bg-background min-h-screen">
+      {/* Mobile Header */}
+      <header className="border-border/40 bg-background/80 fixed top-0 right-0 left-0 z-50 h-16 border-b backdrop-blur-md lg:hidden">
+        <div className="flex h-full items-center justify-between px-4">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="-ml-2 rounded-lg p-2 hover:bg-white/5"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="bg-primary/20 flex h-8 w-8 items-center justify-center rounded-lg">
+              <span className="text-primary font-bold">空</span>
+            </div>
+            <span className="font-bold">Soraku</span>
+          </Link>
+          <div className="w-10" />
+        </div>
+      </header>
+
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Desktop */}
+      <aside
+        className={cn(
+          'bg-card/50 border-border/40 fixed top-0 left-0 z-50 hidden h-screen flex-col border-r backdrop-blur-xl transition-all duration-300 lg:flex',
+          collapsed ? 'w-20' : 'w-64'
+        )}
+      >
+        {sidebarContent}
       </aside>
 
-      {/* Main */}
-      <main className="min-w-0 flex-1">{children}</main>
+      {/* Sidebar - Mobile */}
+      <aside
+        className={cn(
+          'bg-card/95 border-border/40 fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r backdrop-blur-xl transition-transform duration-300 lg:hidden',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <div className="flex items-center justify-end p-4">
+          <button onClick={() => setMobileOpen(false)} className="rounded-lg p-2 hover:bg-white/5">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        {sidebarContent}
+      </aside>
+
+      {/* Main Content */}
+      <main
+        className={cn(
+          'min-h-screen pt-16 transition-all duration-300 lg:pt-0',
+          collapsed ? 'lg:pl-20' : 'lg:pl-64'
+        )}
+      >
+        <div className="p-4 lg:p-6">{children}</div>
+      </main>
     </div>
   )
 }

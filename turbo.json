@@ -1,9 +1,5 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "ui": "tui",
-  "turbopack": {
-    "root": "./apps"
-  },
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

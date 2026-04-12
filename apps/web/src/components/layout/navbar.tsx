@@ -7,10 +7,6 @@ import { useState, useRef, useEffect } from 'react'
 import {
   Menu,
   X,
-  Moon,
-  Sun,
-  ChevronDown,
-  ChevronRight,
   Bell,
   LogOut,
   Shield,
@@ -28,11 +24,12 @@ import {
   FileText,
   UserPlus,
   LayoutDashboard,
-  Users,
+  ChevronDown,
+  Sparkles,
   Star,
   Layers,
+  Users,
 } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import { useNotifications } from '@/hooks/use-notifications'
 import { NOTIF_CONFIG } from '@/lib/notifications'
@@ -50,32 +47,25 @@ type NavChild = {
   href: string
   desc?: string
   Icon: React.FC<{ className?: string }>
+  badge?: string
 }
 type NavGroup = { label: string; Icon: React.FC<{ className?: string }>; children: NavChild[] }
 type NavItem =
   | { type: 'link'; label: string; href: string; Icon: React.FC<{ className?: string }> }
   | { type: 'group'; group: NavGroup }
 
-// Color palette
-const COLORS = {
-  primary: '#4FA3D1',
-  dark: '#1C1E22',
-  secondary: '#6E8FA6',
-  light: '#D9DDE3',
-  accent: '#E8C2A8',
-}
-
 const NAV_ITEMS: NavItem[] = [
   { type: 'link', label: 'Beranda', href: '/', Icon: Home },
+  { type: 'link', label: 'Tentang', href: '/about', Icon: Info },
   {
     type: 'group',
     group: {
       label: 'Fitur',
       Icon: Layers,
       children: [
-        { label: 'Blog', href: '/blog', Icon: BookOpen, desc: 'Artikel komunitas' },
-        { label: 'Events', href: '/events', Icon: Calendar, desc: 'Turnamen & acara' },
-        { label: 'Galeri', href: '/gallery', Icon: ImageIcon, desc: 'Karya anggota' },
+        { label: 'Blog', href: '/blog', Icon: BookOpen, desc: 'Artikel & ulasan komunitas' },
+        { label: 'Events', href: '/events', Icon: Calendar, desc: 'Turnamen & acara mendatang' },
+        { label: 'Galeri', href: '/gallery', Icon: ImageIcon, desc: 'Fanart & karya anggota' },
       ],
     },
   },
@@ -86,6 +76,12 @@ const NAV_ITEMS: NavItem[] = [
       Icon: Tv2,
       children: [
         { label: 'VTuber', href: '/vtubers', Icon: Tv2, desc: 'Virtual YouTuber komunitas' },
+        {
+          label: 'Rekrutmen',
+          href: '/requirements',
+          Icon: UserPlus,
+          desc: 'Bergabung sebagai kreator',
+        },
       ],
     },
   },
@@ -95,8 +91,8 @@ const NAV_ITEMS: NavItem[] = [
       label: 'Komunitas',
       Icon: Users,
       children: [
-        { label: 'Donasi', href: '/donate', Icon: Heart, desc: 'Dukung komunitas kami' },
-        { label: 'Premium', href: '/premium', Icon: Star, desc: 'Akses eksklusif supporter' },
+        { label: 'Donasi', href: '/donate', Icon: Heart, desc: 'Dukung Soraku Community' },
+        { label: 'Premium', href: '/premium', Icon: Star, desc: 'Akses eksklusif', badge: 'NEW' },
       ],
     },
   },
@@ -106,17 +102,10 @@ const NAV_ITEMS: NavItem[] = [
       label: 'Informasi',
       Icon: FileText,
       children: [
-        { label: 'Tentang', href: '/about', Icon: Info, desc: 'Tentang Soraku dan tim' },
-        {
-          label: 'Rekrutmen',
-          href: '/requirements',
-          Icon: UserPlus,
-          desc: 'Bergabung sebagai kreator',
-        },
         { label: 'Privasi', href: '/privacy', Icon: Lock, desc: 'Kebijakan privasi' },
         { label: 'Ketentuan', href: '/tos', Icon: FileText, desc: 'Syarat penggunaan' },
         { label: 'Masukan', href: '/feedback', Icon: MessageSquare, desc: 'Kirim saran' },
-        { label: 'Lisensi', href: '/license', Icon: Shield, desc: 'Lisensi konten' },
+        { label: 'Lisensi', href: '/license', Icon: Shield, desc: 'Lisensi open source' },
       ],
     },
   },
@@ -127,26 +116,32 @@ const IS_ADMIN = (r: string) => ['OWNER', 'MANAGER', 'ADMIN'].includes(r.toUpper
 export function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { resolvedTheme, setTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [profileOpen, setProfileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const [openGroup, setOpenGroup] = useState<string | null>(null)
   const [user, setUser] = useState<SessionUser | null>(null)
-  const [mounted, setMounted] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const notifRef = useRef<HTMLDivElement>(null)
+  const profileRef = useRef<HTMLDivElement>(null)
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications(!!user)
 
   useEffect(() => {
-    setMounted(true)
+    const h = () => setScrolled(window.scrollY > 8)
+    window.addEventListener('scroll', h, { passive: true })
+    return () => window.removeEventListener('scroll', h)
+  }, [])
+  useEffect(() => {
     fetch('/api/auth/me', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => setUser(d.data ?? null))
-      .catch(() => setUser(null))
+      .catch(() => {})
   }, [])
   useEffect(() => {
     const h = (e: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false)
+      if (profileRef.current && !profileRef.current.contains(e.target as Node))
+        setProfileOpen(false)
     }
     document.addEventListener('mousedown', h)
     return () => document.removeEventListener('mousedown', h)
@@ -162,20 +157,24 @@ export function Navbar() {
     router.push('/')
     router.refresh()
   }
-
   const displayName = user?.displayname ?? user?.username ?? ''
   const initial = displayName.charAt(0).toUpperCase()
 
   return (
     <>
-      {/* ═══════════════════════════════════════════════════════════════════════
-          DESKTOP & MOBILE NAVBAR
-          ═══════════════════════════════════════════════════════════════════════ */}
-      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#1C1E22]/95 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      {/* ══ HEADER ══════════════════════════════════════════════════════════ */}
+      <header
+        className={cn(
+          'fixed inset-x-0 top-0 z-50 transition-all duration-300',
+          scrolled
+            ? 'border-b border-white/[0.06] bg-[#1C1E22]/92 shadow-lg shadow-black/25 backdrop-blur-2xl'
+            : 'border-b border-transparent bg-[#1C1E22]/55 backdrop-blur-md'
+        )}
+      >
+        <div className="mx-auto flex h-[60px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="group flex flex-shrink-0 items-center gap-2.5">
-            <div className="h-8 w-8 overflow-hidden rounded-lg border border-white/10 bg-[#1a1c20]">
+            <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-[#1a1c20] transition-all group-hover:border-[#4FA3D1]/30">
               <Image
                 src="/logo.png"
                 alt="Soraku"
@@ -184,143 +183,170 @@ export function Navbar() {
                 className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-110"
               />
             </div>
-            <span className="text-base font-black tracking-tight text-[#D9DDE3] transition-colors group-hover:text-[#4FA3D1]">
+            <span className="text-[15px] font-black tracking-tight text-[#D9DDE3] transition-colors group-hover:text-[#4FA3D1]">
               Soraku
             </span>
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-0.5 lg:flex">
-            {NAV_ITEMS.map((item, idx) => {
-              if (item.type === 'link')
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                      pathname === item.href
-                        ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
-                        : 'text-[#6E8FA6] hover:bg-white/5 hover:text-[#D9DDE3]'
-                    )}
-                  >
-                    <item.Icon className="h-3.5 w-3.5 opacity-70" />
-                    {item.label}
-                  </Link>
-                )
-              const g = (item as any).group as NavGroup
-              const isOpen = openGroup === g.label
-              return (
-                <div
-                  key={g.label}
-                  className="relative"
-                  onMouseEnter={() => setOpenGroup(g.label)}
-                  onMouseLeave={() => setOpenGroup(null)}
-                >
-                  <button
-                    className={cn(
-                      'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                      isOpen
-                        ? 'bg-white/5 text-[#D9DDE3]'
-                        : 'text-[#6E8FA6] hover:bg-white/5 hover:text-[#D9DDE3]'
-                    )}
-                  >
-                    <g.Icon className="h-3.5 w-3.5 opacity-70" />
-                    {g.label}
-                    <ChevronDown
+          {/* Desktop nav — pill container like Propease */}
+          <nav className="hidden items-center lg:flex">
+            <div className="flex items-center gap-0.5 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-2 py-1.5 backdrop-blur-sm">
+              {NAV_ITEMS.map((item) => {
+                if (item.type === 'link') {
+                  const active =
+                    item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
                       className={cn(
-                        'h-3 w-3 transition-transform duration-200',
-                        isOpen && 'rotate-180'
+                        'flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[13px] font-medium transition-all duration-200',
+                        active
+                          ? 'bg-[#4FA3D1]/15 text-[#4FA3D1]'
+                          : 'text-[#6E8FA6] hover:bg-white/5 hover:text-[#D9DDE3]'
                       )}
-                    />
-                  </button>
+                    >
+                      <item.Icon className="h-3.5 w-3.5 opacity-70" />
+                      {item.label}
+                    </Link>
+                  )
+                }
+                const g = (item as any).group as NavGroup
+                const isOpen = openGroup === g.label
+                const isActive = g.children.some((c) => pathname.startsWith(c.href))
+                return (
                   <div
-                    className={cn(
-                      'absolute top-full left-0 z-50 origin-top-left pt-2 transition-all duration-150',
-                      isOpen
-                        ? 'pointer-events-auto scale-100 opacity-100'
-                        : 'pointer-events-none scale-95 opacity-0'
-                    )}
+                    key={g.label}
+                    className="relative"
+                    onMouseEnter={() => setOpenGroup(g.label)}
+                    onMouseLeave={() => setOpenGroup(null)}
                   >
-                    <div className="w-56 overflow-hidden rounded-xl border border-white/[0.08] bg-[#1C1E22]/98 shadow-xl backdrop-blur-xl">
-                      {g.children.map((c) => {
-                        const isActive = pathname === c.href || pathname.startsWith(c.href + '/')
-                        return (
+                    <button
+                      className={cn(
+                        'flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[13px] font-medium transition-all duration-200',
+                        isActive
+                          ? 'bg-[#4FA3D1]/15 text-[#4FA3D1]'
+                          : isOpen
+                            ? 'bg-white/6 text-[#D9DDE3]'
+                            : 'text-[#6E8FA6] hover:bg-white/5 hover:text-[#D9DDE3]'
+                      )}
+                    >
+                      <g.Icon className="h-3.5 w-3.5 opacity-70" />
+                      {g.label}
+                      <ChevronDown
+                        className={cn(
+                          'h-3 w-3 opacity-50 transition-transform duration-200',
+                          isOpen && 'rotate-180'
+                        )}
+                      />
+                    </button>
+                    <div
+                      className={cn(
+                        'absolute top-full left-1/2 z-50 origin-top -translate-x-1/2 pt-3 transition-all duration-150',
+                        isOpen
+                          ? 'pointer-events-auto scale-100 opacity-100'
+                          : 'pointer-events-none scale-95 opacity-0'
+                      )}
+                    >
+                      <div className="w-60 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#1C1E22]/98 p-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl">
+                        {g.children.map((child) => (
                           <Link
-                            key={c.href}
-                            href={c.href}
+                            key={child.href}
+                            href={child.href}
                             onClick={() => setOpenGroup(null)}
                             className={cn(
-                              'flex items-start gap-3 px-4 py-3 transition-colors',
-                              isActive ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]' : 'hover:bg-white/5'
+                              'group/item flex items-start gap-3 rounded-xl px-3.5 py-3 transition-colors',
+                              pathname.startsWith(child.href)
+                                ? 'bg-[#4FA3D1]/10'
+                                : 'hover:bg-white/[0.05]'
                             )}
                           >
-                            <c.Icon
+                            <div
                               className={cn(
-                                'mt-0.5 h-4 w-4 flex-shrink-0',
-                                isActive ? 'text-[#4FA3D1]' : 'text-[#6E8FA6]'
+                                'mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg transition-colors',
+                                pathname.startsWith(child.href)
+                                  ? 'bg-[#4FA3D1]/20'
+                                  : 'bg-white/[0.05] group-hover/item:bg-[#4FA3D1]/15'
                               )}
-                            />
-                            <div>
-                              <p
+                            >
+                              <child.Icon
                                 className={cn(
-                                  'text-sm font-semibold',
-                                  isActive ? 'text-[#4FA3D1]' : 'text-[#D9DDE3]'
+                                  'h-3.5 w-3.5',
+                                  pathname.startsWith(child.href)
+                                    ? 'text-[#4FA3D1]'
+                                    : 'text-[#6E8FA6] group-hover/item:text-[#4FA3D1]'
                                 )}
-                              >
-                                {c.label}
-                              </p>
-                              {c.desc && (
-                                <p className="mt-0.5 text-xs text-[#6E8FA6]/70">{c.desc}</p>
+                              />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <p
+                                  className={cn(
+                                    'text-sm font-semibold',
+                                    pathname.startsWith(child.href)
+                                      ? 'text-[#4FA3D1]'
+                                      : 'text-[#D9DDE3]/85'
+                                  )}
+                                >
+                                  {child.label}
+                                </p>
+                                {child.badge && (
+                                  <span className="rounded-full bg-[#E8C2A8]/20 px-1.5 py-0.5 text-[9px] font-black text-[#E8C2A8]">
+                                    {child.badge}
+                                  </span>
+                                )}
+                              </div>
+                              {child.desc && (
+                                <p className="mt-0.5 text-xs leading-snug text-[#6E8FA6]/55">
+                                  {child.desc}
+                                </p>
                               )}
                             </div>
                           </Link>
-                        )
-                      })}
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </nav>
 
-          {/* Right actions - Desktop */}
-          <div className="hidden items-center gap-1 lg:flex">
-            {mounted && (
-              <button
-                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3]"
-              >
-                {resolvedTheme === 'dark' ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
-              </button>
-            )}
+          {/* Right actions */}
+          <div className="flex items-center gap-1.5">
+            {/* Discord pill */}
+            <a
+              href="https://discord.gg/qm3XJvRa6B"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center gap-1.5 rounded-xl border border-indigo-500/20 bg-indigo-500/8 px-3 py-1.5 text-xs font-semibold text-indigo-300/70 transition-all hover:border-indigo-400/35 hover:bg-indigo-500/15 hover:text-indigo-300 sm:flex"
+            >
+              <DiscordIcon className="h-3.5 w-3.5" />
+              <span className="hidden lg:inline">Discord</span>
+            </a>
 
             {user ? (
               <>
-                {/* Notif */}
+                {/* Notifications */}
                 <div className="relative" ref={notifRef}>
                   <button
                     onClick={() => setNotifOpen((o) => !o)}
                     className={cn(
-                      'relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
+                      'relative flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
                       notifOpen
                         ? 'bg-[#4FA3D1]/15 text-[#4FA3D1]'
-                        : 'text-[#6E8FA6] hover:bg-white/5 hover:text-[#D9DDE3]'
+                        : 'text-[#6E8FA6] hover:bg-white/6 hover:text-[#D9DDE3]'
                     )}
                   >
                     <Bell className="h-4 w-4" />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#E8C2A8] px-1 text-[9px] font-black text-[#1C1E22]">
+                      <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#4FA3D1] px-1 text-[9px] font-black text-white">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
                   </button>
                   {notifOpen && (
-                    <div className="absolute top-full right-0 mt-2 w-80 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#1C1E22]/98 shadow-2xl backdrop-blur-xl">
+                    <div className="absolute top-full right-0 mt-2 w-80 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#1C1E22]/98 shadow-2xl shadow-black/50 backdrop-blur-xl">
                       <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-3">
                         <div className="flex items-center gap-2">
                           <Bell className="h-3.5 w-3.5 text-[#4FA3D1]" />
@@ -334,7 +360,7 @@ export function Navbar() {
                         {unreadCount > 0 && (
                           <button
                             onClick={() => markAllRead()}
-                            className="flex items-center gap-1 text-xs text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
+                            className="flex items-center gap-1 text-xs text-[#6E8FA6]/60 transition-colors hover:text-[#4FA3D1]"
                           >
                             <CheckCheck className="h-3 w-3" /> Baca semua
                           </button>
@@ -343,8 +369,8 @@ export function Navbar() {
                       <div className="max-h-72 overflow-y-auto">
                         {notifications.length === 0 ? (
                           <div className="py-8 text-center">
-                            <Bell className="mx-auto mb-2 h-8 w-8 text-white/15" />
-                            <p className="text-xs text-[#6E8FA6]">Tidak ada notifikasi</p>
+                            <Bell className="mx-auto mb-2 h-8 w-8 text-[#6E8FA6]/25" />
+                            <p className="text-xs text-[#6E8FA6]/40">Tidak ada notifikasi</p>
                           </div>
                         ) : (
                           notifications.slice(0, 8).map((n) => {
@@ -358,8 +384,8 @@ export function Navbar() {
                                   setNotifOpen(false)
                                 }}
                                 className={cn(
-                                  'flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-white/5',
-                                  !n.isread && 'bg-white/[0.03]'
+                                  'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-white/[0.04]',
+                                  !n.isread && 'bg-[#4FA3D1]/5'
                                 )}
                               >
                                 <div
@@ -375,9 +401,11 @@ export function Navbar() {
                                   )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <p className="text-xs font-semibold text-[#D9DDE3]">{n.title}</p>
+                                  <p className="text-xs font-semibold text-[#D9DDE3]/85">
+                                    {n.title}
+                                  </p>
                                   {n.body && (
-                                    <p className="mt-0.5 line-clamp-2 text-[11px] text-[#6E8FA6]/70">
+                                    <p className="mt-0.5 line-clamp-2 text-[11px] text-[#6E8FA6]/50">
                                       {n.body}
                                     </p>
                                   )}
@@ -393,17 +421,25 @@ export function Navbar() {
                       <Link
                         href="/notifications"
                         onClick={() => setNotifOpen(false)}
-                        className="flex items-center justify-center gap-1.5 border-t border-white/[0.06] py-2.5 text-xs text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
+                        className="flex items-center justify-center gap-1.5 border-t border-white/[0.06] py-2.5 text-xs text-[#6E8FA6]/50 transition-colors hover:text-[#4FA3D1]"
                       >
-                        Lihat semua
+                        Lihat semua notifikasi
                       </Link>
                     </div>
                   )}
                 </div>
 
-                {/* Avatar desktop */}
-                <div className="group relative">
-                  <button className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all hover:border-[#4FA3D1]/40 hover:ring-2 hover:ring-[#4FA3D1]/20">
+                {/* Profile avatar */}
+                <div className="relative" ref={profileRef}>
+                  <button
+                    onClick={() => setProfileOpen((o) => !o)}
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border transition-all',
+                      profileOpen
+                        ? 'border-[#4FA3D1]/40 ring-2 ring-[#4FA3D1]/20'
+                        : 'border-white/10 hover:border-[#4FA3D1]/30'
+                    )}
+                  >
                     {user.avatarurl ? (
                       <Image
                         src={user.avatarurl}
@@ -418,24 +454,26 @@ export function Navbar() {
                       </span>
                     )}
                   </button>
-                  <div className="pointer-events-none absolute top-full right-0 origin-top-right scale-95 pt-2 opacity-0 transition-all duration-150 group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100">
-                    <div className="w-52 overflow-hidden rounded-xl border border-white/[0.08] bg-[#1C1E22]/98 shadow-xl backdrop-blur-xl">
+                  {profileOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#1C1E22]/98 shadow-2xl shadow-black/50 backdrop-blur-xl">
                       <div className="border-b border-white/[0.06] px-4 py-3">
-                        <p className="truncate text-sm font-semibold text-[#D9DDE3]">
-                          {displayName}
+                        <p className="truncate text-sm font-bold text-[#D9DDE3]">{displayName}</p>
+                        <p className="truncate text-xs text-[#6E8FA6]/60">
+                          @{user.username ?? '—'}
                         </p>
-                        <p className="truncate text-xs text-[#6E8FA6]">@{user.username ?? '—'}</p>
                       </div>
                       <div className="py-1">
                         <Link
                           href="/profile/me"
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3]"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#6E8FA6]/70 transition-colors hover:bg-white/[0.05] hover:text-[#D9DDE3]"
                         >
-                          <User className="h-4 w-4" /> Profil
+                          <User className="h-4 w-4" /> Profil Saya
                         </Link>
                         <Link
                           href="/notifications"
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3]"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#6E8FA6]/70 transition-colors hover:bg-white/[0.05] hover:text-[#D9DDE3]"
                         >
                           <Bell className="h-4 w-4" /> Notifikasi
                           {unreadCount > 0 && (
@@ -447,12 +485,13 @@ export function Navbar() {
                         {IS_ADMIN(user.role) && (
                           <Link
                             href="/admin"
-                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3]"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#6E8FA6]/70 transition-colors hover:bg-white/[0.05] hover:text-[#D9DDE3]"
                           >
                             <Shield className="h-4 w-4" /> Admin Panel
                           </Link>
                         )}
-                        <div className="mx-2 my-1 border-t border-white/[0.06]" />
+                        <div className="mx-3 my-1 border-t border-white/[0.06]" />
                         <button
                           onClick={handleSignout}
                           className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-400/60 transition-colors hover:bg-red-500/8 hover:text-red-400"
@@ -461,259 +500,221 @@ export function Navbar() {
                         </button>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
+
+                <button
+                  onClick={() => setMenuOpen((o) => !o)}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-[#6E8FA6] transition-colors hover:bg-white/6 hover:text-[#D9DDE3] lg:hidden"
+                >
+                  {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
               </>
             ) : (
-              <Link
-                href="/login"
-                className="hidden items-center gap-2 rounded-xl bg-[#4FA3D1] px-4 py-2 text-sm font-semibold text-[#1C1E22] transition-colors hover:bg-[#4FA3D1]/90 lg:inline-flex"
-              >
-                Masuk
-              </Link>
+              <>
+                <Link
+                  href="/login"
+                  className="hidden rounded-xl px-3.5 py-1.5 text-[13px] font-medium text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3] lg:block"
+                >
+                  Masuk
+                </Link>
+                <Link
+                  href="/register"
+                  className="hidden items-center gap-1.5 rounded-xl px-4 py-1.5 text-[13px] font-semibold text-white transition-all hover:brightness-110 lg:flex"
+                  style={{ background: 'linear-gradient(135deg,#4FA3D1,#3a8fbe)' }}
+                >
+                  <Sparkles className="h-3.5 w-3.5" /> Bergabung
+                </Link>
+                <button
+                  onClick={() => setMenuOpen((o) => !o)}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-[#6E8FA6] transition-colors hover:bg-white/6 hover:text-[#D9DDE3] lg:hidden"
+                >
+                  {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
+              </>
             )}
-          </div>
-
-          {/* Mobile actions */}
-          <div className="flex items-center gap-2 lg:hidden">
-            {/* Theme toggle */}
-            {mounted && (
-              <button
-                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3]"
-              >
-                {resolvedTheme === 'dark' ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
-              </button>
-            )}
-
-            {/* Profile button - separate from menu */}
-            {user ? (
-              <button
-                onClick={() => setProfileOpen((o) => !o)}
-                className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/5"
-              >
-                {user.avatarurl ? (
-                  <Image
-                    src={user.avatarurl}
-                    alt={displayName}
-                    width={36}
-                    height={36}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span className="text-sm font-black text-[#4FA3D1]">
-                    {initial || <User className="h-4 w-4" />}
-                  </span>
-                )}
-              </button>
-            ) : (
-              <Link
-                href="/login"
-                className="flex items-center gap-2 rounded-lg bg-[#4FA3D1] px-3 py-1.5 text-xs font-semibold text-[#1C1E22]"
-              >
-                Masuk
-              </Link>
-            )}
-
-            {/* Menu button */}
-            <button
-              onClick={() => setMenuOpen((o) => !o)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3]"
-            >
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
           </div>
         </div>
       </header>
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-          MOBILE PROFILE DRAWER
-          ═══════════════════════════════════════════════════════════════════════ */}
-      {profileOpen && user && (
+      {/* ══ MOBILE DRAWER ══════════════════════════════════════════════════════ */}
+      {menuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setProfileOpen(false)}
+            onClick={() => setMenuOpen(false)}
           />
-          <div className="absolute top-16 right-0 w-64 rounded-bl-2xl border-b border-l border-white/[0.08] bg-[#1C1E22] shadow-2xl">
-            {/* User info */}
-            <div className="border-b border-white/[0.06] p-4">
-              <div className="mb-3 flex items-center gap-3">
-                <div className="h-12 w-12 overflow-hidden rounded-xl border border-white/10 bg-white/5">
-                  {user.avatarurl ? (
-                    <Image
-                      src={user.avatarurl}
-                      alt={displayName}
-                      width={48}
-                      height={48}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center text-lg font-black text-[#4FA3D1]">
-                      {initial}
+          <div className="absolute inset-x-0 top-0 max-h-[100dvh] overflow-y-auto border-b border-white/[0.08] bg-[#1a1c20] shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+              <Link
+                href="/"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2.5"
+              >
+                <div className="h-8 w-8 overflow-hidden rounded-xl border border-white/10 bg-[#1a1c20]">
+                  <Image
+                    src="/logo.png"
+                    alt="Soraku"
+                    width={32}
+                    height={32}
+                    className="h-full w-full object-cover object-top"
+                  />
+                </div>
+                <span className="text-base font-black text-[#D9DDE3]">Soraku</span>
+              </Link>
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] text-[#6E8FA6] transition-colors hover:text-[#D9DDE3]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-5 px-4 py-5">
+              {user && (
+                <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5">
+                  <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-xl border border-white/10">
+                    {user.avatarurl ? (
+                      <Image
+                        src={user.avatarurl}
+                        alt={displayName}
+                        width={44}
+                        height={44}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-[#4FA3D1]/10 text-base font-black text-[#4FA3D1]">
+                        {initial}
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-bold text-[#D9DDE3]">{displayName}</p>
+                    <p className="truncate text-xs text-[#6E8FA6]/55">@{user.username ?? '—'}</p>
+                  </div>
+                  {unreadCount > 0 && (
+                    <span className="rounded-full bg-[#4FA3D1] px-1.5 py-0.5 text-[9px] font-black text-white">
+                      {unreadCount}
                     </span>
                   )}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-bold text-[#D9DDE3]">{displayName}</p>
-                  <p className="truncate text-xs text-[#6E8FA6]">@{user.username ?? '—'}</p>
-                </div>
-              </div>
-            </div>
-            {/* Profile links */}
-            <div className="p-2">
-              <Link
-                href="/profile/me"
-                onClick={() => setProfileOpen(false)}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3]"
-              >
-                <User className="h-4 w-4" /> Profil
-              </Link>
-              <Link
-                href="/notifications"
-                onClick={() => setProfileOpen(false)}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3]"
-              >
-                <Bell className="h-4 w-4" /> Notifikasi
-                {unreadCount > 0 && (
-                  <span className="ml-auto rounded-full bg-[#4FA3D1]/15 px-2 py-0.5 text-[10px] font-bold text-[#4FA3D1]">
-                    {unreadCount}
-                  </span>
-                )}
-              </Link>
-              {IS_ADMIN(user.role) && (
-                <Link
-                  href="/admin"
-                  onClick={() => setProfileOpen(false)}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[#6E8FA6] transition-colors hover:bg-white/5 hover:text-[#D9DDE3]"
-                >
-                  <Shield className="h-4 w-4" /> Admin Panel
-                </Link>
               )}
-              <div className="my-2 border-t border-white/[0.06]" />
-              <button
-                onClick={handleSignout}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-red-400/60 transition-colors hover:bg-red-500/5 hover:text-red-400"
-              >
-                <LogOut className="h-4 w-4" /> Keluar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ═══════════════════════════════════════════════════════════════════════
-          MOBILE NAVIGATION DRAWER - Simple List Style
-          ═══════════════════════════════════════════════════════════════════════ */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setMenuOpen(false)} />
-          <div className="absolute inset-x-0 top-16 max-h-[calc(100dvh-4rem)] overflow-y-auto bg-[#1C1E22]">
-            <div className="space-y-1 px-4 py-4">
-              {NAV_ITEMS.map((item) => {
-                if (item.type === 'link') {
-                  const isActive = pathname === item.href
-                  return (
+              <div>
+                <p className="mb-2.5 text-[9px] font-black tracking-[0.25em] text-[#6E8FA6]/40 uppercase">
+                  Jelajahi
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: 'Beranda', href: '/', Icon: Home },
+                    { label: 'Events', href: '/events', Icon: Calendar },
+                    { label: 'Blog', href: '/blog', Icon: BookOpen },
+                    { label: 'Galeri', href: '/gallery', Icon: ImageIcon },
+                    { label: 'VTuber', href: '/vtubers', Icon: Tv2 },
+                    { label: 'Tentang', href: '/about', Icon: Info },
+                  ].map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setMenuOpen(false)}
                       className={cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                        isActive
-                          ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
-                          : 'text-[#D9DDE3] hover:bg-white/5'
+                        'flex items-center gap-2.5 rounded-xl border p-3 transition-colors',
+                        pathname === item.href ||
+                          (item.href !== '/' && pathname.startsWith(item.href))
+                          ? 'border-[#4FA3D1]/25 bg-[#4FA3D1]/8 text-[#4FA3D1]'
+                          : 'border-white/[0.07] text-[#6E8FA6]/70 hover:border-[#4FA3D1]/20 hover:bg-white/[0.04] hover:text-[#D9DDE3]'
                       )}
                     >
-                      <item.Icon
-                        className={cn('h-4 w-4', isActive ? 'text-[#4FA3D1]' : 'text-[#6E8FA6]')}
-                      />
+                      <item.Icon className="h-4 w-4 flex-shrink-0" />
+                      <span className="text-sm font-semibold">{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              {user && (
+                <div>
+                  <p className="mb-2.5 text-[9px] font-black tracking-[0.25em] text-[#6E8FA6]/40 uppercase">
+                    Akun
+                  </p>
+                  <div className="space-y-1.5">
+                    {[
+                      { label: 'Profil Saya', href: '/profile/me', Icon: User },
+                      {
+                        label: 'Notifikasi',
+                        href: '/notifications',
+                        Icon: Bell,
+                        count: unreadCount,
+                      },
+                      ...(IS_ADMIN(user.role)
+                        ? [{ label: 'Admin Panel', href: '/admin', Icon: Shield }]
+                        : []),
+                    ].map((item: any) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 rounded-xl border border-white/[0.07] px-4 py-3 text-sm font-semibold text-[#6E8FA6]/70 transition-all hover:border-[#4FA3D1]/20 hover:bg-[#4FA3D1]/5 hover:text-[#D9DDE3]"
+                      >
+                        <item.Icon className="h-4 w-4 flex-shrink-0" />
+                        {item.label}
+                        {item.count > 0 && (
+                          <span className="ml-auto rounded-full bg-[#4FA3D1] px-1.5 py-0.5 text-[9px] font-black text-white">
+                            {item.count}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div>
+                <p className="mb-2.5 text-[9px] font-black tracking-[0.25em] text-[#6E8FA6]/40 uppercase">
+                  Informasi
+                </p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { label: 'Privasi', href: '/privacy', Icon: Lock },
+                    { label: 'Ketentuan', href: '/tos', Icon: FileText },
+                    { label: 'Masukan', href: '/feedback', Icon: MessageSquare },
+                    { label: 'Rekrutmen', href: '/requirements', Icon: UserPlus },
+                    { label: 'Donasi', href: '/donate', Icon: Bell },
+                    { label: 'Lisensi', href: '/license', Icon: Shield },
+                  ].map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-xl border border-white/[0.07] px-3 py-2.5 text-xs font-medium text-[#6E8FA6]/55 transition-colors hover:border-[#4FA3D1]/20 hover:bg-white/[0.04] hover:text-[#D9DDE3]"
+                    >
+                      <item.Icon className="h-3.5 w-3.5 flex-shrink-0" />
                       {item.label}
                     </Link>
-                  )
-                }
-
-                const g = item.group
-                const isGroupOpen = openGroup === g.label
-                const hasActiveChild = g.children.some(
-                  (c) => pathname === c.href || pathname.startsWith(c.href + '/')
-                )
-
-                return (
-                  <div key={g.label}>
-                    <button
-                      onClick={() => setOpenGroup(isGroupOpen ? null : g.label)}
-                      className={cn(
-                        'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                        hasActiveChild ? 'text-[#4FA3D1]' : 'text-[#D9DDE3]'
-                      )}
-                    >
-                      <g.Icon
-                        className={cn(
-                          'h-4 w-4',
-                          hasActiveChild ? 'text-[#4FA3D1]' : 'text-[#6E8FA6]'
-                        )}
-                      />
-                      <span className="flex-1 text-left">{g.label}</span>
-                      <ChevronDown className={cn('h-4 w-4', isGroupOpen && 'rotate-180')} />
-                    </button>
-
-                    {isGroupOpen && (
-                      <div className="mt-1 ml-6 space-y-1">
-                        {g.children.map((c) => {
-                          const isActive = pathname === c.href || pathname.startsWith(c.href + '/')
-                          return (
-                            <Link
-                              key={c.href}
-                              href={c.href}
-                              onClick={() => setMenuOpen(false)}
-                              className={cn(
-                                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                                isActive ? 'text-[#4FA3D1]' : 'text-[#6E8FA6] hover:text-[#D9DDE3]'
-                              )}
-                            >
-                              <c.Icon className="h-4 w-4" />
-                              {c.label}
-                            </Link>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-
-              <div className="my-2 border-t border-white/[0.06]" />
-
-              <a
-                href="https://discord.gg/qm3XJvRa6B"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#D9DDE3] transition-colors hover:bg-white/5"
-              >
-                <DiscordIcon className="h-4 w-4 text-[#5865F2]" />
-                Join Discord
-              </a>
-
-              {!user && (
-                <div className="flex gap-2 pt-2">
-                  <Link
-                    href="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex-1 rounded-lg bg-[#4FA3D1] py-2.5 text-center text-sm font-bold text-[#1C1E22]"
+                  ))}
+                </div>
+              </div>
+              {user ? (
+                <div className="border-t border-white/[0.06] pt-1">
+                  <button
+                    onClick={handleSignout}
+                    className="flex w-full items-center gap-3 rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3.5 text-sm font-semibold text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-400"
                   >
-                    Masuk
-                  </Link>
+                    <LogOut className="h-4 w-4 flex-shrink-0" /> Keluar
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 border-t border-white/[0.06] pt-1">
                   <Link
                     href="/register"
                     onClick={() => setMenuOpen(false)}
-                    className="flex-1 rounded-lg border border-white/[0.08] py-2.5 text-center text-sm font-medium text-[#D9DDE3]"
+                    className="flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold text-white"
+                    style={{ background: 'linear-gradient(135deg,#4FA3D1,#3a8fbe)' }}
                   >
-                    Daftar
+                    <Sparkles className="h-4 w-4" /> Bergabung Gratis
+                  </Link>
+                  <Link
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-center rounded-2xl border border-white/[0.08] py-3.5 text-sm font-semibold text-[#6E8FA6]/65 transition-all hover:border-white/[0.15] hover:text-[#D9DDE3]"
+                  >
+                    Masuk
                   </Link>
                 </div>
               )}
@@ -724,3 +725,5 @@ export function Navbar() {
     </>
   )
 }
+
+export default Navbar

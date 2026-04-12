@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.1.1] - 9 April 2026
+
+### Fixed
+
+- **Navbar Announcement**: Changed from 1anime.app RSS to Soraku API (`https://apisoraku.vercel.app/api/community/blog`)
+- **API Docs**: Updated to new collapsible design with accordion sections
+
+### Updated
+
+- **Footer**: New Soraku branding and navigation links
+- **About Page**: Complete redesign with new content
+
+### Added
+
+- **API Documentation Page** (`/api-docs`): Complete REST API reference with:
+  - Anime endpoints (info, episode, source, recent, schedule)
+  - Manga endpoints (info, pages)
+  - Discovery endpoints (status, badges)
+  - User endpoints (profile, progress, AniList sync)
+  - Admin endpoints (broadcast, meta, bug-report)
+  - Data Sources section (Consumet, Anify, AniList, MyAnimeList)
+  - Features section (Streaming, Manga, AniList, Schedules, Redis, PWA)
+
 ## [v0.1.0] - 7 April 2026
 
 ### Core Features (Currently Active)

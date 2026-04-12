@@ -2,6 +2,83 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.6.5] - 13 April 2026
+
+### Added
+
+- Cookie Consent Popup dengan opsi (Accept All / Customize / Only Necessary)
+- Simplified homepage design: Hero + Features + CTA sections
+- Fallback images untuk Blog & Event cards dari Dribbble:
+  - Blog: `https://cdn.dribbble.com/userupload/25695983/file/original-0f88b9cf84315de3c021720b318e8279.png`
+  - Event: `https://cdn.dribbble.com/userupload/10296709/file/original-0e04efb308e6970fce37f47f67bf5484.png`
+- Dummy data placeholders untuk Events dan Blogs saat database kosong
+
+### Changed
+
+- Reverted ke Next.js 15.x karena turbopack build issues dengan monorepo
+- Package updates ke versi latest:
+  - @hookform/resolvers: 3.10.0 → 5.2.2
+  - @types/node: 22.19.17 → 25.6.0
+  - drizzle-kit: 0.18.1 → 0.31.10
+  - eslint: 9.39.4 → 10.2.0
+  - lucide-react: 0.513.0 → 1.8.0
+  - react-hook-form: 7.72.1 → 7.56.1
+  - typescript: 5.9.3 → 6.0.2
+  - zod: 3.25.76 → 4.3.6
+  - @supabase/ssr: 0.6.1 → 0.10.2
+- Blog & Event cards menggunakan GlassCard glassmorphism style
+- Navbar export default fixed
+
+### Removed
+
+- Teks "Belajar, Berkarya, Bersama" dari hero section
+- Efek blur/gradasi hitam pada mascot di hero
+- Referensi ke karakteranime images (folder kosong)
+
+### Fixed
+
+- Missing export default di Navbar component
+- Missing @soraku/ui package.json untuk workspace
+- Icon imports (Instagram/Twitter/Youtube → custom-icons)
+
+---
+
+## [v1.6.4] - 12 April 2026
+
+### Added
+
+- Homepage redesign dengan 10 sections (anime studio style)
+- Navbar dengan "Konten" dropdown (Blog, VTuber, Gallery)
+- Zustand store untuk user state personalization
+
+---
+
+## [v1.6.3] - 11 April 2026
+
+### Added
+
+- API endpoint `/api/home` untuk homepage data
+- Personalization system (guest/new_user/active_user detection)
+
+---
+
+## [v1.6.2] - 10 April 2026
+
+### Added
+
+- Navbar user avatar dropdown (Profile, Dashboard, Settings, Logout)
+- Updated navbar dengan Konten dropdown menu
+
+---
+
+## [v1.6.1] - 9 April 2026
+
+### Fixed
+
+- Navbar structure dengan Blog, VTuber, Gallery grouped into "Konten" dropdown
+
+---
+
 ## [v1.6.0] - 7 April 2026
 
 ### Added

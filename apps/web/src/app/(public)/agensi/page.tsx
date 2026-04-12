@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Youtube, Instagram, Twitter } from 'lucide-react'
+import { InstagramIcon, YouTubeIcon, XIcon } from '@/components/icons/custom-icons'
 import { db } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -107,7 +107,7 @@ function VtuberCard({ v }: { v: VtuberRow }) {
               rel="noopener noreferrer"
               className="flex h-8 w-8 items-center justify-center rounded-lg border border-red-500/30 bg-red-500/8 text-red-400 transition-colors hover:bg-red-500/15"
             >
-              <Youtube className="h-3.5 w-3.5" />
+              <YouTubeIcon className="h-3.5 w-3.5" />
             </a>
           )}
           {socials.instagram && (
@@ -117,7 +117,7 @@ function VtuberCard({ v }: { v: VtuberRow }) {
               rel="noopener noreferrer"
               className="flex h-8 w-8 items-center justify-center rounded-lg border border-rose-500/30 bg-rose-500/8 text-rose-400 transition-colors hover:bg-rose-500/15"
             >
-              <Instagram className="h-3.5 w-3.5" />
+              <InstagramIcon className="h-3.5 w-3.5" />
             </a>
           )}
           {socials.twitter && (
@@ -127,7 +127,7 @@ function VtuberCard({ v }: { v: VtuberRow }) {
               rel="noopener noreferrer"
               className="flex h-8 w-8 items-center justify-center rounded-lg border border-sky-500/30 bg-sky-500/8 text-sky-400 transition-colors hover:bg-sky-500/15"
             >
-              <Twitter className="h-3.5 w-3.5" />
+              <XIcon className="h-3.5 w-3.5" />
             </a>
           )}
           <Link

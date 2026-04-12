@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { db } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils'
-import { Youtube, ArrowLeft } from 'lucide-react'
-import { XIcon } from '@/components/icons/custom-icons'
+import { ArrowLeft } from 'lucide-react'
+import { YouTubeIcon, XIcon } from '@/components/icons/custom-icons'
 
 export const dynamic = 'force-dynamic'
 
@@ -125,7 +125,7 @@ export default async function VTuberDetailPage({ params }: Props) {
                   rel="noopener noreferrer"
                   className="border-border bg-card/50 text-muted-foreground flex h-10 w-10 items-center justify-center rounded-xl border transition-colors hover:border-red-500/40 hover:text-red-400"
                 >
-                  <Youtube className="h-4 w-4" />
+                  <YouTubeIcon className="h-4 w-4" />
                 </a>
               )}
               {socials.twitter && (

@@ -6,8 +6,8 @@ import { z } from "zod";
 // ── App URLs ───────────────────────────────────────────────────
 
 export const SORAKU_URLS = {
-  web: process.env.NEXT_PUBLIC_SITE_URL ?? "https://soraku.vercel.app",
-  stream: process.env.NEXT_PUBLIC_SITE_URL ?? "https://stream.soraku.id",
+  web: process.env.NEXT_PUBLIC_SITE_URL ?? "https://soraku.id",
+  stream: process.env.NEXT_PUBLIC_SITE_URL ?? "https://soraku.live",
   api: process.env.SORAKU_URL ?? "https://apisoraku.vercel.app",
   discord: "https://discord.gg/soraku",
 } as const;

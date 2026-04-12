@@ -8,6 +8,10 @@ const isProduction = process.env.NODE_ENV === "production";
 
 const config = {
   reactStrictMode: false,
+  // @ts-expect-error - Next.js 16 turbopack config
+  turbopack: {
+    root: process.cwd()
+  },
   images: {
     unoptimized: true
   },

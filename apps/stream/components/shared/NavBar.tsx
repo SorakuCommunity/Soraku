@@ -181,40 +181,29 @@ export function Navbar({
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       try {
-        const response = await fetch("https://1anime.app/feed.rss", {
-          signal: controller.signal
-        });
+        const response = await fetch(
+          "https://apisoraku.vercel.app/api/community/blog?limit=1",
+          {
+            signal: controller.signal
+          }
+        );
         clearTimeout(timeoutId);
         if (!response.ok) {
-          console.error("Failed to fetch RSS:", response.status);
+          console.error("Failed to fetch announcement:", response.status);
           return;
         }
-        const xmlText = await response.text();
-        parseString(xmlText, (err, result) => {
-          if (err) {
-            console.error("Error parsing RSS:", err);
-            return;
-          }
-          if (!result?.rss?.channel?.[0]?.item?.[0]) {
-            console.error("Invalid RSS format:", result);
-            return;
-          }
-          const latestItem = result.rss.channel[0].item[0];
+        const data = await response.json();
+        if (data?.data?.[0]) {
+          const latestPost = data.data[0];
           setAnnouncement({
-            title: latestItem.title[0],
-            link: ensureFullUrl(latestItem.link[0]),
-            pubDate: latestItem.pubDate[0]
+            title: latestPost.title,
+            link: `/blog/${latestPost.slug}`
           });
-        });
-      } catch (error) {
-        clearTimeout(timeoutId);
-        if (error instanceof Error && error.name === "AbortError") {
-          return;
         }
-        console.error("Error fetching RSS:", error);
+      } catch (err) {
+        console.error("Error fetching announcement:", err);
       }
     };
-
     fetchAnnouncement();
   }, []);
 

@@ -73,6 +73,14 @@ export async function GET(_req: NextRequest) {
       }
     })
 
+    // Gallery items (approved, latest 8)
+    const { data: galleryItems } = await adminDb()
+      .from('gallery')
+      .select('id,imageurl,title,tags,uploadedby,createdat')
+      .eq('status', 'approved')
+      .order('createdat', { ascending: false })
+      .limit(8)
+
     const { data: partnerships } = await adminDb()
       .from('partnerships')
       .select('id,name,logourl,website,category,description')
@@ -84,6 +92,6 @@ export async function GET(_req: NextRequest) {
     const partnersOnly = allPartners.filter(p => p.category !== 'sponsor')
     const sponsorsOnly = allPartners.filter(p => p.category === 'sponsor')
 
-    return ok({ events: formattedEvents, blogs, partnerships: partnersOnly, sponsorships: sponsorsOnly })
+    return ok({ events: formattedEvents, blogs, gallery: galleryItems ?? [], partnerships: partnersOnly, sponsorships: sponsorsOnly })
   } catch { return SERVER_ERROR() }
 }

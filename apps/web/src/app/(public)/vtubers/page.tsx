@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Youtube, Twitter } from 'lucide-react'
+import { YouTubeIcon, XIcon } from '@/components/icons/custom-icons'
 import { db } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -128,7 +128,7 @@ export default async function VTuberPage() {
                       rel="noopener noreferrer"
                       className="flex h-9 w-9 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/8 text-red-400 transition-colors hover:bg-red-500/15"
                     >
-                      <Youtube className="h-4 w-4" />
+                      <YouTubeIcon className="h-4 w-4" />
                     </a>
                   )}
                   {socials.twitter && (
@@ -138,7 +138,7 @@ export default async function VTuberPage() {
                       rel="noopener noreferrer"
                       className="flex h-9 w-9 items-center justify-center rounded-xl border border-sky-500/30 bg-sky-500/8 text-sky-400 transition-colors hover:bg-sky-500/15"
                     >
-                      <Twitter className="h-4 w-4" />
+                      <XIcon className="h-4 w-4" />
                     </a>
                   )}
                   {v.islive && v.liveurl && (

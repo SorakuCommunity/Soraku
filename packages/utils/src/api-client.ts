@@ -8,7 +8,7 @@
  *   - services/bot → import { createApiClient } from "@soraku/utils"
  *
  * Usage:
- *   const api = createApiClient({ baseUrl: "https://soraku-api.vercel.app" })
+ *   const api = createApiClient({ baseUrl: "https://apisoraku.vercel.app" })
  *   const { data } = await api.blog.list({ tag: "anime" })
  *   const { data } = await api.anime.search("naruto", "hianime")
  *   const { data } = await api.anime.episode("ep-id", "hianime")
@@ -23,7 +23,7 @@ import type {
 
 // ── Config ────────────────────────────────────────────────────
 export interface ApiClientConfig {
-  /** URL services/api — contoh: https://soraku-api.vercel.app */
+  /** URL services/api — contoh: https://apisoraku.vercel.app */
   baseUrl: string
   /**
    * Token auth — salah satu dari:

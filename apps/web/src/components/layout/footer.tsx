@@ -68,18 +68,17 @@ const GROUP_LINKS = [
 ]
 
 const QUICK_LINKS = [
-  { label: 'Beranda', href: '/' },
-  { label: 'Blog', href: '/blog' },
   { label: 'Events', href: '/events' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Galeri', href: '/gallery' },
   { label: 'VTuber', href: '/vtubers' },
+  { label: 'Premium', href: '/premium' },
 ]
 
 const INFO_LINKS = [
-  { label: 'Tentang', href: '/about' },
-  { label: 'Kontak', href: '/contact' },
-  { label: 'Feedback', href: '/feedback' },
+  { label: 'Tentang Soraku', href: '/about' },
   { label: 'Rekrutmen', href: '/requirements' },
+  { label: 'Masukan', href: '/feedback' },
   { label: 'Privasi', href: '/privacy' },
   { label: 'Ketentuan', href: '/tos' },
   { label: 'Lisensi', href: '/license' },
@@ -131,11 +130,11 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Product Column */}
+          {/* Platform Column */}
           <div className="sm:col-span-2 lg:col-span-2">
             <div className="mb-4 flex items-center gap-2">
               <p className="text-xs font-black tracking-[0.2em] text-[#D9DDE3] uppercase">
-                Product
+                Platform
               </p>
               <span className="text-[#6E8FA6]">····</span>
             </div>
@@ -153,11 +152,39 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Resources Column */}
+          {/* Komunitas Column */}
           <div className="sm:col-span-2 lg:col-span-2">
             <div className="mb-4 flex items-center gap-2">
               <p className="text-xs font-black tracking-[0.2em] text-[#D9DDE3] uppercase">
-                Resources
+                Komunitas
+              </p>
+              <span className="text-[#6E8FA6]">····</span>
+            </div>
+            <ul className="space-y-3">
+              <li>
+                <Link
+                  href="/donate"
+                  className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
+                >
+                  <span className="text-[#6E8FA6]/50">−</span> Donasi
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/agensi"
+                  className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
+                >
+                  <span className="text-[#6E8FA6]/50">−</span> Agensi
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Informasi Column */}
+          <div className="sm:col-span-2 lg:col-span-2">
+            <div className="mb-4 flex items-center gap-2">
+              <p className="text-xs font-black tracking-[0.2em] text-[#D9DDE3] uppercase">
+                Informasi
               </p>
               <span className="text-[#6E8FA6]">····</span>
             </div>
@@ -258,12 +285,12 @@ export function Footer() {
           </div>
 
           <div className="grid grid-cols-2 gap-6">
+            {/* Platform */}
             <div>
               <div className="mb-3 flex items-center gap-2">
                 <p className="text-xs font-black tracking-[0.15em] text-[#D9DDE3] uppercase">
-                  Product
+                  Platform
                 </p>
-                <span className="text-[#6E8FA6]">····</span>
               </div>
               <ul className="space-y-2">
                 {QUICK_LINKS.map((l) => (
@@ -279,14 +306,22 @@ export function Footer() {
               </ul>
             </div>
 
+            {/* Lainnya */}
             <div>
               <div className="mb-3 flex items-center gap-2">
                 <p className="text-xs font-black tracking-[0.15em] text-[#D9DDE3] uppercase">
-                  Resources
+                  Lainnya
                 </p>
-                <span className="text-[#6E8FA6]">····</span>
               </div>
               <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/donate"
+                    className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
+                  >
+                    <span className="text-[#6E8FA6]/50">−</span> Donasi
+                  </Link>
+                </li>
                 {INFO_LINKS.map((l) => (
                   <li key={l.href}>
                     <Link

@@ -9,6 +9,6 @@
   "dependencies": {
     "@soraku/types": "workspace:*",
     "@supabase/supabase-js": "^2.99.0",
-    "@supabase/ssr": "^0.6.1"
+    "@supabase/ssr": "^0.10.2"
   }
 }

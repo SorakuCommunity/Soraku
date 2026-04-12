@@ -11,9 +11,6 @@ import {
   Globe,
   Lock,
   Camera,
-  Instagram,
-  Twitter,
-  Youtube,
   ExternalLink,
   Zap,
   Star,
@@ -24,7 +21,7 @@ import {
   AlertCircle,
   Pencil,
 } from 'lucide-react'
-import { DiscordIcon } from '@/components/icons/custom-icons'
+import { DiscordIcon, InstagramIcon, YouTubeIcon, XIcon } from '@/components/icons/custom-icons'
 import { cn } from '@/lib/utils'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -89,9 +86,9 @@ const getLevelTitle = (lv: number) => LEVEL_TITLES.find(([m]) => lv >= m)?.[1] ?
 
 const SOCIAL_FIELDS = [
   { key: 'discord', label: 'Discord', placeholder: 'user#1234 atau ID', Icon: DiscordIcon },
-  { key: 'instagram', label: 'Instagram', placeholder: '@username', Icon: Instagram },
-  { key: 'x', label: 'X / Twitter', placeholder: '@username', Icon: Twitter },
-  { key: 'youtube', label: 'YouTube', placeholder: 'URL channel', Icon: Youtube },
+  { key: 'instagram', label: 'Instagram', placeholder: '@username', Icon: InstagramIcon },
+  { key: 'x', label: 'X / Twitter', placeholder: '@username', Icon: XIcon },
+  { key: 'youtube', label: 'YouTube', placeholder: 'URL channel', Icon: YouTubeIcon },
   { key: 'website', label: 'Website', placeholder: 'https://yoursite.id', Icon: Globe },
 ] as const
 
@@ -99,13 +96,13 @@ const SOCIAL_CONFIG = [
   { key: 'discord', Icon: DiscordIcon, getHref: (v: string) => `https://discord.com/users/${v}` },
   {
     key: 'instagram',
-    Icon: Instagram,
+    Icon: InstagramIcon,
     getHref: (v: string) => `https://instagram.com/${v.replace('@', '')}`,
   },
-  { key: 'x', Icon: Twitter, getHref: (v: string) => `https://x.com/${v.replace('@', '')}` },
+  { key: 'x', Icon: XIcon, getHref: (v: string) => `https://x.com/${v.replace('@', '')}` },
   {
     key: 'youtube',
-    Icon: Youtube,
+    Icon: YouTubeIcon,
     getHref: (v: string) => (v.startsWith('http') ? v : `https://youtube.com/${v}`),
   },
   {
