@@ -91,29 +91,6 @@ function createApiClient(baseUrl: string, token?: string, internalSecret?: strin
       list: (params?: { tag?: string; page?: number; limit?: number }) =>
         get(`/api/gallery${qs(params)}`),
     },
-    stream: {
-      list: (params?: {
-        type?: string
-        vtuberid?: string
-        ispremium?: boolean
-        page?: number
-        limit?: number
-      }) => get(`/api/stream${qs(params)}`),
-      get: (slug: string) => get(`/api/stream/${slug}`),
-    },
-    anime: {
-      search: (q: string, source = 'hianime', page = 1) =>
-        get(`/api/stream${qs({ anime: 'true', q, source, page })}`),
-      detail: (animeId: string, source = 'hianime') =>
-        get(
-          `/api/stream/${encodeURIComponent(animeId)}${qs({ anime: 'true', source, info: 'true' })}`
-        ),
-      episode: (episodeId: string, source = 'hianime', quality = 'auto') =>
-        get(
-          `/api/stream/${encodeURIComponent(episodeId)}${qs({ anime: 'true', source, quality })}`
-        ),
-      sources: () => get('/api/stream/sources'),
-    },
     donate: {
       createXendit: (data: unknown) => post('/api/donate/xendit/create', data),
     },

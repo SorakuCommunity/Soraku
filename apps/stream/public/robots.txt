@@ -1,5 +1,0 @@
-User-agent: *
-Disallow: /anime/
-Disallow: /manga/
-Disallow: /admin/
-Disallow: /api/
