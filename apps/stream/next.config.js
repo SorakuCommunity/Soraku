@@ -1,3 +1,4 @@
+const path = require("path");
 const dns = require("dns");
 
 dns.setDefaultResultOrder("ipv4first");
@@ -6,19 +7,14 @@ dns.setDefaultResultOrder("ipv4first");
 
 const isProduction = process.env.NODE_ENV === "production";
 
+const projectRoot = path.resolve(__dirname);
+
 const config = {
   reactStrictMode: false,
-  // @ts-expect-error - Next.js 16 turbopack config
-  turbopack: {
-    root: process.cwd()
-  },
-  images: {
-    unoptimized: true
-  },
+  outputFileTracingRoot: process.env.VERCEL ? "/vercel/path0" : projectRoot,
   typescript: {
     ignoreBuildErrors: true
   },
-  // Remove deprecated eslint config - use .eslintrc instead
   async redirects() {
     return [
       {
@@ -29,14 +25,14 @@ const config = {
       },
       {
         source: "/about",
-        destination: "https://soraku.vercel.app/about/",
-        permanent: false,
+        destination: "https://soraku.live/about/",
+        permanent: true,
         basePath: false
       },
       {
         source: "/changelogs",
-        destination: "https://soraku.vercel.app/changelogs/",
-        permanent: false,
+        destination: "https://soraku.live/changelogs/",
+        permanent: true,
         basePath: false
       },
       {

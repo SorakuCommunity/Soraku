@@ -181,12 +181,11 @@ export function Navbar({
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       try {
-        const response = await fetch(
-          "https://apisoraku.vercel.app/api/community/blog?limit=1",
-          {
-            signal: controller.signal
-          }
-        );
+        const apiUrl =
+          process.env.NEXT_PUBLIC_SORAKU_URL || "https://apisoraku.vercel.app";
+        const response = await fetch(`${apiUrl}/api/community/blog?limit=1`, {
+          signal: controller.signal
+        });
         clearTimeout(timeoutId);
         if (!response.ok) {
           console.error("Failed to fetch announcement:", response.status);

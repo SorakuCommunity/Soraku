@@ -3,6 +3,12 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "env": [
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "API_URL",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN"
+      ],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },

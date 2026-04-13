@@ -17,7 +17,8 @@
       "@/components/*": ["components/*"],
       "@/utils/*": ["utils/*"],
       "@/lib/*": ["lib/*"],
-      "@/prisma/*": ["lib/prisma-stub.ts"]
+      "@/prisma/*": ["lib/prisma-stub.ts"],
+      "types/*": ["types/*"]
     },
     "target": "ES2017"
   },
