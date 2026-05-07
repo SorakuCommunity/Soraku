@@ -85,6 +85,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
+        {/* Umami Analytics */}
+        <Script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="ba55e75f-b8b7-4f68-807f-77f7073bc23f"
+        />
       </head>
       <body className="bg-background font-body min-h-screen antialiased">
         <Providers>{children}</Providers>
