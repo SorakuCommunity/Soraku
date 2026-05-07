@@ -106,7 +106,7 @@ async function sendDiscordEventEmbed(event: {
   await sendDiscordWebhook('discord_event_webhook_url', {
     username: 'Soraku Events',
     avatar_url: `${siteUrl}/logo.png`,
-    content: `@everyone 🎉 **Event baru dari Soraku Community!**`,
+     content: `@everyone 🎉 **Event baru dari Soraku!**`,
     embeds: [
       {
         author: {
@@ -116,7 +116,7 @@ async function sendDiscordEventEmbed(event: {
         title: event.title,
         url: eventUrl,
         description:
-          (event.description?.slice(0, 300) ?? 'Event baru dari Soraku Community!') +
+           (event.description?.slice(0, 300) ?? 'Event baru dari Soraku!') +
           `
 
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -125,7 +125,7 @@ async function sendDiscordEventEmbed(event: {
         fields,
         image: event.coverurl ? { url: event.coverurl } : undefined,
         footer: {
-          text: `Soraku Community · soraku.id`,
+           text: `Soraku · soraku.id`,
           icon_url: `${siteUrl}/logo.png`,
         },
         timestamp: new Date().toISOString(),
@@ -171,10 +171,10 @@ export async function POST(req: NextRequest) {
     if (error) return err(error.message)
 
     // Auto-notify saat event dipublish
-      if (parsed.data.ispublished) {
-        notifyNewEvent({ slug: data.slug, title: data.title }).catch(() => {})
-      }
-      if (parsed.data.ispublished) {
+    if (parsed.data.ispublished) {
+      notifyNewEvent({ slug: data.slug, title: data.title }).catch(() => {})
+    }
+    if (parsed.data.ispublished) {
       // 1. Discord embed via webhook
       sendDiscordEventEmbed({ ...parsed.data })
       // 2. Bot legacy webhook

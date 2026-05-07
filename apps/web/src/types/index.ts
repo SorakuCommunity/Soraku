@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════
-//  Soraku Community — Core Types
+//  Soraku — Core Types
 //  v0.1.0 — sync with Kaizo (backend)
 // ═══════════════════════════════════════
 

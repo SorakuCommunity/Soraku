@@ -8,8 +8,8 @@ import { formatRelativeTime } from '@/lib/utils'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Blog | Soraku Community',
-  description: 'Artikel, review, dan ulasan anime & budaya Jepang dari komunitas Soraku.',
+  title: 'Blog | Soraku',
+  description: 'Artikel, review, dan ulasan anime & budaya Jepang dari Soraku.',
 }
 
 const ALL_TAGS = [

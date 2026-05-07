@@ -43,7 +43,7 @@ async function sendWelcomeCard(channel, member, settings) {
     )
     .setImage(guild.bannerURL({ size: 1024 }) ?? null)
     .setFooter({
-      text:    `Soraku Community • Member ke-${guild.memberCount.toLocaleString('id-ID')}`,
+       text:    `Soraku • Member ke-${guild.memberCount.toLocaleString('id-ID')}`,
       iconURL: member.client.user.displayAvatarURL(),
     })
     .setTimestamp()

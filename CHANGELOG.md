@@ -1,120 +1,80 @@
-# Catatan Perubahan - Soraku Community Platform
+# Catatan Perubahan - Soraku Platform
 
 Semua perubahan signifikan pada platform Soraku dicatat di sini.
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
----
+Mengikuti yang ada di:
+- [Soraku Web](https://github.com/soraku-id/soraku/blob/main/apps/web/CHANGELOG.md)
+- [Soraku API](https://github.com/soraku-id/soraku/blob/main/apps/api/CHANGELOG.md)
+- [Soraku Bot](https://github.com/soraku-id/soraku/blob/main/apps/bot/CHANGELOG.md)
 
-## [v1.6.0] - 7 April 2026
+Gabungkan menjadi satu changelog untuk keseluruhan platform Soraku.
 
-**Admin Dashboard v2, Stream Dashboard, Mobile Refactor, Billing & Bot Control**
+## [unreleased]
 
-### apps/web - Web Komunitas (1.5.0 → 1.6.0)
+## [v1.5.2] - 26 April 2026
 
-Ditambahkan:
+### Added
+- Updated Soraku identity from "Soraku Community" to "Soraku" reflecting professional positioning
+- New identity statement emphasizing community-driven digital platform for anime culture, learning, and creator development
+- Positioned as scalable product with future monetization potential, similar to Dicoding/RevoU/Udemy but community-first
+- **ALL FEATURES INTEGRATED**:
+  - Cookie Consent Popup dengan opsi (Accept All / Customize / Only Necessary)
+  - Simplified homepage design: Hero + Features + CTA sections
+  - Fallback images untuk Blog & Event cards dari Dribbble
+  - Dummy data placeholders untuk Events dan Blogs saat database kosong
+  - Homepage redesign dengan 10 sections (anime studio style)
+  - Navbar dengan "Konten" dropdown (Blog, VTuber, Gallery)
+  - Zustand store untuk user state personalization
+  - API endpoint `/api/home` untuk homepage data
+  - Personalization system (guest/new_user/active_user detection)
+  - Navbar user avatar dropdown (Profile, Dashboard, Settings, Logout)
+  - Updated navbar dengan Konten dropdown menu
+  - Admin Dashboard v2: New pages for Analytics, Premium, Billing, Bot Control, and Settings
+  - Analytics Page: Period selection (7/30/90 days), top pages, visitor stats
+  - Billing Page: Paddle subscription integration with Free/Pro/Premium plans
+  - Premium Page: Benefits overview and plan comparison table
+  - Bot Control Page: Status, stats, modules toggle (Music, Moderation, Auto Replies, Level System)
+  - Settings Page: Profile editing (display name, avatar), account info
+  - New Navigation Items: Analytics, Premium, Billing, Bot, Settings in admin sidebar
+  - Updated Contact Emails: contact@soraku.id (Contact Center), admin@soraku.id (Admin Center)
+  - Updated Footer to use CONTACT_EMAILS.contact
+  - Updated License, TOS, Privacy, Contact pages with new email addresses
+  - Updated SECURITY.md: Security contact updated to admin@soraku.id
 
-- Dashboard admin baru: Analytics, Premium, Billing, Discord Bot Control, Settings
-- Halaman Settings admin untuk profile dan akun
-- Analytics page dengan periode 7/30/90 hari dan top pages
-- Billing page dengan Paddle integration (placeholder)
-- Premium page dengan perbandingan plan
-- Discord Bot control panel dengan status, modules toggle, dan quick actions
-- Navigation baru: Analytics, Premium, Billing, Bot, Settings
+### Changed
+- Updated all references from "Soraku Community" to "Soraku" throughout codebase:
+  - Web application (apps/web/) - layout, metadata, pages, components
+  - Discord bot (services/bot/) - package.json, config, commands, events
+  - API service (services/api/) - metadata and descriptions
+  - Documentation - LICENSE, CHANGELOG.md, stack.md, SECURITY.md
+  - Environment variables (.env.example)
+  - License file - Soraku Source License v1.0
+- Reverted ke Next.js 15.x karena turbopack build issues dengan monorepo
+- Package updates ke versi latest:
+  - @hookform/resolvers: 3.10.0 → 5.2.2
+  - @types/node: 22.19.17 → 25.6.0
+  - drizzle-kit: 0.18.1 → 0.31.10
+  - eslint: 9.39.4 → 10.2.0
+  - lucide-react: 0.513.0 → 1.8.0
+  - react-hook-form: 7.72.1 → 7.56.1
+  - typescript: 5.9.3 → 6.0.2
+  - zod: 3.25.76 → 4.3.6
+  - @supabase/ssr: 0.6.1 → 0.10.2
+- Blog & Event cards menggunakan GlassCard glassmorphism style
+- Navbar export default fixed
+- Icon imports (Instagram/Twitter/Youtube → custom-icons)
 
-Diperbaiki:
-
-- Email kontak di footer: contact@soraku.id dan admin@soraku.id
-- Email di halaman Lisensi, TOS, Privacy, Contact diperbarui
-- Email di SECURITY.md diperbarui ke admin@soraku.id
-- Footer menggunakan CONTACT_EMAILS.contact вместо CONTACT_EMAILS.general
-
-### apps/stream - Web Streaming (0.0.0 → 0.1.0)
-
-Ditambahkan:
-
-- Dashboard streaming di /dashboard dengan stats dan anime sources
-- Anime sources: Consumet, AniList, MyAnimeList, Anify, Samehadaku, Otakudesu
-- Stats: total anime, episodes, images, active sources, cache size, uptime
-
-Infrastruktur:
-
-- Prisma dihapus, gunakan Drizzle ORM
-- Konfigurasi Next.js dengan ignoreBuildErrors dan ignoreDuringBuilds
-
-### apps/mobile (0.0.0 → 0.0.1)
-
-Ditambahkan:
-
-- Struktur dasar mobile app dengan Expo
-- Package workspace: @soraku/types, @soraku/utils, @soraku/api-client, @soraku/config
-- Dipindahkan dari apps/stream/mobile ke apps/mobile
-
-### services/api (0.1.0 → 1.0.0)
-
-Ditambahkan:
-
-- API endpoints untuk community: blog, events, gallery, vtubers
-- API endpoints untuk stream: favorites, watch history, sources
-- API endpoints untuk donation: Trakteer, Xendit
-- Premium subscription API
-- Konfigurasi CORS yang fleksibel
-- Next.js 16.2.2 dengan ignoreBuildErrors
-
-### services/bot - Discord Bot (1.0.0)
-
-Ditambahkan:
-
-- Sharding dengan discord-hybrid-sharding
-- Music system dengan Lavalink
-- Command handlers: Info, Developer, Giveaway, Welcome, Pfps, Owner, Invites, Extra
-- Database repos: User, Guild, Moderation, Premium, Playlists, Invites, Ticket, SorakuUser
-- Event handlers: player, node, discord
-- Auto-reply dan autoreact system
-- Invite tracking dan ranks
-
----
-
-## [v1.5.1] - 30 Maret 2026
-
-**Admin Webhook, Halaman Legal, Konsolidasi Migrasi, Feedback & Kontak**
-
-Ditambahkan:
-
-- Panel admin Discord Webhooks: kelola URL webhook Blog, Event, Pendaftaran, dan Feedback dari UI
-- Fitur test webhook langsung dari panel admin dengan satu klik
-- Admin panel terpisah dari navbar utama, layout standalone dengan header sendiri
-- Halaman Kebijakan Privasi dengan 10 section (privasi anak, retensi data, hak pengguna)
-- Halaman Ketentuan Penggunaan dengan 12 section (konten terlarang, event, pembatasan tanggung jawab)
-- Halaman Lisensi dengan Soraku Community Source License v1.0 (8 bagian)
-- Auto-notifikasi in-app saat artikel blog dipublikasikan (broadcast ke semua user)
-- Partnership & Sponsorship admin page dengan upload logo dan kategori
-- Halaman Kirim Masukan (/feedback) dengan form dan integrasi Discord webhook
-- Halaman Kontak (/contact) dengan info email, Discord, lokasi, dan peta
-- Link Kontak dan Feedback di footer
-
-Diperbaiki:
-
-- POST /api/analytics/tiktok gagal 500 jika TIKTOK_ACCESS_TOKEN tidak di-set, sekarang di-skip
-- GET /api/admin/webhooks gagal 500: kolom label dan category tidak ada di DB, ditambah migrasi fix
-- PATCH /api/admin/webhooks gagal 400/500, perbaikan parsing body dan validasi
-- GET /api/admin/partnerships gagal 500, ditambah error logging
-- Upstash Redis error saat ENV tidak di-set, sekarang di-skip dengan graceful
-- Next.js Image fill tanpa prop sizes, ditambah sizes="100vw"
-- Cross-origin warning di dev server, ditambah allowedDevOrigins
-- Notifikasi `notifyNewBlog` tidak ter-trigger saat artikel di-publish
-- Hero section: tombol "Masuk" dihapus, hanya Register + Discord atau Discord + About
-- Semua em-dash di teks publik diganti dengan format yang lebih natural
-- `export const dynamic` dihapus dari client component
-
-Infrastruktur:
-
-- Migrasi database terkonsolidasi ke satu file: `20260329_soraku_v1_5_1_consolidated.sql`
-- Migrasi tambahan: `20260330_fix_sitesettings_columns.sql` untuk tambah kolom label/category
-- Semua file migration lama dihapus, hanya tersisa file konsolidasi + fix
-- Tabel `sitesettings` untuk konfigurasi webhook (key-value tanpa underscore)
-- Discord webhook mendukung feedback: `discordFeedbackWebhookUrl`
-- `discord-webhook.ts` mendukung format key baru (camelCase) dan lama (snake_case)
-- Route admin dipindah dari `(dashboard)/admin` ke `(admin)/admin`, terpisah dari layout user
+### Fixed
+- Build errors in tos/page.tsx (JSX syntax)
+- Removed empty connects directory causing TypeScript issues
+- Fixed remaining "Soraku Community" references in login/page.tsx
+- Missing export default di Navbar component
+- Missing @soraku/ui package.json untuk workspace
+- Teks "Belajar, Berkarya, Bersama" dari hero section
+- Efek blur/gradasi hitam pada mascot di hero
+- Referensi ke karakteranime images (folder kosong)
+- All builds now pass successfully
 
 ---
 
@@ -348,7 +308,7 @@ Ditambahkan:
 
 ---
 
-_Soraku Community. Est. 2023._
+_Soraku. Est. 2023._
 
 ```
 

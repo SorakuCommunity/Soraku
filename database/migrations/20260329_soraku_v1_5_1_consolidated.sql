@@ -1,5 +1,5 @@
 -- ============================================================
--- Soraku Community — Consolidated Schema Migration
+-- Soraku — Consolidated Schema Migration
 -- Schema  : soraku
 -- Version : v1.5.1 (2026-03-29)
 -- Run via : Supabase SQL Editor (Dashboard)

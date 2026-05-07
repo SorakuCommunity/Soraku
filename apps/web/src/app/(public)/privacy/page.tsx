@@ -12,7 +12,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-foreground mb-3 text-lg font-black">1. Pendahuluan</h2>
           <p>
-            Soraku Community (&ldquo;Soraku&rdquo;, &ldquo;kami&rdquo;) menghargai privasi setiap
+            Soraku (&ldquo;Soraku&rdquo;, &ldquo;kami&rdquo;) menghargai privasi setiap
             pengguna (&ldquo;kamu&rdquo;, &ldquo;pengguna&rdquo;). Kebijakan Privasi ini menjelaskan
             bagaimana kami mengumpulkan, menggunakan, menyimpan, dan melindungi informasi pribadimu
             saat menggunakan platform di{' '}
@@ -217,11 +217,11 @@ export default function PrivacyPage() {
         </section>
 
         <div className="mt-8 border-t border-white/[0.06] pt-6">
-          <p className="text-muted-foreground/40 text-xs">
-            Kebijakan Privasi ini berlaku untuk seluruh layanan Soraku Community termasuk website,
-            API, dan integrasi Discord. &copy; 2023&ndash;2026 Soraku Community. Seluruh hak
-            dilindungi.
-          </p>
+           <p className="text-muted-foreground/40 text-xs">
+             Kebijakan Privasi ini berlaku untuk seluruh layanan Soraku termasuk website,
+             API, dan integrasi Discord. &copy; 2023&ndash;2026 Soraku. Seluruh hak
+             dilindungi.
+           </p>
         </div>
       </div>
     </div>

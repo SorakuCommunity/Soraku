@@ -230,9 +230,9 @@ export default function ApiLandingPage() {
             }}
           >
             Central REST API untuk seluruh ekosistem platform{" "}
-            <span style={{ color: "#a78bfa", fontWeight: 600 }}>
-              Soraku Community
-            </span>{" "}
+             <span style={{ color: "#a78bfa", fontWeight: 600 }}>
+               Soraku
+             </span>{" "}
             — komunitas anime, manga, VTuber, dan budaya Jepang Indonesia.
           </p>
 
@@ -296,9 +296,9 @@ export default function ApiLandingPage() {
                 fontWeight: 700,
                 textDecoration: "none",
               }}
-            >
-              🌐 Soraku Community
-            </a>
+             >
+               🌐 Soraku
+             </a>
           </div>
         </div>
 
@@ -470,7 +470,7 @@ export default function ApiLandingPage() {
             <span style={{ color: "#94a3b8" }}>Sora (AI)</span> ·{" "}
             <span style={{ color: "#94a3b8" }}>Kaizo (Back-end)</span>
           </p>
-          <p style={{ margin: 0 }}>© 2026 Soraku Community · Indonesia 🇮🇩</p>
+           <p style={{ margin: 0 }}>© 2026 Soraku · Indonesia 🇮🇩</p>
         </div>
       </div>
     </div>

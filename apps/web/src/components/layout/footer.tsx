@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Mail } from 'lucide-react'
+import { Mail, Heart } from 'lucide-react'
 import {
   DiscordIcon,
   InstagramIcon,
@@ -63,8 +63,12 @@ const GROUP_LINKS = [
     label: 'Facebook Group',
     href: 'https://www.facebook.com/groups/2080754095772347/?ref=share&mibextid=NSMWBT',
   },
-  { label: 'WhatsApp Channel', href: 'https://whatsapp.com/channel/0029VbBNBA29MF93HdPSMu3E' },
-  { label: 'LinkedIn', href: '#' },
+  { label: 'WhatsApp Channel',
+    href: 'https://whatsapp.com/channel/0029VbBNBA29MF93HdPSMu3E'
+  },
+  { label: 'LinkedIn',
+    href: '#'
+  },
 ]
 
 const QUICK_LINKS = [
@@ -97,7 +101,7 @@ export function Footer() {
               <Link href="/" className="group inline-flex items-center gap-3">
                 <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-[#1a1c20]">
                   <Image
-                    src="/logo.png"
+                    src="/assets/brand/logo.png"
                     alt="Soraku"
                     width={48}
                     height={48}
@@ -110,9 +114,7 @@ export function Footer() {
               </Link>
             </div>
             <p className="mb-6 max-w-sm text-sm leading-relaxed text-[#6E8FA6]">
-              Soraku adalah komunitas non-profit budaya pop Jepang di Indonesia yang menyajikan
-              berita, artikel, dan ruang kreatif bagi komunitas anime, manga, game, culture jepang,
-              vtuber dan cosplayer.
+              Soraku adalah platform global yang menggabungkan budaya pop Jepang, pembelajaran berbasis proyek, dan ekonomi kreatif menjadi satu ekosistem terintegrasi.
             </p>
             <div className="flex items-center gap-2">
               {SOCIAL_LINKS.map(({ href, Icon, label, color }) => (
@@ -152,33 +154,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Komunitas Column */}
-          <div className="sm:col-span-2 lg:col-span-2">
-            <div className="mb-4 flex items-center gap-2">
-              <p className="text-xs font-black tracking-[0.2em] text-[#D9DDE3] uppercase">
-                Komunitas
-              </p>
-              <span className="text-[#6E8FA6]">····</span>
-            </div>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href="/donate"
-                  className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
-                >
-                  <span className="text-[#6E8FA6]/50">−</span> Donasi
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/agensi"
-                  className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
-                >
-                  <span className="text-[#6E8FA6]/50">−</span> Agensi
-                </Link>
-              </li>
-            </ul>
-          </div>
+
 
           {/* Informasi Column */}
           <div className="sm:col-span-2 lg:col-span-2">
@@ -256,7 +232,7 @@ export function Footer() {
             <Link href="/" className="group mb-4 inline-flex items-center gap-3">
               <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-[#1a1c20]">
                 <Image
-                  src="/logo.png"
+                  src="/assets/brand/logo.png"
                   alt="Soraku"
                   width={48}
                   height={48}
@@ -266,7 +242,7 @@ export function Footer() {
               <span className="text-xl font-black text-[#D9DDE3]">Soraku</span>
             </Link>
             <p className="mb-4 text-sm leading-relaxed text-[#6E8FA6]">
-              Soraku adalah komunitas non-profit budaya pop Jepang di Indonesia.
+              Soraku adalah platform global yang menggabungkan budaya pop Jepang, pembelajaran berbasis proyek, dan ekonomi kreatif menjadi satu ekosistem terintegrasi.
             </p>
             <div className="flex items-center gap-2">
               {SOCIAL_LINKS.map(({ href, Icon, label, color }) => (
@@ -284,57 +260,60 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            {/* Platform */}
-            <div>
-              <div className="mb-3 flex items-center gap-2">
-                <p className="text-xs font-black tracking-[0.15em] text-[#D9DDE3] uppercase">
-                  Platform
-                </p>
-              </div>
-              <ul className="space-y-2">
-                {QUICK_LINKS.map((l) => (
-                  <li key={l.href}>
-                    <Link
-                      href={l.href}
-                      className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
-                    >
-                      <span className="text-[#6E8FA6]/50">−</span> {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+           <div className="grid grid-cols-2 gap-6">
+             {/* Platform */}
+             <div>
+               <div className="mb-3 flex items-center gap-2">
+                 <p className="text-xs font-black tracking-[0.15em] text-[#D9DDE3] uppercase">
+                   Platform
+                 </p>
+               </div>
+               <ul className="space-y-2">
+                 {QUICK_LINKS.map((l) => (
+                   <li key={l.href}>
+                     <Link
+                       href={l.href}
+                       className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
+                     >
+                       <span className="text-[#6E8FA6]/50">−</span> {l.label}
+                     </Link>
+                   </li>
+                 ))}
+               </ul>
+             </div>
 
-            {/* Lainnya */}
-            <div>
-              <div className="mb-3 flex items-center gap-2">
-                <p className="text-xs font-black tracking-[0.15em] text-[#D9DDE3] uppercase">
-                  Lainnya
-                </p>
-              </div>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="/donate"
-                    className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
-                  >
-                    <span className="text-[#6E8FA6]/50">−</span> Donasi
-                  </Link>
-                </li>
-                {INFO_LINKS.map((l) => (
-                  <li key={l.href}>
-                    <Link
-                      href={l.href}
-                      className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
-                    >
-                      <span className="text-[#6E8FA6]/50">−</span> {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+             {/* Donasi & Contact */}
+             <div className="space-y-4">
+               {/* Donasi Card */}
+               <div className="flex items-center bg-white/[0.03] rounded-xl p-3">
+                 <Heart className="h-5 w-5 text-[#E8C2A8]/70" />
+                 <span className="text-sm font-medium text-[#D9DDE3]">Donasi</span>
+               </div>
+               
+               {/* Contact Section */}
+               <div className="mt-4">
+                 <p className="mb-2 text-xs font-black tracking-[0.15em] text-[#D9DDE3] uppercase">
+                   Contact
+                 </p>
+                 <div className="space-y-2">
+                   <a
+                     href={`mailto:${CONTACT_EMAILS.contact}`}
+                     className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
+                   >
+                     <MailIcon className="h-4 w-4" />
+                     <span>{CONTACT_EMAILS.contact}</span>
+                   </a>
+                   <a
+                     href={`mailto:${CONTACT_EMAILS.admin}`}
+                     className="flex items-center gap-2 text-sm text-[#6E8FA6] transition-colors hover:text-[#4FA3D1]"
+                   >
+                     <MailIcon className="h-4 w-4" />
+                     <span>{CONTACT_EMAILS.admin}</span>
+                   </a>
+                 </div>
+               </div>
+             </div>
+           </div>
 
           <div className="border-t border-white/[0.06] pt-4">
             <p className="mb-3 text-xs font-black tracking-[0.15em] text-[#D9DDE3] uppercase">

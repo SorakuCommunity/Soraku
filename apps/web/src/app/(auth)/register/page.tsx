@@ -454,7 +454,7 @@ export default function RegisterPage() {
           </h1>
           <p className="text-muted-foreground mt-1.5 text-sm">
             {step === 1
-              ? 'Daftar ke Soraku Community — gratis!'
+              ? 'Daftar ke Soraku — gratis!'
               : 'Username unikmu di komunitas Soraku'}
           </p>
 

@@ -109,7 +109,7 @@ export default class WelcomeCommand extends Command {
           ].join('\n'),
         },
       )
-      .setFooter({ text: 'Soraku Community', iconURL: message.client.user.displayAvatarURL() })
+       .setFooter({ text: 'Soraku', iconURL: message.client.user.displayAvatarURL() })
       .setTimestamp()
 
     const row = new ActionRowBuilder().addComponents(
@@ -165,7 +165,7 @@ export default class WelcomeCommand extends Command {
       .setTitle('✅ Welcome Channel Diset!')
       .setDescription(`Channel welcome berhasil diset ke <#${channel.id}>.\nWelcome system otomatis **diaktifkan**.`)
       .addFields({ name: '🧪 Test Sekarang', value: 'Ketik `!welcome test` untuk mencoba.' })
-      .setFooter({ text: 'Soraku Community' })
+      .setFooter({ text: 'Soraku' })
       .setTimestamp()
 
     return message.reply({ embeds: [embed] })
@@ -280,10 +280,10 @@ export default class WelcomeCommand extends Command {
         },
       )
       .setImage(guild.bannerURL({ size: 1024 }) ?? null)
-      .setFooter({
-        text:    `Soraku Community • Member ke-${guild.memberCount.toLocaleString('id-ID')}`,
-        iconURL: member.client.user.displayAvatarURL(),
-      })
+       .setFooter({
+         text:    `Soraku • Member ke-${guild.memberCount.toLocaleString('id-ID')}`,
+         iconURL: member.client.user.displayAvatarURL(),
+       })
       .setTimestamp()
 
     // Tombol aksi

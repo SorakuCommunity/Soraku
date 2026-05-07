@@ -82,6 +82,12 @@ const NAV_ITEMS: NavItem[] = [
           Icon: UserPlus,
           desc: 'Bergabung sebagai kreator',
         },
+        {
+          label: 'Class Online',
+          href: '/class',
+          Icon: BookOpen,
+          desc: 'Kelas online interaktif',
+        },
       ],
     },
   },
@@ -91,7 +97,7 @@ const NAV_ITEMS: NavItem[] = [
       label: 'Komunitas',
       Icon: Users,
       children: [
-        { label: 'Donasi', href: '/donate', Icon: Heart, desc: 'Dukung Soraku Community' },
+        { label: 'Donasi', href: '/donate', Icon: Heart, desc: 'Dukung Soraku' },
         { label: 'Premium', href: '/premium', Icon: Star, desc: 'Akses eksklusif', badge: 'NEW' },
       ],
     },
@@ -176,7 +182,7 @@ export function Navbar() {
           <Link href="/" className="group flex flex-shrink-0 items-center gap-2.5">
             <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-[#1a1c20] transition-all group-hover:border-[#4FA3D1]/30">
               <Image
-                src="/logo.png"
+                src="/assets/brand/logo.png"
                 alt="Soraku"
                 width={32}
                 height={32}
@@ -537,58 +543,34 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* ══ MOBILE DRAWER ══════════════════════════════════════════════════════ */}
+      {/* ══ MOBILE DROPDOWN ══════════════════════════════════════════════════════ */}
       {menuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="absolute inset-x-0 top-0 max-h-[100dvh] overflow-y-auto border-b border-white/[0.08] bg-[#1a1c20] shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-              <Link
-                href="/"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-2.5"
-              >
-                <div className="h-8 w-8 overflow-hidden rounded-xl border border-white/10 bg-[#1a1c20]">
-                  <Image
-                    src="/logo.png"
-                    alt="Soraku"
-                    width={32}
-                    height={32}
-                    className="h-full w-full object-cover object-top"
-                  />
-                </div>
-                <span className="text-base font-black text-[#D9DDE3]">Soraku</span>
-              </Link>
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] text-[#6E8FA6] transition-colors hover:text-[#D9DDE3]"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="space-y-5 px-4 py-5">
+          <div className="relative top-[60px] max-h-[calc(100dvh-60px)] overflow-y-auto rounded-b-2xl border-t border-white/[0.08] bg-[#1C1E22] shadow-xl">
+            <div className="px-4 py-3">
               {user && (
-                <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5">
-                  <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-xl border border-white/10">
+                <div className="mb-1 flex items-center gap-3 rounded-xl bg-white/[0.03] px-3 py-3">
+                  <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-white/10">
                     {user.avatarurl ? (
                       <Image
                         src={user.avatarurl}
                         alt={displayName}
-                        width={44}
-                        height={44}
+                        width={40}
+                        height={40}
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-[#4FA3D1]/10 text-base font-black text-[#4FA3D1]">
+                      <div className="flex h-full w-full items-center justify-center bg-[#4FA3D1]/10 text-sm font-black text-[#4FA3D1]">
                         {initial}
                       </div>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-bold text-[#D9DDE3]">{displayName}</p>
+                    <p className="truncate text-sm font-bold text-[#D9DDE3]">{displayName}</p>
                     <p className="truncate text-xs text-[#6E8FA6]/55">@{user.username ?? '—'}</p>
                   </div>
                   {unreadCount > 0 && (
@@ -599,125 +581,193 @@ export function Navbar() {
                 </div>
               )}
               <div>
-                <p className="mb-2.5 text-[9px] font-black tracking-[0.25em] text-[#6E8FA6]/40 uppercase">
-                  Jelajahi
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { label: 'Beranda', href: '/', Icon: Home },
-                    { label: 'Events', href: '/events', Icon: Calendar },
-                    { label: 'Blog', href: '/blog', Icon: BookOpen },
-                    { label: 'Galeri', href: '/gallery', Icon: ImageIcon },
-                    { label: 'VTuber', href: '/vtubers', Icon: Tv2 },
-                    { label: 'Tentang', href: '/about', Icon: Info },
-                  ].map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMenuOpen(false)}
-                      className={cn(
-                        'flex items-center gap-2.5 rounded-xl border p-3 transition-colors',
-                        pathname === item.href ||
-                          (item.href !== '/' && pathname.startsWith(item.href))
-                          ? 'border-[#4FA3D1]/25 bg-[#4FA3D1]/8 text-[#4FA3D1]'
-                          : 'border-white/[0.07] text-[#6E8FA6]/70 hover:border-[#4FA3D1]/20 hover:bg-white/[0.04] hover:text-[#D9DDE3]'
-                      )}
-                    >
-                      <item.Icon className="h-4 w-4 flex-shrink-0" />
-                      <span className="text-sm font-semibold">{item.label}</span>
-                    </Link>
-                  ))}
-                </div>
+                <Link
+                  href="/"
+                  onClick={() => setMenuOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                    pathname === '/'
+                      ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
+                      : 'text-[#6E8FA6]/70 hover:bg-white/[0.04] hover:text-[#D9DDE3]'
+                  )}
+                >
+                  <Home className="h-4 w-4 flex-shrink-0" /> Beranda
+                </Link>
+                <Link
+                  href="/about"
+                  onClick={() => setMenuOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                    pathname.startsWith('/about')
+                      ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
+                      : 'text-[#6E8FA6]/70 hover:bg-white/[0.04] hover:text-[#D9DDE3]'
+                  )}
+                >
+                  <Info className="h-4 w-4 flex-shrink-0" /> Tentang
+                </Link>
               </div>
-              {user && (
-                <div>
-                  <p className="mb-2.5 text-[9px] font-black tracking-[0.25em] text-[#6E8FA6]/40 uppercase">
-                    Akun
-                  </p>
-                  <div className="space-y-1.5">
-                    {[
-                      { label: 'Profil Saya', href: '/profile/me', Icon: User },
-                      {
-                        label: 'Notifikasi',
-                        href: '/notifications',
-                        Icon: Bell,
-                        count: unreadCount,
-                      },
-                      ...(IS_ADMIN(user.role)
-                        ? [{ label: 'Admin Panel', href: '/admin', Icon: Shield }]
-                        : []),
-                    ].map((item: any) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-3 rounded-xl border border-white/[0.07] px-4 py-3 text-sm font-semibold text-[#6E8FA6]/70 transition-all hover:border-[#4FA3D1]/20 hover:bg-[#4FA3D1]/5 hover:text-[#D9DDE3]"
-                      >
-                        <item.Icon className="h-4 w-4 flex-shrink-0" />
-                        {item.label}
-                        {item.count > 0 && (
-                          <span className="ml-auto rounded-full bg-[#4FA3D1] px-1.5 py-0.5 text-[9px] font-black text-white">
-                            {item.count}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div>
-                <p className="mb-2.5 text-[9px] font-black tracking-[0.25em] text-[#6E8FA6]/40 uppercase">
+              <div className="border-t border-white/[0.06] pt-2">
+                <p className="px-3 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#6E8FA6]/40">
+                  Fitur
+                </p>
+                {[
+                  { label: 'Blog', href: '/blog', Icon: BookOpen },
+                  { label: 'Events', href: '/events', Icon: Calendar },
+                  { label: 'Galeri', href: '/gallery', Icon: ImageIcon },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                      pathname.startsWith(item.href)
+                        ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
+                        : 'text-[#6E8FA6]/70 hover:bg-white/[0.04] hover:text-[#D9DDE3]'
+                    )}
+                  >
+                    <item.Icon className="h-4 w-4 flex-shrink-0" />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="border-t border-white/[0.06] pt-2">
+                <p className="px-3 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#6E8FA6]/40">
+                  Agensi
+                </p>
+                {[
+                  { label: 'VTuber', href: '/vtubers', Icon: Tv2 },
+                  { label: 'Rekrutmen', href: '/requirements', Icon: UserPlus },
+                  { label: 'Class Online', href: '/class', Icon: BookOpen },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                      pathname.startsWith(item.href)
+                        ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
+                        : 'text-[#6E8FA6]/70 hover:bg-white/[0.04] hover:text-[#D9DDE3]'
+                    )}
+                  >
+                    <item.Icon className="h-4 w-4 flex-shrink-0" />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="border-t border-white/[0.06] pt-2">
+                <p className="px-3 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#6E8FA6]/40">
+                  Komunitas
+                </p>
+                {[
+                  { label: 'Donasi', href: '/donate', Icon: Heart },
+                  { label: 'Premium', href: '/premium', Icon: Star },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                      pathname.startsWith(item.href)
+                        ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
+                        : 'text-[#6E8FA6]/70 hover:bg-white/[0.04] hover:text-[#D9DDE3]'
+                    )}
+                  >
+                    <item.Icon className="h-4 w-4 flex-shrink-0" />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="border-t border-white/[0.06] pt-2">
+                <p className="px-3 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#6E8FA6]/40">
                   Informasi
                 </p>
-                <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { label: 'Privasi', href: '/privacy', Icon: Lock },
+                  { label: 'Ketentuan', href: '/tos', Icon: FileText },
+                  { label: 'Masukan', href: '/feedback', Icon: MessageSquare },
+                  { label: 'Lisensi', href: '/license', Icon: Shield },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                      pathname.startsWith(item.href)
+                        ? 'bg-[#4FA3D1]/10 text-[#4FA3D1]'
+                        : 'text-[#6E8FA6]/70 hover:bg-white/[0.04] hover:text-[#D9DDE3]'
+                    )}
+                  >
+                    <item.Icon className="h-4 w-4 flex-shrink-0" />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              {user && (
+                <div className="border-t border-white/[0.06] pt-2">
+                  <p className="px-3 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#6E8FA6]/40">
+                    Akun
+                  </p>
                   {[
-                    { label: 'Privasi', href: '/privacy', Icon: Lock },
-                    { label: 'Ketentuan', href: '/tos', Icon: FileText },
-                    { label: 'Masukan', href: '/feedback', Icon: MessageSquare },
-                    { label: 'Rekrutmen', href: '/requirements', Icon: UserPlus },
-                    { label: 'Donasi', href: '/donate', Icon: Bell },
-                    { label: 'Lisensi', href: '/license', Icon: Shield },
-                  ].map((item) => (
+                    { label: 'Profil Saya', href: '/profile/me', Icon: User },
+                    {
+                      label: 'Notifikasi',
+                      href: '/notifications',
+                      Icon: Bell,
+                      count: unreadCount,
+                    },
+                    ...(IS_ADMIN(user.role)
+                      ? [{ label: 'Admin Panel', href: '/admin', Icon: Shield }]
+                      : []),
+                  ].map((item: any) => (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-2 rounded-xl border border-white/[0.07] px-3 py-2.5 text-xs font-medium text-[#6E8FA6]/55 transition-colors hover:border-[#4FA3D1]/20 hover:bg-white/[0.04] hover:text-[#D9DDE3]"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6E8FA6]/70 transition-colors hover:bg-white/[0.04] hover:text-[#D9DDE3]"
                     >
-                      <item.Icon className="h-3.5 w-3.5 flex-shrink-0" />
+                      <item.Icon className="h-4 w-4 flex-shrink-0" />
                       {item.label}
+                      {item.count > 0 && (
+                        <span className="ml-auto rounded-full bg-[#4FA3D1] px-1.5 py-0.5 text-[9px] font-black text-white">
+                          {item.count}
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>
-              </div>
-              {user ? (
-                <div className="border-t border-white/[0.06] pt-1">
+              )}
+              <div className="border-t border-white/[0.06] py-3">
+                {user ? (
                   <button
                     onClick={handleSignout}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3.5 text-sm font-semibold text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2.5 text-sm font-semibold text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-400"
                   >
-                    <LogOut className="h-4 w-4 flex-shrink-0" /> Keluar
+                    <LogOut className="h-4 w-4" /> Keluar
                   </button>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2 border-t border-white/[0.06] pt-1">
-                  <Link
-                    href="/register"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold text-white"
-                    style={{ background: 'linear-gradient(135deg,#4FA3D1,#3a8fbe)' }}
-                  >
-                    <Sparkles className="h-4 w-4" /> Bergabung Gratis
-                  </Link>
-                  <Link
-                    href="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center rounded-2xl border border-white/[0.08] py-3.5 text-sm font-semibold text-[#6E8FA6]/65 transition-all hover:border-white/[0.15] hover:text-[#D9DDE3]"
-                  >
-                    Masuk
-                  </Link>
-                </div>
-              )}
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      href="/register"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold text-white"
+                      style={{ background: 'linear-gradient(135deg,#4FA3D1,#3a8fbe)' }}
+                    >
+                      <Sparkles className="h-4 w-4" /> Bergabung Gratis
+                    </Link>
+                    <Link
+                      href="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center justify-center rounded-lg border border-white/[0.08] py-2.5 text-sm font-semibold text-[#6E8FA6]/65 transition-all hover:border-white/[0.15] hover:text-[#D9DDE3]"
+                    >
+                      Masuk
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

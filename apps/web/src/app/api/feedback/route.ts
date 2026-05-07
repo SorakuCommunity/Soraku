@@ -42,18 +42,20 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        embeds: [{
-          title: `Feedback Baru: ${subject}`,
-          color: 0x4FA3D1,
-          fields: [
-            { name: 'Tipe', value: typeLabel, inline: true },
-            { name: 'Nama', value: name, inline: true },
-            { name: 'Email', value: email, inline: true },
-            { name: 'Pesan', value: message.slice(0, 1000) },
-          ],
-          timestamp: new Date().toISOString(),
-          footer: { text: 'Soraku Feedback' },
-        }],
+        embeds: [
+          {
+            title: `Feedback Baru: ${subject}`,
+            color: 0x4fa3d1,
+            fields: [
+              { name: 'Tipe', value: typeLabel, inline: true },
+              { name: 'Nama', value: name, inline: true },
+              { name: 'Email', value: email, inline: true },
+              { name: 'Pesan', value: message.slice(0, 1000) },
+            ],
+            timestamp: new Date().toISOString(),
+            footer: { text: 'Soraku Feedback' },
+          },
+        ],
       }),
     })
 

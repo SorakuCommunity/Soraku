@@ -62,22 +62,22 @@ export async function POST(req: NextRequest) {
     if (dbErr) return err(dbErr.message)
 
     // Kirim notif pendaftaran ke Discord channel
-    await sendDiscordWebhook('discord_registration_webhook_url', {
-      username: 'Soraku Community',
-      embeds: [
-        {
-          title: '🌸 Anggota Baru Mendaftar!',
-          color: 8142077,
-          fields: [
-            { name: '👤 Username', value: `@${username}`, inline: true },
-            { name: '📧 Email', value: authData.user.email ?? '-', inline: true },
-            { name: '📅 Waktu', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: false },
-          ],
-          footer: { text: 'Soraku Community • Sistem Pendaftaran' },
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    })
+     await sendDiscordWebhook('discord_registration_webhook_url', {
+       username: 'Soraku',
+       embeds: [
+         {
+           title: '🌸 Anggota Baru Mendaftar!',
+           color: 8142077,
+           fields: [
+             { name: '👤 Username', value: `@${username}`, inline: true },
+             { name: '📧 Email', value: authData.user.email ?? '-', inline: true },
+             { name: '📅 Waktu', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: false },
+           ],
+           footer: { text: 'Soraku • Sistem Pendaftaran' },
+           timestamp: new Date().toISOString(),
+         },
+       ],
+     })
     return ok(
       {
         id: authData.user.id,

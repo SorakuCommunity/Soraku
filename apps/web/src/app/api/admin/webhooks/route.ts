@@ -24,7 +24,7 @@ export async function GET() {
     }
 
     // Bersihkan kutip ganda di value (data lama)
-    const cleaned = (data ?? []).map(row => ({
+    const cleaned = (data ?? []).map((row) => ({
       ...row,
       value: row.value ? row.value.replace(/^"+|"+$/g, '').trim() : row.value,
     }))
@@ -66,7 +66,10 @@ export async function PATCH(req: NextRequest) {
     // Validate it's a discord webhook URL if value is provided
     if (value && value.trim() !== '') {
       const trimmed = value.trim()
-      if (!trimmed.includes('discord.com/api/webhooks') && !trimmed.includes('discordapp.com/api/webhooks')) {
+      if (
+        !trimmed.includes('discord.com/api/webhooks') &&
+        !trimmed.includes('discordapp.com/api/webhooks')
+      ) {
         return err('URL harus berupa Discord webhook URL yang valid')
       }
     }
@@ -147,23 +150,20 @@ export async function POST(req: NextRequest) {
     const oldKey = KEY_MAP[key]
 
     // Cari dengan key baru (camelCase) dulu, fallback ke key lama
-    let data = (await adminDb()
-      .from('sitesettings')
-      .select('value')
-      .eq('key', key)
-      .maybeSingle()).data
+    let data = (await adminDb().from('sitesettings').select('value').eq('key', key).maybeSingle())
+      .data
 
     if (!data && oldKey) {
-      data = (await adminDb()
-        .from('sitesettings')
-        .select('value')
-        .eq('key', oldKey)
-        .maybeSingle()).data
+      data = (await adminDb().from('sitesettings').select('value').eq('key', oldKey).maybeSingle())
+        .data
     }
 
     let url: string | null = null
     if (data?.value) {
-      const raw = typeof data.value === 'string' ? data.value : (data.value as any).url ?? (data.value as any).value ?? null
+      const raw =
+        typeof data.value === 'string'
+          ? data.value
+          : ((data.value as any).url ?? (data.value as any).value ?? null)
       url = raw ? raw.replace(/^"+|"+$/g, '').trim() : null
     }
 

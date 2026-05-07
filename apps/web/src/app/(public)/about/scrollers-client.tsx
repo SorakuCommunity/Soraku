@@ -54,9 +54,7 @@ interface Partner {
   website: string
 }
 
-type Props =
-  | { type: 'social'; socials: SocialData[] }
-  | { type: 'partner' }
+type Props = { type: 'social'; socials: SocialData[] } | { type: 'partner' }
 
 /* ─────────────────────────────────────────────
    SOCIAL CARD
@@ -114,8 +112,7 @@ function PartnerCard({ p }: { p: Partner }) {
         <p className="text-foreground text-sm font-bold">{p.name}</p>
         <span
           className={`mt-1 inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold capitalize ${
-            BADGE[p.category] ??
-            'bg-muted/20 text-muted-foreground border-border/40'
+            BADGE[p.category] ?? 'bg-muted/20 text-muted-foreground border-border/40'
           }`}
         >
           {p.category}

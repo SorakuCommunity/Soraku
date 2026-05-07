@@ -62,7 +62,7 @@ export const DEFAULT_PLAYLIST: Track[] = [
     artist: 'KANA-BOON',
     anime: 'Naruto Shippuden OP16',
     cover: '🍃',
-    src: '', // TODO: isi URL audio
+    src: 'https://jumpshare.com/share/x4ugZlhwOqxKa6EORZn0', // TODO: isi URL audio
   },
   {
     id: '2',

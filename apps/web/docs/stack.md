@@ -1,4 +1,4 @@
-# Soraku Community — Tech Stack
+# Soraku — Tech Stack
 
 > Dokumen ini ditulis oleh Kaizo (Back-end) untuk Tim Soraku.
 > Semua stack di bawah sudah terpasang dan terkonfigurasi di `apps/web/`.

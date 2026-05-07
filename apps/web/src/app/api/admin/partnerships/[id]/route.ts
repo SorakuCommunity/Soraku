@@ -10,8 +10,18 @@ type Params = { params: Promise<{ id: string }> }
 
 const PatchSchema = z.object({
   name: z.string().min(1).optional(),
-  logourl: z.string().url().optional().or(z.literal('')).transform(v => v || undefined),
-  website: z.string().url().optional().or(z.literal('')).transform(v => v || undefined),
+  logourl: z
+    .string()
+    .url()
+    .optional()
+    .or(z.literal(''))
+    .transform((v) => v || undefined),
+  website: z
+    .string()
+    .url()
+    .optional()
+    .or(z.literal(''))
+    .transform((v) => v || undefined),
   category: z.enum(['partner', 'sponsor']).optional(),
   description: z.string().optional(),
   isactive: z.boolean().optional(),

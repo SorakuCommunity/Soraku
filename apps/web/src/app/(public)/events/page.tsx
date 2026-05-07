@@ -17,8 +17,8 @@ import {
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Event | Soraku Community',
-  description: 'Event, gathering, dan workshop komunitas Soraku Indonesia.',
+  title: 'Event | Soraku',
+  description: 'Event, gathering, dan workshop Soraku Indonesia.',
 }
 
 const FILTERS = [

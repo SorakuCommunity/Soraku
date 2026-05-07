@@ -7,9 +7,9 @@ import { db } from '@/lib/supabase/server'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Agensi | Soraku Community',
+  title: 'Agensi | Soraku',
   description:
-    'Talent management Soraku Community. VTuber, kreator, cosplayer, dan musisi Indonesia.',
+    'Talent management Soraku. VTuber, kreator, cosplayer, dan musisi Indonesia.',
 }
 
 type VtuberRow = {
@@ -159,7 +159,7 @@ export default async function AgensiPage() {
           Agensi <span className="text-gradient">Soraku</span>
         </h1>
         <p className="text-muted-foreground mx-auto mt-4 max-w-xl">
-          Talent management Soraku Community, mendukung kreator, VTuber, cosplayer, dan musisi
+           Talent management Soraku, mendukung kreator, VTuber, cosplayer, dan musisi
           Indonesia.
         </p>
         <Link

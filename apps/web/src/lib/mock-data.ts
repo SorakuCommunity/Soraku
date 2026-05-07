@@ -68,8 +68,8 @@ export const MOCK_POSTS: BlogPost[] = [
     id: '6',
     slug: 'event-recap-animeku-jakarta-2026',
     title: 'Recap: Animeku Jakarta 2026 — Seru Banget!',
-    excerpt:
-      'Soraku Community hadir di Animeku Jakarta 2026! Lihat keseruan dan momen terbaik di sini.',
+     excerpt:
+       'Soraku hadir di Animeku Jakarta 2026! Lihat keseruan dan momen terbaik di sini.',
     cover_url: null,
     tags: ['event', 'recap', 'jakarta'],
     published_at: '2026-02-10T16:00:00Z',
@@ -203,7 +203,7 @@ export const MOCK_TALENTS: Talent[] = [
     type: 'vtuber',
     avatar_url: null,
     banner_url: null,
-    bio: 'VTuber Soraku Community! Suka anime, gaming, dan ngobrol bareng penonton.',
+     bio: 'VTuber Soraku! Suka anime, gaming, dan ngobrol bareng penonton.',
     tags: ['gaming', 'anime', 'zatsudan'],
     socials: { youtube: 'https://youtube.com/@chsoraku', twitter: 'https://twitter.com/@AppSora' },
     is_active: true,
@@ -266,7 +266,7 @@ export const MOCK_VTUBERS: VTuber[] = [
     model_type: '2D',
     avatar_url: null,
     banner_url: null,
-    bio: 'VTuber pertama Soraku Community! Gadis langit yang suka anime, gaming, dan berbagi cerita dengan penontonnya. Bergabunglah di channel untuk konten gaming dan zatsudan seru!',
+     bio: 'VTuber pertama Soraku! Gadis langit yang suka anime, gaming, dan berbagi cerita dengan penontonnya. Bergabunglah di channel untuk konten gaming dan zatsudan seru!',
     tags: ['gaming', 'anime', 'zatsudan', 'minecraft'],
     socials: {
       youtube: 'https://youtube.com/@chsoraku',

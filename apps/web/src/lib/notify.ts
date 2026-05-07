@@ -4,27 +4,39 @@
  */
 import { adminDb } from '@/lib/supabase/admin'
 
-type NotifType = 'event'|'blog'|'gallery'|'badge'|'system'|'info'|'premium'|'follow'|'ban'|'mention'
+type NotifType =
+  | 'event'
+  | 'blog'
+  | 'gallery'
+  | 'badge'
+  | 'system'
+  | 'info'
+  | 'premium'
+  | 'follow'
+  | 'ban'
+  | 'mention'
 
 interface NotifPayload {
-  userid:  string
-  type:    NotifType
-  title:   string
-  body?:   string | null
-  href?:   string | null
+  userid: string
+  type: NotifType
+  title: string
+  body?: string | null
+  href?: string | null
 }
 
 /** Kirim satu notifikasi ke satu user */
 export async function sendNotif(payload: NotifPayload) {
   try {
-    await adminDb().from('notifications').insert({
-      userid:  payload.userid,
-      type:    payload.type,
-      title:   payload.title,
-      body:    payload.body ?? null,
-      href:    payload.href ?? null,
-      isread:  false,
-    })
+    await adminDb()
+      .from('notifications')
+      .insert({
+        userid: payload.userid,
+        type: payload.type,
+        title: payload.title,
+        body: payload.body ?? null,
+        href: payload.href ?? null,
+        isread: false,
+      })
   } catch (e) {
     console.error('[notify] sendNotif error:', e)
   }
@@ -32,7 +44,7 @@ export async function sendNotif(payload: NotifPayload) {
 
 /** Broadcast ke semua user (atau filter by role) */
 export async function broadcastNotif(
-  payload: Omit<NotifPayload,'userid'>,
+  payload: Omit<NotifPayload, 'userid'>,
   options?: { role?: string; limit?: number }
 ) {
   try {
@@ -45,8 +57,12 @@ export async function broadcastNotif(
     const BATCH = 500
     for (let i = 0; i < users.length; i += BATCH) {
       const rows = users.slice(i, i + BATCH).map((u: any) => ({
-        userid: u.id, type: payload.type, title: payload.title,
-        body: payload.body ?? null, href: payload.href ?? null, isread: false,
+        userid: u.id,
+        type: payload.type,
+        title: payload.title,
+        body: payload.body ?? null,
+        href: payload.href ?? null,
+        isread: false,
       }))
       await adminDb().from('notifications').insert(rows)
     }
@@ -56,12 +72,16 @@ export async function broadcastNotif(
 }
 
 /** Notif: Blog baru published → semua follower author atau semua user */
-export async function notifyNewBlog(post: { slug: string; title: string; authorid?: string | null }) {
+export async function notifyNewBlog(post: {
+  slug: string
+  title: string
+  authorid?: string | null
+}) {
   const href = `/blog/${post.slug}`
   await broadcastNotif({
     type: 'blog',
     title: `Artikel baru: ${post.title}`,
-    body:  'Ada artikel baru yang baru saja dipublikasikan!',
+    body: 'Ada artikel baru yang baru saja dipublikasikan!',
     href,
   })
 }
@@ -71,14 +91,16 @@ export async function notifyNewEvent(event: { slug: string; title: string }) {
   await broadcastNotif({
     type: 'event',
     title: `Event baru: ${event.title}`,
-    body:  'Event komunitas baru telah dibuka. Yuk daftar!',
-    href:  `/events/${event.slug}`,
+    body: 'Event komunitas baru telah dibuka. Yuk daftar!',
+    href: `/events/${event.slug}`,
   })
 }
 
 /** Notif: Gallery approved/rejected → pemilik */
 export async function notifyGalleryStatus(opts: {
-  userid: string; imageTitle: string | null; approved: boolean
+  userid: string
+  imageTitle: string | null
+  approved: boolean
 }) {
   await sendNotif({
     userid: opts.userid,
@@ -97,10 +119,10 @@ export async function notifyGalleryStatus(opts: {
 export async function notifyFollow(opts: { targetUserId: string; followerName: string }) {
   await sendNotif({
     userid: opts.targetUserId,
-    type:   'follow' as NotifType,
-    title:  `${opts.followerName} mulai mengikutimu`,
-    body:   null,
-    href:   null,
+    type: 'follow' as NotifType,
+    title: `${opts.followerName} mulai mengikutimu`,
+    body: null,
+    href: null,
   })
 }
 
@@ -108,10 +130,12 @@ export async function notifyFollow(opts: { targetUserId: string; followerName: s
 export async function notifyBan(opts: { userid: string; banned: boolean; reason?: string }) {
   await sendNotif({
     userid: opts.userid,
-    type:   'system',
-    title:  opts.banned ? 'Akunmu telah dinonaktifkan' : 'Akun kamu telah dipulihkan',
-    body:   opts.banned ? (opts.reason ?? 'Melanggar ketentuan komunitas.') : 'Kamu kembali bisa mengakses Soraku.',
-    href:   '/help',
+    type: 'system',
+    title: opts.banned ? 'Akunmu telah dinonaktifkan' : 'Akun kamu telah dipulihkan',
+    body: opts.banned
+      ? (opts.reason ?? 'Melanggar ketentuan komunitas.')
+      : 'Kamu kembali bisa mengakses Soraku.',
+    href: '/help',
   })
 }
 
@@ -119,10 +143,10 @@ export async function notifyBan(opts: { userid: string; banned: boolean; reason?
 export async function notifyLevelUp(opts: { userid: string; newLevel: number }) {
   await sendNotif({
     userid: opts.userid,
-    type:   'badge',
-    title:  `🎉 Naik ke Level ${opts.newLevel}!`,
-    body:   'Kamu mendapatkan XP baru. Terus aktif di komunitas!',
-    href:   '/profile/me',
+    type: 'badge',
+    title: `🎉 Naik ke Level ${opts.newLevel}!`,
+    body: 'Kamu mendapatkan XP baru. Terus aktif di komunitas!',
+    href: '/profile/me',
   })
 }
 
@@ -130,10 +154,10 @@ export async function notifyLevelUp(opts: { userid: string; newLevel: number }) 
 export async function notifyNewBadge(opts: { userid: string; badgeName: string }) {
   await sendNotif({
     userid: opts.userid,
-    type:   'badge',
-    title:  `Badge baru: ${opts.badgeName} 🏅`,
-    body:   'Kamu mendapatkan penghargaan dari komunitas!',
-    href:   '/profile/me',
+    type: 'badge',
+    title: `Badge baru: ${opts.badgeName} 🏅`,
+    body: 'Kamu mendapatkan penghargaan dari komunitas!',
+    href: '/profile/me',
   })
 }
 
@@ -141,10 +165,10 @@ export async function notifyNewBadge(opts: { userid: string; badgeName: string }
 export async function notifyRoleChange(opts: { userid: string; newRole: string }) {
   await sendNotif({
     userid: opts.userid,
-    type:   'system',
-    title:  `Role kamu diperbarui: ${opts.newRole}`,
-    body:   'Status kamu di komunitas Soraku telah diperbarui.',
-    href:   '/profile/me',
+    type: 'system',
+    title: `Role kamu diperbarui: ${opts.newRole}`,
+    body: 'Status kamu di komunitas Soraku telah diperbarui.',
+    href: '/profile/me',
   })
 }
 
@@ -152,9 +176,11 @@ export async function notifyRoleChange(opts: { userid: string; newRole: string }
 export async function notifyPremiumChange(opts: { userid: string; role: string; active: boolean }) {
   await sendNotif({
     userid: opts.userid,
-    type:   'premium',
-    title:  opts.active ? `Status ${opts.role} aktif! ⭐` : `Status ${opts.role} berakhir`,
-    body:   opts.active ? 'Terima kasih atas dukunganmu untuk Soraku!' : 'Status premium kamu telah berakhir.',
-    href:   '/premium',
+    type: 'premium',
+    title: opts.active ? `Status ${opts.role} aktif! ⭐` : `Status ${opts.role} berakhir`,
+    body: opts.active
+      ? 'Terima kasih atas dukunganmu untuk Soraku!'
+      : 'Status premium kamu telah berakhir.',
+    href: '/premium',
   })
 }

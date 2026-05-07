@@ -1,4 +1,4 @@
-# 🌸 Filosofi Soraku Community
+# 🌸 Filosofi Soraku
 
 ## Makna Nama
 

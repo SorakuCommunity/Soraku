@@ -8,8 +8,17 @@ import { z } from 'zod'
 
 const PartnershipSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi'),
-  logourl: z.string().url('URL logo tidak valid').or(z.literal('')).transform(v => v || undefined),
-  website: z.string().url('URL website tidak valid').optional().or(z.literal('')).transform(v => v || undefined),
+  logourl: z
+    .string()
+    .url('URL logo tidak valid')
+    .or(z.literal(''))
+    .transform((v) => v || undefined),
+  website: z
+    .string()
+    .url('URL website tidak valid')
+    .optional()
+    .or(z.literal(''))
+    .transform((v) => v || undefined),
   category: z.enum(['partner', 'sponsor']).default('partner'),
   description: z.string().optional(),
   isactive: z.boolean().default(true),
@@ -54,11 +63,7 @@ export async function POST(req: NextRequest) {
       createdby: session.id,
     }
 
-    const { data, error } = await adminDb()
-      .from('partnerships')
-      .insert(payload)
-      .select()
-      .single()
+    const { data, error } = await adminDb().from('partnerships').insert(payload).select().single()
 
     if (error) {
       console.error('[partnerships POST]', error.message)

@@ -12,7 +12,7 @@ interface Role {
 }
 
 export const metadata: Metadata = {
-  title: 'Become a Contributor | Soraku Community',
+  title: 'Become a Contributor | Soraku',
   description:
     'Join Soraku as a Contributor - Earn extra income while contributing to the anime & pop culture community.',
 }

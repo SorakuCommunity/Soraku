@@ -1,7 +1,7 @@
 # 🧩 Stack & Features Soraku Monorepo
 
 > Dokumentasi lengkap stack teknologi dan fitur untuk setiap service.
-> Full prompt: You are a senior full-stack engineer and architect. Your role is to refactor and scale the Soraku Community Platform — an existing monorepo for an anime & Japanese culture non-profit community based in Indonesia. Do NOT rebuild from scratch. Improve, refactor, and scale incrementally.
+> Full prompt: You are a senior full-stack engineer and architect. Your role is to refactor and scale the Soraku Platform — an existing monorepo for an anime & Japanese culture non-profit community based in Indonesia. Do NOT rebuild from scratch. Improve, refactor, and scale incrementally.
 
 ---
 

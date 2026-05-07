@@ -75,10 +75,10 @@ export async function POST(req: NextRequest) {
             ...(tagsStr ? [{ name: '🏷️ Tags', value: tagsStr, inline: false }] : []),
           ],
           image: post.coverurl ? { url: post.coverurl } : undefined,
-          footer: {
-            text: 'Soraku Community · soraku.id',
-            icon_url: `${siteUrl}/logo.png`,
-          },
+             footer: {
+               text: 'Soraku · soraku.id',
+               icon_url: `${siteUrl}/logo.png`,
+             },
           timestamp: new Date().toISOString(),
         },
       ],

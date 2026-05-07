@@ -50,7 +50,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (error) return err(error.message)
     // Auto-notify uploader
     if (parsed.data.status && data?.uploadedby) {
-      notifyGalleryStatus({ userid: data.uploadedby, imageTitle: data.title, approved: parsed.data.status === 'approved' }).catch(() => {})
+      notifyGalleryStatus({
+        userid: data.uploadedby,
+        imageTitle: data.title,
+        approved: parsed.data.status === 'approved',
+      }).catch(() => {})
     }
     return ok(data)
   } catch {

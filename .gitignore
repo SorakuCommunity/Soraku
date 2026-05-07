@@ -1,3 +1,15 @@
+# Random
+.swc
+.DS_Store
+.idea
+**/*Zone.Identifier
+RUNNING.md
+STACK.md
+.github/docs
+.github/docs/**
+.devcontainer
+.devcontainer/**
+
 # Dependencies
 node_modules
 .pnpm-store

@@ -116,7 +116,7 @@ export async function startWebhookServer(client) {
       if (description) embed.setDescription(description)
       if (startAt) embed.addFields({ name: '🕐 Mulai', value: `<t:${Math.floor(new Date(startAt).getTime() / 1000)}:F>`, inline: true })
       if (eventUrl) embed.setURL(eventUrl)
-      embed.setFooter({ text: 'Soraku Community • ' + config.soraku.webUrl })
+       embed.setFooter({ text: 'Soraku • ' + config.soraku.webUrl })
 
       await channel.send({ embeds: [embed] })
       res.json({ ok: true })

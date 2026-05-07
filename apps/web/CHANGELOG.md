@@ -1,20 +1,50 @@
-# Changelog - Soraku Web (Web Komunitas)
+# Changelog - Soraku Web
 
 All notable changes to this project will be documented in this file.
 
-## [v1.6.5] - 13 April 2026
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [v1.5.2] - 26 April 2026
 
 ### Added
-
-- Cookie Consent Popup dengan opsi (Accept All / Customize / Only Necessary)
-- Simplified homepage design: Hero + Features + CTA sections
-- Fallback images untuk Blog & Event cards dari Dribbble:
-  - Blog: `https://cdn.dribbble.com/userupload/25695983/file/original-0f88b9cf84315de3c021720b318e8279.png`
-  - Event: `https://cdn.dribbble.com/userupload/10296709/file/original-0e04efb308e6970fce37f47f67bf5484.png`
-- Dummy data placeholders untuk Events dan Blogs saat database kosong
+- Updated Soraku identity from "Soraku Community" to "Soraku" reflecting professional positioning
+- New identity statement emphasizing community-driven digital platform for anime culture, learning, and creator development
+- Positioned as scalable product with future monetization potential, similar to Dicoding/RevoU/Udemy but community-first
+- **ALL FEATURES INTEGRATED**:
+  - Cookie Consent Popup dengan opsi (Accept All / Customize / Only Necessary)
+  - Simplified homepage design: Hero + Features + CTA sections
+  - Fallback images untuk Blog & Event cards dari Dribbble
+  - Dummy data placeholders untuk Events dan Blogs saat database kosong
+  - Homepage redesign dengan 10 sections (anime studio style)
+  - Navbar dengan "Konten" dropdown (Blog, VTuber, Gallery)
+  - Zustand store untuk user state personalization
+  - API endpoint `/api/home` untuk homepage data
+  - Personalization system (guest/new_user/active_user detection)
+  - Navbar user avatar dropdown (Profile, Dashboard, Settings, Logout)
+  - Updated navbar dengan Konten dropdown menu
+  - Admin Dashboard v2: New pages for Analytics, Premium, Billing, Bot Control, and Settings
+  - Analytics Page: Period selection (7/30/90 days), top pages, visitor stats
+  - Billing Page: Paddle subscription integration with Free/Pro/Premium plans
+  - Premium Page: Benefits overview and plan comparison table
+  - Bot Control Page: Status, stats, modules toggle (Music, Moderation, Auto Replies, Level System)
+  - Settings Page: Profile editing (display name, avatar), account info
+  - New Navigation Items: Analytics, Premium, Billing, Bot, Settings in admin sidebar
+  - Updated Contact Emails: contact@soraku.id (Contact Center), admin@soraku.id (Admin Center)
+  - Updated Footer to use CONTACT_EMAILS.contact
+  - Updated License, TOS, Privacy, Contact pages with new email addresses
+  - Updated SECURITY.md: Security contact updated to admin@soraku.id
 
 ### Changed
-
+- Updated all references from "Soraku Community" to "Soraku" throughout codebase:
+  - Web application (apps/web/) - layout, metadata, pages, components
+  - Discord bot (services/bot/) - package.json, config, commands, events
+  - API service (services/api/) - metadata and descriptions
+  - Documentation - LICENSE, CHANGELOG.md, stack.md, SECURITY.md
+  - Environment variables (.env.example)
+  - License file - Soraku Source License v1.0
 - Reverted ke Next.js 15.x karena turbopack build issues dengan monorepo
 - Package updates ke versi latest:
   - @hookform/resolvers: 3.10.0 → 5.2.2
@@ -28,81 +58,18 @@ All notable changes to this project will be documented in this file.
   - @supabase/ssr: 0.6.1 → 0.10.2
 - Blog & Event cards menggunakan GlassCard glassmorphism style
 - Navbar export default fixed
+- Icon imports (Instagram/Twitter/Youtube → custom-icons)
 
-### Removed
-
+### Fixed
+- Build errors in tos/page.tsx (JSX syntax)
+- Removed empty connects directory causing TypeScript issues
+- Fixed remaining "Soraku Community" references in login/page.tsx
+- Missing export default di Navbar component
+- Missing @soraku/ui package.json untuk workspace
 - Teks "Belajar, Berkarya, Bersama" dari hero section
 - Efek blur/gradasi hitam pada mascot di hero
 - Referensi ke karakteranime images (folder kosong)
-
-### Fixed
-
-- Missing export default di Navbar component
-- Missing @soraku/ui package.json untuk workspace
-- Icon imports (Instagram/Twitter/Youtube → custom-icons)
-
----
-
-## [v1.6.4] - 12 April 2026
-
-### Added
-
-- Homepage redesign dengan 10 sections (anime studio style)
-- Navbar dengan "Konten" dropdown (Blog, VTuber, Gallery)
-- Zustand store untuk user state personalization
-
----
-
-## [v1.6.3] - 11 April 2026
-
-### Added
-
-- API endpoint `/api/home` untuk homepage data
-- Personalization system (guest/new_user/active_user detection)
-
----
-
-## [v1.6.2] - 10 April 2026
-
-### Added
-
-- Navbar user avatar dropdown (Profile, Dashboard, Settings, Logout)
-- Updated navbar dengan Konten dropdown menu
-
----
-
-## [v1.6.1] - 9 April 2026
-
-### Fixed
-
-- Navbar structure dengan Blog, VTuber, Gallery grouped into "Konten" dropdown
-
----
-
-## [v1.6.0] - 7 April 2026
-
-### Added
-
-- **Admin Dashboard v2**: New pages for Analytics, Premium, Billing, Bot Control, and Settings
-- **Analytics Page** (`/admin/analytics`): Period selection (7/30/90 days), top pages, visitor stats
-- **Billing Page** (`/admin/billing`): Paddle subscription integration with Free/Pro/Premium plans
-- **Premium Page** (`/admin/premium`): Benefits overview and plan comparison table
-- **Bot Control Page** (`/admin/bot`): Status, stats, modules toggle (Music, Moderation, Auto Replies, Level System)
-- **Settings Page** (`/admin/settings`): Profile editing (display name, avatar), account info
-- **New Navigation Items**: Analytics, Premium, Billing, Bot, Settings in admin sidebar
-
-### Updated
-
-- **Contact Emails**:
-  - contact@soraku.id (Contact Center - sponsor, partner, umum)
-  - admin@soraku.id (Admin Center - OTP, teknis)
-- **Footer**: Uses `CONTACT_EMAILS.contact` instead of `CONTACT_EMAILS.general`
-- **Pages Updated**: License, TOS, Privacy, Contact pages now use new email addresses
-- **SECURITY.md**: Security contact updated to admin@soraku.id
-
-### Removed
-
-- Navigation items from admin sidebar: (old layout)
+- All builds now pass successfully
 
 ---
 

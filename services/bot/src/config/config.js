@@ -64,9 +64,9 @@ export const config = {
   },
 
   status: {
-    name:
-      process.env.STATUS_TEXT ||
-      `${process.env.PREFIX || "!"}help | Soraku Community`,
+     name:
+       process.env.STATUS_TEXT ||
+       `${process.env.PREFIX || "!"}help | Soraku`,
     status: process.env.STATUS_TYPE || "online",
     type: "CUSTOM",
   },
@@ -143,6 +143,6 @@ export const config = {
     },
   },
 
-  watermark: "Soraku Community",
+   watermark: "Soraku",
   version: "2.0.0",
 };

@@ -30,7 +30,7 @@
   --color-ring: var(--ring);
 
   /* ── Font ── */
-  --font-heading: var(--font-heading);
+  --font-heading: 'Playfair Display', var(--font-heading);
   --font-script: var(--font-script);
   --font-body: var(--font-body);
   --font-code: var(--font-code);
@@ -1050,6 +1050,24 @@ kbd {
 }
 
 @keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* 404 page */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.animate-glitch {
+  animation: glitch 0.4s infinite;
 }

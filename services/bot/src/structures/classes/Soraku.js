@@ -97,7 +97,7 @@ export class Soraku extends Client {
       await this.login(config.token);
 
       this.logger.success("Soraku", `❄️ Bot has successfully initialized. 🌸`);
-      this.logger.info("Soraku", "🌸 Soraku Community Bot");
+       this.logger.info("Soraku", "🌸 Soraku Bot");
     } catch (error) {
       this.logger.error(
         "Soraku",

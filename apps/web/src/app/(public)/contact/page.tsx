@@ -5,7 +5,7 @@ import { DiscordIcon } from '@/components/icons/custom-icons'
 
 export const metadata: Metadata = {
   title: 'Kontak | Soraku',
-  description: 'Hubungi Soraku Community. Email, lokasi, dan Discord server.',
+  description: 'Hubungi Soraku. Email, lokasi, dan Discord server.',
 }
 
 export default function ContactPage() {

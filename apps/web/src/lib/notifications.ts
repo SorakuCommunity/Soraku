@@ -13,8 +13,8 @@ export type NotifType =
   | 'system' // Pengumuman platform
   | 'info' // Info umum
   | 'premium' // Status premium berubah
-  | 'follow'  // Follow/unfollow
-  | 'ban'     // User dibanned/unbanned
+  | 'follow' // Follow/unfollow
+  | 'ban' // User dibanned/unbanned
 
 export interface Notification {
   id: string
@@ -38,6 +38,6 @@ export const NOTIF_CONFIG: Record<
   system: { emoji: '📢', bg: 'bg-accent/10', color: 'text-accent' },
   info: { emoji: 'ℹ️', bg: 'bg-muted/20', color: 'text-muted-foreground' },
   premium: { emoji: '⭐', bg: 'bg-yellow-400/10', color: 'text-yellow-300' },
-  follow:  { emoji: '👥', bg: 'bg-cyan-500/10',   color: 'text-cyan-400'   },
-  ban:     { emoji: '🚫', bg: 'bg-red-500/10',    color: 'text-red-400'    },
+  follow: { emoji: '👥', bg: 'bg-cyan-500/10', color: 'text-cyan-400' },
+  ban: { emoji: '🚫', bg: 'bg-red-500/10', color: 'text-red-400' },
 }

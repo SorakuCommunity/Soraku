@@ -11,17 +11,17 @@ export default function LicensePage() {
       <div className="text-muted-foreground/80 space-y-8 text-sm leading-relaxed">
         {/* === Soraku Source License === */}
         <section>
-          <h2 className="text-foreground mb-3 text-lg font-black">
-            Soraku Community Source License
-          </h2>
+           <h2 className="text-foreground mb-3 text-lg font-black">
+             Soraku Source License
+           </h2>
           <p className="text-muted-foreground/60 mb-4 text-xs">
-            Hak Cipta (c) 2023&ndash;2026 Soraku Community &middot; Semua hak dilindungi
+             Hak Cipta (c) 2023&ndash;2026 Soraku &middot; Semua hak dilindungi
             undang-undang.
           </p>
           <p>
             <span className="text-foreground font-medium">Pemilik dan Pemegang Hak Cipta:</span>
             <br />
-            Riu (Koordinator dan Pengembang Utama) &mdash; Soraku Community, Indonesia
+             Riu (Koordinator dan Pengembang Utama) &mdash; Soraku, Indonesia
           </p>
           <p className="mt-1">
             Kontak resmi: <span className="text-foreground font-medium">contact@soraku.id</span>{' '}
@@ -114,7 +114,7 @@ export default function LicensePage() {
           <h2 className="text-foreground mb-3 text-lg font-black">Bagian IV &mdash; Kontribusi</h2>
           <p>
             Setiap kontribusi yang dikirimkan ke repositori dianggap sebagai karya yang diserahkan
-            kepada proyek Soraku Community. Kontributor menyatakan bahwa:
+            kepada proyek Soraku. Kontributor menyatakan bahwa:
           </p>
           <ol className="mt-2 ml-2 list-inside list-decimal space-y-2">
             <li>Kontributor memiliki hak penuh atas karya yang dikontribusikan.</li>
@@ -197,7 +197,7 @@ export default function LicensePage() {
           <h2 className="text-foreground mb-3 text-lg font-black">Kode Sumber</h2>
           <p>
             Kode sumber Soraku tersedia di repositori GitHub resmi untuk transparansi dan
-            kontribusi. Penggunaan kode sumber tetap mengikuti Soraku Community Source License di
+             kontribusi. Penggunaan kode sumber tetap mengikuti Soraku Source License di
             atas.
           </p>
           <div className="mt-3 flex items-center gap-2">
@@ -216,9 +216,9 @@ export default function LicensePage() {
         </section>
 
         <div className="mt-8 border-t border-white/[0.06] pt-6">
-          <p className="text-muted-foreground/40 text-xs">
-            Soraku Community Source License v1.0 &middot; &copy; 2023&ndash;2026 Soraku Community
-          </p>
+            <p className="text-muted-foreground/40 text-xs">
+              Soraku Source License v1.0 &middot; &copy; 2023&ndash;2026 Soraku
+            </p>
         </div>
       </div>
     </div>

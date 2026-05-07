@@ -106,10 +106,10 @@ export async function PATCH(
             : `Maaf, pendaftaran tim **${reg.teamname}** untuk event **[${eventTitle}](${siteUrl}/events/${eventSlug})** tidak dapat diterima.\n\n━━━━━━━━━━━━━━━━━━━━━━`,
           color: isApproved ? 0x57f287 : 0xed4245,
           fields,
-          footer: {
-            text: `Soraku Community · ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB`,
-            icon_url: `${siteUrl}/logo.png`,
-          },
+            footer: {
+              text: `Soraku · ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB`,
+              icon_url: `${siteUrl}/logo.png`,
+            },
           timestamp: new Date().toISOString(),
           ...(reg.teamlogourl ? { thumbnail: { url: reg.teamlogourl } } : {}),
         },

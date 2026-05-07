@@ -240,7 +240,7 @@ function LoginPageInner() {
                 priority
               />
               <div className="from-background/90 via-background/40 absolute inset-x-0 bottom-0 bg-gradient-to-t to-transparent p-5 pt-10">
-                <p className="text-base font-black">Soraku Community</p>
+                 <p className="text-base font-black">Soraku</p>
                 <p className="text-muted-foreground/60 text-xs">空 · Indonesia · Est. 2023</p>
               </div>
             </div>
@@ -250,7 +250,7 @@ function LoginPageInner() {
           <p className="text-muted-foreground/70 text-sm leading-relaxed italic">
             "Komunitas yang hangat untuk semua pecinta budaya pop Jepang di Indonesia."
           </p>
-          <p className="text-muted-foreground/40 mt-2 text-xs">— Soraku Community</p>
+           <p className="text-muted-foreground/40 mt-2 text-xs">— Soraku</p>
         </div>
       </div>
 

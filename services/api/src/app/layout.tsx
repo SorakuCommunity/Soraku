@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Soraku API",
-  description: "Central REST API untuk ekosistem platform Soraku Community",
+  description: "Central REST API untuk ekosistem platform Soraku",
 }
 
 export default function ApiLayout({ children }: { children: React.ReactNode }) {

@@ -161,10 +161,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
           description: `Tim **${d.teamname}** mendaftar untuk event **[${event.title}](${siteUrl}/events/${slug})**\n\n━━━━━━━━━━━━━━━━━━━━━━`,
           color: 0x57f287, // hijau
           fields,
-          footer: {
-            text: `Soraku Community · ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB`,
-            icon_url: `${siteUrl}/logo.png`,
-          },
+            footer: {
+              text: `Soraku · ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB`,
+              icon_url: `${siteUrl}/logo.png`,
+            },
           timestamp: new Date().toISOString(),
           ...(d.teamlogourl ? { thumbnail: { url: d.teamlogourl } } : {}),
         },

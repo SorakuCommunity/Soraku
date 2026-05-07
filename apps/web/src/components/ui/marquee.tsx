@@ -33,7 +33,7 @@ export default function Marquee({
             key={i}
             className={cn(
               'flex shrink-0 justify-around',
-              vertical ? 'flex-col animate-marquee-vertical' : 'flex-row animate-marquee',
+              vertical ? 'animate-marquee-vertical flex-col' : 'animate-marquee flex-row',
               '[gap:var(--gap)]',
               pauseOnHover && 'group-hover:[animation-play-state:paused]',
               reverse && '[animation-direction:reverse]'

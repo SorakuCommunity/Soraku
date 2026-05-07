@@ -22,16 +22,18 @@ export async function GET(_req: NextRequest) {
       .limit(6)
 
     // Author info
-    const authorIds = [...new Set((posts ?? []).filter(p => p.authorid).map(p => p.authorid!))]
+    const authorIds = [...new Set((posts ?? []).filter((p) => p.authorid).map((p) => p.authorid!))]
     let authorsMap: Record<string, any> = {}
     if (authorIds.length > 0) {
       const { data: users } = await adminDb()
-        .from('users').select('id,username,displayname,avatarurl').in('id', authorIds)
-      if (users) authorsMap = Object.fromEntries(users.map(u => [u.id, u]))
+        .from('users')
+        .select('id,username,displayname,avatarurl')
+        .in('id', authorIds)
+      if (users) authorsMap = Object.fromEntries(users.map((u) => [u.id, u]))
     }
 
     // Comment counts per post
-    const postIds = (posts ?? []).map(p => p.id)
+    const postIds = (posts ?? []).map((p) => p.id)
     let commentMap: Record<string, number> = {}
     if (postIds.length > 0) {
       const { data: comments } = await adminDb()
@@ -47,9 +49,12 @@ export async function GET(_req: NextRequest) {
       }
     }
 
-    const blogs = (posts ?? []).map(p => ({
-      id: p.id, slug: p.slug, title: p.title,
-      excerpt: p.excerpt, coverurl: p.coverurl,
+    const blogs = (posts ?? []).map((p) => ({
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt,
+      coverurl: p.coverurl,
       publishedat: p.publishedat,
       viewcount: p.viewcount ?? 0,
       likecount: p.likecount ?? 0,
@@ -58,18 +63,24 @@ export async function GET(_req: NextRequest) {
       author: p.authorid ? (authorsMap[p.authorid] ?? null) : null,
     }))
 
-    const formattedEvents = (events ?? []).map(e => {
+    const formattedEvents = (events ?? []).map((e) => {
       const start = new Date(e.startdate)
-      const end   = e.enddate ? new Date(e.enddate) : null
+      const end = e.enddate ? new Date(e.enddate) : null
       let status = 'upcoming'
       if (now >= start && (!end || now <= end)) status = 'live'
       else if (end && now > end) status = 'selesai'
       else if (start > now) status = 'upcoming'
       return {
-        id: e.id, slug: e.slug, title: e.title,
-        description: e.description, coverurl: e.coverurl,
-        startdate: e.startdate, enddate: e.enddate ?? null,
-        isonline: e.isonline, tags: e.tags ?? [], status,
+        id: e.id,
+        slug: e.slug,
+        title: e.title,
+        description: e.description,
+        coverurl: e.coverurl,
+        startdate: e.startdate,
+        enddate: e.enddate ?? null,
+        isonline: e.isonline,
+        tags: e.tags ?? [],
+        status,
       }
     })
 
@@ -89,9 +100,17 @@ export async function GET(_req: NextRequest) {
       .limit(12)
 
     const allPartners = partnerships ?? []
-    const partnersOnly = allPartners.filter(p => p.category !== 'sponsor')
-    const sponsorsOnly = allPartners.filter(p => p.category === 'sponsor')
+    const partnersOnly = allPartners.filter((p) => p.category !== 'sponsor')
+    const sponsorsOnly = allPartners.filter((p) => p.category === 'sponsor')
 
-    return ok({ events: formattedEvents, blogs, gallery: galleryItems ?? [], partnerships: partnersOnly, sponsorships: sponsorsOnly })
-  } catch { return SERVER_ERROR() }
+    return ok({
+      events: formattedEvents,
+      blogs,
+      gallery: galleryItems ?? [],
+      partnerships: partnersOnly,
+      sponsorships: sponsorsOnly,
+    })
+  } catch {
+    return SERVER_ERROR()
+  }
 }

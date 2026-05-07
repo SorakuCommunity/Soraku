@@ -7,8 +7,8 @@ import { formatRupiah, formatDate } from '@/lib/utils'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Leaderboard Donatur | Soraku Community',
-  description: 'Daftar donatur terbaik yang mendukung Soraku Community.',
+  title: 'Leaderboard Donatur | Soraku',
+  description: 'Daftar donatur terbaik yang mendukung Soraku.',
 }
 
 const TIER_STYLES: Record<string, { badge: string; glow: string; text: string }> = {
@@ -54,7 +54,7 @@ export default async function TopDonaturPage() {
           Top <span className="text-gradient">Donatur</span>
         </h1>
         <p className="text-muted-foreground mx-auto mt-4 max-w-lg">
-          Terima kasih kepada para supporter setia yang membuat Soraku Community tetap hidup. 💙
+           Terima kasih kepada para supporter setia yang membuat Soraku tetap hidup. 💙
         </p>
       </div>
 

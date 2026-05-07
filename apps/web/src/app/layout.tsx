@@ -1,33 +1,63 @@
 import type { Metadata, Viewport } from 'next'
 import { Providers } from '@/components/providers'
 import { TikTokPixel } from '@/components/analytics/TikTokPixel'
+import Script from 'next/script'
 import '@/styles/globals.css'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.soraku.id'
 
 export const metadata: Metadata = {
-  title: { default: 'Soraku Community', template: '%s | Soraku Community' },
+  title: { default: 'Soraku', template: '%s | Soraku' },
   description: 'Komunitas anime & budaya Jepang non-profit pop Indonesia. Est. 2023.',
   metadataBase: new URL(APP_URL),
   openGraph: {
     type: 'website',
     locale: 'id_ID',
     url: APP_URL,
-    siteName: 'Soraku Community',
-    title: 'Soraku Community',
+    siteName: 'Soraku',
+    title: 'Soraku',
     description: 'Komunitas anime & budaya Jepang non-profit pop Indonesia.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Soraku Community' }],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Soraku' }],
   },
   twitter: {
     card: 'summary_large_image',
     site: '@AppSoraa',
     creator: '@AppSoraa',
-    title: 'Soraku Community',
+    title: 'Soraku',
     description: 'Komunitas anime & budaya Jepang non-profit pop Indonesia.',
   },
-  keywords: ['soraku', 'anime', 'komunitas', 'indonesia', 'budaya jepang', 'vtuber'],
-  authors: [{ name: 'Soraku Community', url: APP_URL }],
+  keywords: [
+    'soraku',
+    'anime',
+    'komunitas',
+    'indonesia',
+    'budaya jepang',
+    'vtuber',
+    'belajar',
+    'berkembang',
+    'jepang',
+    'indonesia',
+    'indonesian',
+    'indonesian anime',
+    'indonesian pop',
+    'indonesian culture',
+    'indonesian vtuber',
+    'indonesian anime community',
+    'indonesian pop culture',
+    'indonesian vtuber community',
+  ],
+  authors: [{ name: 'Soraku', url: APP_URL }],
   robots: { index: true, follow: true },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+    other: {
+      rel: 'apple-touch-icon',
+      sizes: '180x180',
+      url: '/apple-touch-icon.png'
+    }
+  }
 }
 
 export const viewport: Viewport = {
@@ -42,6 +72,20 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" suppressHydrationWarning data-scroll-behavior="smooth">
+      <head>
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5TB7WK9M8"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-Y5TB7WK9M8');
+            `,
+          }}
+        />
+      </head>
       <body className="bg-background font-body min-h-screen antialiased">
         <Providers>{children}</Providers>
         <TikTokPixel />

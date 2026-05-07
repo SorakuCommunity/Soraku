@@ -50,28 +50,29 @@ export default async function VTuberDetailPage({ params }: Props) {
 
       <div className="glass-card overflow-hidden">
         {/* Cover */}
-        {vt.coverurl && (
-          <div className="relative h-48 w-full sm:h-64">
-            <Image src={vt.coverurl} alt={vt.name} fill sizes="100vw" className="object-cover" />
-            <div className="from-card/90 absolute inset-0 bg-gradient-to-t to-transparent" />
-          </div>
-        )}
+{vt.coverurl && (
+  <div className="relative h-48 w-full sm:h-64">
+    <Image src={vt.coverurl} alt={vt.name} width={1200} height={400} className="object-cover" />
+    <div className="from-card/90 absolute inset-0 bg-gradient-to-t to-transparent" />
+  </div>
+)}
 
         <div className="p-6 sm:p-8">
           <div className="flex items-start gap-6">
             {/* Avatar */}
-            {vt.avatarurl && (
-              <div
-                className={`border-primary/30 relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl border-2 ${vt.coverurl ? '-mt-14' : ''}`}
-              >
-                <Image
-                  src={vt.avatarurl}
-                  alt={vt.charactername ?? vt.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )}
+{vt.avatarurl && (
+  <div
+    className={`border-primary/30 relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl border-2 ${vt.coverurl ? '-mt-14' : ''}`}
+  >
+    <Image
+      src={vt.avatarurl}
+      alt={vt.charactername ?? vt.name}
+      width={24}
+      height={24}
+      className="object-cover"
+    />
+  </div>
+)}
             <div className="min-w-0 flex-1">
               <h1 className="text-2xl font-black tracking-tight">{vt.charactername ?? vt.name}</h1>
               {vt.charactername && <p className="text-muted-foreground text-sm">CV: {vt.name}</p>}

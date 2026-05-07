@@ -1,5 +1,5 @@
 /**
- * env.ts — Soraku Community
+ * env.ts — Soraku
  * Type-safe environment variable management via T3 Env + Zod.
  *
  * Import: import { env } from '@/env'

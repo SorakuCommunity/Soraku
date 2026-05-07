@@ -8,19 +8,19 @@ export default class LinkCommand extends Command {
   constructor() {
     super({
       name: 'link', aliases: ['daftar', 'register'], category: 'Soraku',
-      description: 'Hubungkan akun Discord kamu ke Soraku Community',
+       description: 'Hubungkan akun Discord kamu ke Soraku',
       usage: 'link', cooldown: 5,
       enabledSlash: true,
-      slashData: { name: 'link', description: 'Hubungkan akun Discord ke Soraku Community 🔗' },
+       slashData: { name: 'link', description: 'Hubungkan akun Discord ke Soraku 🔗' },
     })
   }
 
   _buildEmbed(client) {
     return new EmbedBuilder()
       .setColor('#7c3aed')
-      .setTitle('🌸 Bergabung dengan Soraku Community')
+       .setTitle('🌸 Bergabung dengan Soraku')
       .setDescription(
-        `Hubungkan akun Discord kamu dengan **Soraku Community**:\n\n` +
+         `Hubungkan akun Discord kamu dengan **Soraku**:\n\n` +
         `💜 **Profile** — tampil di website\n` +
         `🎨 **Galeri** — upload & share karya\n` +
         `📖 **Blog & Event** — ikuti kegiatan komunitas\n` +
@@ -29,7 +29,7 @@ export default class LinkCommand extends Command {
       )
       .setThumbnail(client.user.displayAvatarURL())
       .addFields({ name: '🌐 Website', value: `[${WEB.replace('https://', '')}](${WEB})`, inline: true })
-      .setFooter({ text: 'Soraku Community' })
+       .setFooter({ text: 'Soraku' })
       .setTimestamp()
   }
 

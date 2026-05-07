@@ -7,8 +7,8 @@ import { db } from '@/lib/supabase/server'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'VTubers | Soraku Community',
-  description: 'Virtual YouTuber dari Soraku Community Indonesia.',
+  title: 'VTubers | Soraku',
+  description: 'Virtual YouTuber dari Soraku Indonesia.',
 }
 
 export default async function VTuberPage() {
@@ -31,8 +31,8 @@ export default async function VTuberPage() {
           Virtual <span className="text-gradient">YouTuber</span>
         </h1>
         <p className="text-muted-foreground mx-auto mt-4 max-w-lg">
-          Kenalan dengan VTuber dari Soraku Community, kreator virtual yang menghibur dan
-          menginspirasi.
+           Kenalan dengan VTuber dari Soraku, kreator virtual yang menghibur dan
+           menginspirasi.
         </p>
       </div>
 
