@@ -9,17 +9,8 @@ import {
   Award,
   ArrowRight,
   Loader2,
+  Sparkles,
 } from 'lucide-react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  Badge,
-  Button,
-  cn,
-} from '@soraku/ui'
 
 interface ClassItem {
   id: string
@@ -151,98 +142,91 @@ export default function ClassOnlinePage() {
   }
 
   return (
-    <div className="flex-1 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Kelas Online</h2>
-          <p className="text-muted-foreground mt-1">
-            Belajar dari instruktur terbaik, kapan pun dan di mana pun.
-          </p>
-        </div>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <div className="mb-8 text-center">
+        <span className="mb-4 inline-flex items-center gap-2 rounded-md border-2 border-black bg-primary px-3 py-1.5 text-[10px] font-bold text-white shadow-[2px_2px_0px_#000]">
+          <Sparkles className="h-3 w-3" />
+          Kelas Online
+        </span>
+        <h1 className="mt-4 text-3xl font-black tracking-tighter text-foreground sm:text-5xl">
+          Belajar dari <span className="text-primary">Instruktur Terbaik</span>
+        </h1>
+        <p className="mx-auto mt-4 max-w-lg text-sm text-muted">
+          Belajar dari instruktur terbaik, kapan pun dan di mana pun.
+        </p>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-blue-500/5 border-blue-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-500">Total Kelas</CardTitle>
-            <BookOpen className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{classes.length}</div>
-            <p className="text-xs text-muted-foreground">Kelas tersedia</p>
-          </CardContent>
-        </Card>
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-md border-2 border-black bg-surface p-5 shadow-[3px_3px_0px_#000]">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Total Kelas</p>
+            <BookOpen className="h-4 w-4 text-primary" />
+          </div>
+          <p className="mt-2 text-3xl font-black text-foreground">{classes.length}</p>
+          <p className="text-xs text-muted">Kelas tersedia</p>
+        </div>
 
-        <Card className="bg-green-500/5 border-green-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-500">Siswa Terdaftar</CardTitle>
-            <Users className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{classes.reduce((s, c) => s + c.students, 0).toLocaleString('id-ID')}</div>
-            <p className="text-xs text-muted-foreground">Seluruh siswa</p>
-          </CardContent>
-        </Card>
+        <div className="rounded-md border-2 border-black bg-surface p-5 shadow-[3px_3px_0px_#000]">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Siswa Terdaftar</p>
+            <Users className="h-4 w-4 text-emerald-400" />
+          </div>
+          <p className="mt-2 text-3xl font-black text-foreground">{classes.reduce((s, c) => s + c.students, 0).toLocaleString('id-ID')}</p>
+          <p className="text-xs text-muted">Seluruh siswa</p>
+        </div>
 
-        <Card className="bg-amber-500/5 border-amber-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-amber-500">Kelas Live</CardTitle>
+        <div className="rounded-md border-2 border-black bg-surface p-5 shadow-[3px_3px_0px_#000]">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Kelas Live</p>
             <div className="relative">
-              <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse absolute -top-1 -right-1" />
-              <Clock className="h-4 w-4 text-amber-500" />
+              <span className="absolute -top-1 -right-1 h-2 w-2 animate-pulse rounded-full bg-red-500" />
+              <Clock className="h-4 w-4 text-amber-400" />
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{classes.filter((c) => c.isLive).length}</div>
-            <p className="text-xs text-muted-foreground">Sedang berlangsung</p>
-          </CardContent>
-        </Card>
+          </div>
+          <p className="mt-2 text-3xl font-black text-foreground">{classes.filter((c) => c.isLive).length}</p>
+          <p className="text-xs text-muted">Sedang berlangsung</p>
+        </div>
 
-        <Card className="bg-purple-500/5 border-purple-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-500">Level Tertinggi</CardTitle>
-            <Award className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Lanjutan</div>
-            <p className="text-xs text-muted-foreground">3 kelas tersedia</p>
-          </CardContent>
-        </Card>
+        <div className="rounded-md border-2 border-black bg-surface p-5 shadow-[3px_3px_0px_#000]">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Level Tertinggi</p>
+            <Award className="h-4 w-4 text-purple-400" />
+          </div>
+          <p className="mt-2 text-3xl font-black text-foreground">Lanjutan</p>
+          <p className="text-xs text-muted">3 kelas tersedia</p>
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground mr-2">Kategori:</span>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <span className="mr-2 text-[10px] font-bold text-muted uppercase tracking-wider">Kategori:</span>
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
             onClick={() => setCategory(cat)}
-            className={cn(
-              'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+            className={`rounded-md border-2 border-black px-3 py-1.5 text-[10px] font-bold transition-all ${
               category === cat
-                ? 'bg-primary text-white shadow-sm'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            )}
+                ? 'bg-primary text-white shadow-[2px_2px_0px_#000]'
+                : 'bg-surface text-foreground hover:bg-muted/20 shadow-[2px_2px_0px_#000]'
+            }`}
           >
             {cat}
           </button>
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground mr-2">Level:</span>
+      <div className="mb-8 flex flex-wrap items-center gap-2">
+        <span className="mr-2 text-[10px] font-bold text-muted uppercase tracking-wider">Level:</span>
         {LEVELS.map((lvl) => (
           <button
             key={lvl}
             onClick={() => setLevel(lvl)}
-            className={cn(
-              'rounded-full px-3 py-1.5 text-xs font-medium transition-all',
+            className={`rounded-md border-2 border-black px-3 py-1.5 text-[10px] font-bold transition-all ${
               level === lvl
-                ? 'bg-primary text-white shadow-sm'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            )}
+                ? 'bg-primary text-white shadow-[2px_2px_0px_#000]'
+                : 'bg-surface text-foreground hover:bg-muted/20 shadow-[2px_2px_0px_#000]'
+            }`}
           >
             {lvl}
           </button>
@@ -253,100 +237,87 @@ export default function ClassOnlinePage() {
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-40 w-full bg-muted rounded-lg mb-4" />
-                <div className="h-4 w-3/4 bg-muted rounded mb-2" />
-                <div className="h-3 w-1/2 bg-muted rounded" />
-              </CardHeader>
-            </Card>
+            <div key={i} className="animate-pulse rounded-md border-2 border-black bg-surface p-4 shadow-[3px_3px_0px_#000]">
+              <div className="mb-4 h-40 w-full rounded-sm bg-muted/30" />
+              <div className="mb-2 h-4 w-3/4 rounded bg-muted/30" />
+              <div className="h-3 w-1/2 rounded bg-muted/30" />
+            </div>
           ))}
         </div>
       ) : filteredClasses.length === 0 ? (
-        <div className="text-center py-16">
-          <BookOpen className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-medium text-muted-foreground">Tidak ada kelas</h3>
-          <p className="text-sm text-muted-foreground/70">Coba ubah filter kategori atau level di atas.</p>
+        <div className="py-16 text-center">
+          <BookOpen className="mx-auto mb-4 h-12 w-12 text-muted" />
+          <h3 className="text-sm font-bold text-muted">Tidak ada kelas</h3>
+          <p className="text-xs text-muted">Coba ubah filter kategori atau level di atas.</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredClasses.map((kelas) => (
-            <Card
+            <div
               key={kelas.id}
-              className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              className="group overflow-hidden rounded-md border-2 border-black bg-surface shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000]"
             >
-              <div className="relative h-40 overflow-hidden">
+              <div className="relative h-40 overflow-hidden bg-gradient-to-br from-primary/20 to-violet-500/15">
                 <img
                   src={kelas.image}
                   alt={kelas.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="h-full w-full object-cover opacity-60 transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface/80 to-transparent" />
                 <div className="absolute top-3 left-3">
-                  <Badge
-                    variant={kelas.isLive ? 'destructive' : 'secondary'}
-                    className="text-[10px]"
-                  >
+                  <span className={`rounded-sm border-2 border-black px-2 py-0.5 text-[9px] font-bold shadow-[1px_1px_0px_#000] ${
+                    kelas.isLive ? 'bg-red-600 text-white' : 'bg-surface text-foreground'
+                  }`}>
                     {kelas.isLive ? '🔴 LIVE' : 'Akademik'}
-                  </Badge>
+                  </span>
                 </div>
                 <div className="absolute top-3 right-3">
-                  <Badge variant="outline" className="bg-black/50 border-black/50 text-white text-[10px]">
+                  <span className="rounded-sm border-2 border-black bg-black px-2 py-0.5 text-[9px] font-bold text-white shadow-[1px_1px_0px_#000]">
                     {kelas.level}
-                  </Badge>
+                  </span>
                 </div>
               </div>
-              <CardHeader>
-                <CardTitle className="line-clamp-2 text-base">{kelas.title}</CardTitle>
-                <CardDescription className="line-clamp-2">{kelas.description}</CardDescription>
-                <div className="mt-3 flex items-center gap-2">
-                  <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">
-                    {kelas.students.toLocaleString('id-ID')} siswa
-                  </span>
-                  <span className="text-muted-foreground/40">•</span>
-                  <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">{kelas.duration}</span>
+              <div className="p-4">
+                <h3 className="line-clamp-2 text-sm font-bold text-foreground">{kelas.title}</h3>
+                <p className="mt-1 line-clamp-2 text-[10px] text-muted">{kelas.description}</p>
+                <div className="mt-3 flex items-center gap-2 text-[10px] text-muted">
+                  <Users className="h-3 w-3" />
+                  <span>{kelas.students.toLocaleString('id-ID')} siswa</span>
+                  <span className="text-muted/40">•</span>
+                  <Clock className="h-3 w-3" />
+                  <span>{kelas.duration}</span>
                 </div>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">📅 Mulai: {formatDate(kelas.startsAt)}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="group-hover:border-primary/50 transition-all"
-                    asChild
+                <div className="mt-3 flex items-center justify-between border-t-2 border-black pt-3">
+                  <span className="text-[9px] text-muted">📅 Mulai: {formatDate(kelas.startsAt)}</span>
+                  <Link
+                    href={`/class/${kelas.id}`}
+                    className="inline-flex items-center gap-1 rounded-sm border-2 border-black bg-surface px-2.5 py-1 text-[10px] font-bold text-foreground shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_#000]"
                   >
-                    <Link href={`/class/${kelas.id}`}>
-                      Detail
-                      <ArrowRight className="ml-1.5 h-3 w-3" />
-                    </Link>
-                  </Button>
+                    Detail <ArrowRight className="h-3 w-3" />
+                  </Link>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}
 
       {/* CTA */}
       {!loading && filteredClasses.length > 0 && (
-        <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20">
-          <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6">
+        <div className="mt-8 rounded-md border-2 border-black bg-gradient-to-br from-primary/10 to-surface p-6 shadow-[4px_4px_0px_#000] sm:p-8">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div>
-              <CardTitle className="text-lg">Mau Jadi Instruktur?</CardTitle>
-              <CardDescription className="mt-1">
-                Bagikan pengetahuanmu ke komunitas Soraku. Daftarkan kelasmu sekarang!
-              </CardDescription>
+              <h3 className="text-lg font-black text-foreground">Mau Jadi Instruktur?</h3>
+              <p className="mt-1 text-sm text-muted">Bagikan pengetahuanmu ke komunitas Soraku.</p>
             </div>
-            <Button asChild>
-              <Link href="/contact">
-                Daftar Kelas <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-md border-2 border-black bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-[3px_3px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_#000]"
+            >
+              Daftar Kelas <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
       )}
     </div>
   )

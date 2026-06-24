@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { ChevronDown } from 'lucide-react'
 
 interface Role {
   id: string
@@ -21,32 +21,35 @@ export default function RequirementsForm({ communityRoles }: Props) {
   const [selectedRole, setSelectedRole] = useState<string | null>(null)
 
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-[#1C1E22]/50 p-6">
+    <div className="rounded-md border-2 border-black bg-surface p-6 shadow-[3px_3px_0px_#000]">
       <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-lg">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-black bg-primary/20 text-lg">
           💬
         </div>
         <div>
-          <h3 className="font-semibold text-[#D9DDE3]">Community Manager</h3>
-          <p className="text-xs text-[#6E8FA6]">Kelola Discord server Soraku</p>
+          <h3 className="font-bold text-foreground">Community Manager</h3>
+          <p className="text-xs text-muted">Kelola Discord server Soraku</p>
         </div>
       </div>
 
-      <select
-        value={selectedRole || ''}
-        onChange={(e) => setSelectedRole(e.target.value || null)}
-        className="w-full rounded-lg border border-white/[0.06] bg-white/5 px-3 py-2 text-sm text-[#D9DDE3] outline-none focus:border-[#4FA3D1]/30"
-      >
-        <option value="">Pilih peran yang dilamar</option>
-        {communityRoles.map((role) => (
-          <option key={role.id} value={role.role}>
-            {role.role}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          value={selectedRole || ''}
+          onChange={(e) => setSelectedRole(e.target.value || null)}
+          className="w-full appearance-none rounded-md border-2 border-black bg-surface px-3 py-2.5 pr-8 text-sm font-bold text-foreground focus:border-primary focus:outline-none"
+        >
+          <option value="">Pilih peran yang dilamar</option>
+          {communityRoles.map((role) => (
+            <option key={role.id} value={role.role}>
+              {role.role}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted" />
+      </div>
 
       {selectedRole && (
-        <div className="mt-4 border-t border-white/[0.06] pt-4">
+        <div className="mt-4 border-t-2 border-black pt-4">
           {(() => {
             const role = communityRoles.find((r) => r.role === selectedRole)
             if (!role) return null
@@ -56,29 +59,25 @@ export default function RequirementsForm({ communityRoles }: Props) {
                 <div className="mb-4 flex items-center gap-3">
                   <span className="text-2xl">{role.icon}</span>
                   <div>
-                    <h4 className="font-medium text-[#D9DDE3]">{role.role}</h4>
-                    <p className="text-xs text-[#6E8FA6]">{role.desc}</p>
+                    <h4 className="font-bold text-foreground">{role.role}</h4>
+                    <p className="text-xs text-muted">{role.desc}</p>
                   </div>
                 </div>
 
                 <div className="mb-4">
-                  <p className="mb-2 text-xs font-medium text-[#6E8FA6]">Tugas utama:</p>
+                  <p className="mb-2 text-xs font-bold text-muted">Tugas utama:</p>
                   <ul className="space-y-1">
                     {role.tasks.map((task, j) => (
-                      <li key={j} className="text-xs text-[#D9DDE3]/70">
-                        • {task}
-                      </li>
+                      <li key={j} className="text-xs text-muted">• {task}</li>
                     ))}
                   </ul>
                 </div>
 
                 <div>
-                  <p className="mb-2 text-xs font-medium text-[#6E8FA6]">Kualifikasi:</p>
+                  <p className="mb-2 text-xs font-bold text-muted">Kualifikasi:</p>
                   <ul className="space-y-1">
                     {role.qualifications.map((qual, k) => (
-                      <li key={k} className="text-xs text-[#D9DDE3]/70">
-                        • {qual}
-                      </li>
+                      <li key={k} className="text-xs text-muted">• {qual}</li>
                     ))}
                   </ul>
                 </div>

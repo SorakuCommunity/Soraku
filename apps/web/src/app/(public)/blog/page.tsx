@@ -1,29 +1,36 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { BookOpen, Eye, Heart, Clock, Search, X } from 'lucide-react'
+import { BookOpen, Eye, Heart, Clock, Sparkles } from 'lucide-react'
 import { db } from '@/lib/supabase/server'
 import { formatRelativeTime } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
+const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.soraku.id'
+
 export const metadata: Metadata = {
   title: 'Blog | Soraku',
   description: 'Artikel, review, dan ulasan anime & budaya Jepang dari Soraku.',
+  alternates: { canonical: `${BASE}/blog` },
+  openGraph: {
+    title: 'Blog | Soraku',
+    description: 'Artikel, review, dan ulasan anime & budaya Jepang dari Soraku.',
+    url: `${BASE}/blog`,
+    siteName: 'Soraku',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Soraku Blog' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Blog | Soraku',
+    description: 'Artikel, review, dan ulasan anime & budaya Jepang dari Soraku.',
+    images: ['/og.png'],
+  },
 }
 
 const ALL_TAGS = [
-  'Semua',
-  'anime',
-  'manga',
-  'cosplay',
-  'review',
-  'list',
-  'panduan',
-  'event',
-  'musik',
-  'vtuber',
-  'gaming',
+  'Semua', 'anime', 'manga', 'cosplay', 'review',
+  'list', 'panduan', 'event', 'musik', 'vtuber', 'gaming',
 ]
 
 type PostItem = {
@@ -52,80 +59,44 @@ function PostCard({ post, featured }: { post: PostItem; featured?: boolean }) {
     return (
       <Link
         href={`/blog/${post.slug}`}
-        className="group glass-card border-border/50 hover:border-primary/30 col-span-3 flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 sm:col-span-4 sm:flex-row lg:col-span-3"
+        className="group col-span-3 flex flex-col overflow-hidden rounded-md border-2 border-black bg-surface shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000] sm:col-span-4 sm:flex-row lg:col-span-3"
       >
-        {/* Cover */}
-        <div className="from-primary/20 via-accent/10 relative h-48 flex-shrink-0 overflow-hidden bg-gradient-to-br to-violet-500/15 sm:h-auto sm:w-72 lg:w-96">
+        <div className="relative h-48 flex-shrink-0 overflow-hidden bg-gradient-to-br from-primary/20 to-violet-500/15 sm:h-auto sm:w-72 lg:w-96">
           {post.coverurl ? (
             <Image
               src={post.coverurl}
               alt={post.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-              unoptimized
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes="400px"
             />
-          ) : (
-            <div className="flex h-full items-center justify-center">
-              <span className="text-primary/6 text-7xl font-black select-none">空</span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-transparent" />
-          <div className="bg-primary absolute top-3 left-3 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-black text-white shadow-md">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> Featured
-          </div>
+          ) : null}
         </div>
-        {/* Content */}
-        <div className="flex flex-1 flex-col p-5 sm:p-6">
-          <div className="mb-3 flex flex-wrap gap-1.5">
-            {post.tags.slice(0, 3).map((t: string) => (
-              <span
-                key={t}
-                className="border-primary/25 bg-primary/10 text-primary/80 rounded-full border px-2.5 py-0.5 text-[10px] font-bold capitalize"
-              >
+        <div className="flex flex-1 flex-col justify-center p-5">
+          <div className="flex flex-wrap gap-2">
+            {post.tags?.slice(0, 2).map((t) => (
+              <span key={t} className="rounded-sm border border-black/30 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
                 {t}
               </span>
             ))}
           </div>
-          <h2 className="group-hover:text-primary line-clamp-3 text-xl leading-snug font-black transition-colors sm:text-2xl">
+          <h2 className="mt-3 text-lg font-black leading-tight text-foreground group-hover:text-primary">
             {post.title}
           </h2>
-          {post.excerpt && (
-            <p className="text-muted-foreground/70 mt-2 line-clamp-2 flex-1 text-sm leading-relaxed">
-              {post.excerpt}
-            </p>
-          )}
-          <div className="border-border/30 mt-4 flex items-center justify-between border-t pt-3">
-            <div className="flex items-center gap-2">
-              {author?.avatarurl ? (
-                <Image
-                  src={author.avatarurl}
-                  alt={name}
-                  width={24}
-                  height={24}
-                  className="rounded-full"
-                  unoptimized
-                />
-              ) : (
-                <div className="bg-primary/20 text-primary flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black">
-                  {name.charAt(0).toUpperCase()}
-                </div>
-              )}
-              <span className="text-muted-foreground/60 text-xs">{name}</span>
-            </div>
-            <div className="text-muted-foreground/40 flex items-center gap-3 text-[11px]">
-              <span className="flex items-center gap-1">
-                <Eye className="h-3 w-3" />
-                {post.viewcount ?? 0}
-              </span>
-              <span className="flex items-center gap-1">
-                <Heart className="h-3 w-3" />
-                {post.likecount ?? 0}
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {readingTime(post.excerpt)} min
-              </span>
-            </div>
+          <p className="mt-2 line-clamp-2 text-sm text-muted">{post.excerpt}</p>
+          <div className="mt-4 flex items-center gap-4 text-[10px] text-muted">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {formatRelativeTime(post.publishedat)}
+            </span>
+            <span className="flex items-center gap-1">
+              <BookOpen className="h-3 w-3" />
+              {readingTime(post.excerpt)} min read
+            </span>
+            <span className="flex items-center gap-1">
+              <Eye className="h-3 w-3" />
+              {post.viewcount}
+            </span>
           </div>
         </div>
       </Link>
@@ -135,194 +106,81 @@ function PostCard({ post, featured }: { post: PostItem; featured?: boolean }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group glass-card border-border/50 hover:border-primary/30 flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1"
+      className="group flex flex-col overflow-hidden rounded-md border-2 border-black bg-surface shadow-[3px_3px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_#000]"
     >
-      {/* Cover */}
-      <div className="from-primary/15 via-accent/8 relative aspect-video w-full overflow-hidden bg-gradient-to-br to-violet-500/10">
+      <div className="relative h-40 overflow-hidden bg-gradient-to-br from-primary/20 to-violet-500/15">
         {post.coverurl ? (
           <Image
             src={post.coverurl}
             alt={post.title}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            unoptimized
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="400px"
           />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <BookOpen className="text-primary/20 h-8 w-8" />
-          </div>
-        )}
-        <div className="from-background/40 absolute inset-0 bg-gradient-to-t to-transparent" />
+        ) : null}
       </div>
-      {/* Content */}
-      <div className="flex flex-1 flex-col p-3.5">
-        <h3 className="group-hover:text-primary line-clamp-2 flex-1 text-sm leading-snug font-bold transition-colors">
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex flex-wrap gap-1">
+          {post.tags?.slice(0, 2).map((t) => (
+            <span key={t} className="rounded-sm border border-black/30 bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary">
+              {t}
+            </span>
+          ))}
+        </div>
+        <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-tight text-foreground group-hover:text-primary">
           {post.title}
         </h3>
-        {post.excerpt && (
-          <p className="text-muted-foreground/60 mt-1.5 line-clamp-2 text-xs leading-relaxed">
-            {post.excerpt}
-          </p>
-        )}
-        {/* Author row */}
-        <div className="mt-2.5 flex items-center gap-1.5">
-          {author?.avatarurl ? (
-            <Image
-              src={author.avatarurl}
-              alt={name}
-              width={16}
-              height={16}
-              className="flex-shrink-0 rounded-full"
-              unoptimized
-            />
-          ) : (
-            <div className="bg-primary/20 text-primary flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-[8px] font-black">
-              {name.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <span className="text-muted-foreground/50 truncate text-[10px]">{name}</span>
-          <span className="text-muted-foreground/30 ml-auto text-[10px]">
-            {formatRelativeTime(post.publishedat)}
-          </span>
+        <p className="mt-1 line-clamp-2 text-[10px] text-muted">{post.excerpt}</p>
+        <div className="mt-auto flex items-center gap-3 pt-3 text-[9px] text-muted">
+          <span className="flex items-center gap-1"><Clock className="h-2.5 w-2.5" />{formatRelativeTime(post.publishedat)}</span>
+          <span className="flex items-center gap-1"><Eye className="h-2.5 w-2.5" />{post.viewcount}</span>
         </div>
-        {/* Stats */}
-        <div className="border-border/20 text-muted-foreground/35 mt-2 flex items-center gap-2.5 border-t pt-2 text-[10px]">
-          <span className="flex items-center gap-1">
-            <Eye className="h-2.5 w-2.5" />
-            {post.viewcount ?? 0}
-          </span>
-          <span className="flex items-center gap-1">
-            <Heart className="h-2.5 w-2.5" />
-            {post.likecount ?? 0}
-          </span>
-          <span className="ml-auto flex items-center gap-1">
-            <Clock className="h-2.5 w-2.5" />
-            {readingTime(post.excerpt)} min
-          </span>
-        </div>
-        {/* Hashtags di bawah */}
-        {post.tags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1">
-            {post.tags.slice(0, 3).map((t: string) => (
-              <span
-                key={t}
-                className="bg-muted/30 text-muted-foreground/50 rounded-full px-1.5 py-0.5 text-[9px] capitalize"
-              >
-                #{t}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
     </Link>
   )
 }
 
-export default async function BlogPage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ tag?: string; q?: string }>
-}) {
-  const params = await searchParams
-  const activeTag = params?.tag ?? 'Semua'
-  const searchQ = params?.q ?? ''
-  const query = (await db())
-    .from('posts')
-    .select('id,slug,title,excerpt,tags,publishedat,coverurl,viewcount,likecount,authorid')
+export default async function BlogPage() {
+  const { data: posts } = await (await db())
+    .from('blog')
+    .select('id,slug,title,excerpt,coverurl,tags,publishedat,viewcount,likecount,author:profiles!userid(username,displayname,avatarurl)')
     .eq('ispublished', true)
     .order('publishedat', { ascending: false })
+    .limit(50)
 
-  let filteredQuery = activeTag === 'Semua' ? query : query.contains('tags', [activeTag])
-  if (searchQ) filteredQuery = filteredQuery.ilike('title', `%${searchQ}%`)
-  const { data: rawPosts } = await filteredQuery
-
-  // Fetch authors
-  const authorIds = [...new Set((rawPosts ?? []).filter((p) => p.authorid).map((p) => p.authorid!))]
-  let authorsMap: Record<string, any> = {}
-  if (authorIds.length > 0) {
-    const { data: users } = await (await db())
-      .from('users')
-      .select('id,username,displayname,avatarurl')
-      .in('id', authorIds)
-    authorsMap = Object.fromEntries((users ?? []).map((u) => [u.id, u]))
-  }
-
-  const posts: PostItem[] = (rawPosts ?? []).map((p) => ({
-    ...p,
-    viewcount: p.viewcount ?? 0,
-    likecount: p.likecount ?? 0,
-    author: p.authorid ? (authorsMap[p.authorid] ?? null) : null,
-  }))
-
-  const [featured, ...rest] = posts
+  const items = (posts ?? []) as unknown as PostItem[]
+  const featured = items[0]
+  const rest = items.slice(1)
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-8">
-        <p className="text-primary/70 mb-2 text-xs font-bold tracking-widest uppercase">
-          Komunitas
-        </p>
-        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-          Blog <span className="text-gradient">Soraku</span>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <div className="mb-8 text-center">
+        <span className="mb-4 inline-flex items-center gap-2 rounded-md border-2 border-black bg-primary px-3 py-1.5 text-[10px] font-bold text-white shadow-[2px_2px_0px_#000]">
+          <Sparkles className="h-3 w-3" />
+          Blog
+        </span>
+        <h1 className="mt-4 text-3xl font-black tracking-tighter text-foreground sm:text-5xl">
+          Artikel & <span className="text-primary">Review</span>
         </h1>
-        <p className="text-muted-foreground mt-2 max-w-xl text-sm">
-          Artikel, review anime, tips cosplay, dan cerita dari komunitas Soraku Indonesia.
+        <p className="mx-auto mt-4 max-w-lg text-sm text-muted">
+          Artikel, review, dan ulasan anime & budaya Jepang dari Soraku.
         </p>
       </div>
 
-      {/* Search bar */}
-      <div className="relative mb-4 max-w-sm">
-        <Search className="text-muted-foreground/40 absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-        <form action="/blog" method="GET">
-          {activeTag !== 'Semua' && <input type="hidden" name="tag" value={activeTag} />}
-          <input
-            name="q"
-            defaultValue={searchQ}
-            placeholder="Cari artikel..."
-            className="border-border/50 bg-card/30 placeholder:text-muted-foreground/30 focus:border-primary/40 focus:ring-primary/10 w-full rounded-xl border py-2 pr-4 pl-9 text-sm transition-all outline-none focus:ring-2"
-          />
-        </form>
-        {searchQ && (
-          <a
-            href={activeTag !== 'Semua' ? `/blog?tag=${activeTag}` : '/blog'}
-            className="text-muted-foreground/40 hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
-          >
-            <X className="h-3.5 w-3.5" />
-          </a>
-        )}
-      </div>
+      {featured && <PostCard post={featured} featured />}
 
-      {/* Tag filters */}
-      <div className="mb-8 flex flex-wrap gap-1.5">
-        {ALL_TAGS.map((tag) => (
-          <Link
-            key={tag}
-            href={tag === 'Semua' ? '/blog' : `/blog?tag=${tag}`}
-            className={`rounded-full px-3 py-1 text-xs font-semibold capitalize transition-all ${
-              activeTag === tag
-                ? 'bg-primary shadow-primary/20 text-white shadow-md'
-                : 'border-border/50 text-muted-foreground/70 hover:border-primary/40 hover:text-foreground border'
-            }`}
-          >
-            {tag === 'Semua' ? '✨ Semua' : `#${tag}`}
-          </Link>
-        ))}
-      </div>
-
-      {posts.length === 0 ? (
-        <div className="py-20 text-center">
-          <p className="mb-3 text-4xl">🔍</p>
-          <p className="text-muted-foreground">Belum ada artikel dengan tag ini.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-6">
-          {/* Featured — span 3 cols mobile, full width */}
-          {featured && <PostCard post={featured} featured />}
-          {/* Regular grid — 3 col mobile, 3 col on sm, 6 col on lg (3 per row = 2 articles) */}
+      {rest.length > 0 && (
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
+        </div>
+      )}
+
+      {items.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20">
+          <BookOpen className="mb-4 h-16 w-16 text-muted" />
+          <p className="text-sm text-muted">Belum ada artikel.</p>
         </div>
       )}
     </div>

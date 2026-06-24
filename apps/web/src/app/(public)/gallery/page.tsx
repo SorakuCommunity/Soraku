@@ -3,18 +3,14 @@ export const dynamic = 'force-dynamic'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import {
   Upload,
   Search,
   X,
   ZoomIn,
   ImageIcon,
-  Filter,
   ChevronLeft,
   ChevronRight,
-  Heart,
-  Eye,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -79,7 +75,7 @@ function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-4"
       onClick={onClose}
     >
       <button
@@ -88,7 +84,7 @@ function Lightbox({
           onPrev()
         }}
         className={cn(
-          'absolute left-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/50 text-white/70 transition-all hover:bg-white/15 hover:text-white',
+          'absolute left-4 flex h-10 w-10 items-center justify-center border-2 border-white/20 bg-black text-white/70 transition-all hover:bg-primary hover:text-white',
           idx <= 0 && 'pointer-events-none opacity-30'
         )}
       >
@@ -100,7 +96,7 @@ function Lightbox({
           onNext()
         }}
         className={cn(
-          'absolute right-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/50 text-white/70 transition-all hover:bg-white/15 hover:text-white',
+          'absolute right-4 flex h-10 w-10 items-center justify-center border-2 border-white/20 bg-black text-white/70 transition-all hover:bg-primary hover:text-white',
           idx >= items.length - 1 && 'pointer-events-none opacity-30'
         )}
       >
@@ -108,7 +104,7 @@ function Lightbox({
       </button>
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/50 text-white/70 transition-all hover:bg-white/15 hover:text-white"
+        className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center border-2 border-white/20 bg-black text-white/70 transition-all hover:bg-primary hover:text-white"
       >
         <X className="h-4 w-4" />
       </button>
@@ -118,20 +114,19 @@ function Lightbox({
         onClick={(e) => e.stopPropagation()}
       >
         {item.imageurl ? (
-          <div className="relative max-h-[72vh] overflow-hidden rounded-2xl">
+          <div className="relative max-h-[72vh] overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.imageurl}
               alt={item.title ?? ''}
-              className="max-h-[72vh] max-w-full rounded-2xl object-contain"
+              className="max-h-[72vh] max-w-full object-contain"
             />
           </div>
         ) : (
           <div
             className={cn(
-              'h-64 w-80 rounded-2xl bg-gradient-to-br',
+              'flex h-64 w-80 items-center justify-center bg-gradient-to-br',
               PLACEHOLDER_COLORS[0],
-              'flex items-center justify-center'
             )}
           >
             <ImageIcon className="h-12 w-12 text-white/20" />
@@ -151,7 +146,7 @@ function Lightbox({
               {(item.tags ?? []).map((t) => (
                 <span
                   key={t}
-                  className="rounded-full border border-white/12 bg-white/8 px-2.5 py-0.5 text-[10px] font-semibold text-white/50 capitalize"
+                  className="border-2 border-white/20 bg-black px-2.5 py-0.5 text-[10px] font-semibold text-white/50 capitalize"
                 >
                   {t}
                 </span>
@@ -242,11 +237,11 @@ function UploadModal({ onClose }: { onClose: () => void }) {
   if (success)
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-md"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-4"
         onClick={onClose}
       >
         <div
-          className="border-border/60 bg-card/95 relative w-full max-w-sm rounded-3xl border p-8 text-center"
+          className="w-full max-w-sm border-2 border-border bg-card p-8 text-center"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="mb-4 text-5xl">🌸</div>
@@ -256,7 +251,7 @@ function UploadModal({ onClose }: { onClose: () => void }) {
           </p>
           <button
             onClick={onClose}
-            className="bg-primary hover:bg-primary/90 w-full rounded-2xl py-3 text-sm font-bold text-white transition-colors"
+            className="w-full border-2 border-primary bg-primary py-3 text-sm font-bold text-white transition-all hover:bg-primary/90 hover:shadow-[4px_4px_0px_0px_#000000]"
           >
             Oke, Tutup
           </button>
@@ -266,24 +261,24 @@ function UploadModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-md sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/90 sm:items-center"
       onClick={onClose}
     >
       <div
-        className="border-border/60 bg-card/98 relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border backdrop-blur-xl sm:rounded-3xl"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto border-2 border-border bg-card sm:rounded-md"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle bar mobile */}
         <div className="flex justify-center pt-3 pb-1 sm:hidden">
-          <div className="bg-border/60 h-1 w-10 rounded-full" />
+          <div className="h-1 w-10 rounded-full bg-border" />
         </div>
 
         {/* Header */}
-        <div className="border-border/40 flex items-center justify-between border-b px-6 py-4">
+        <div className="flex items-center justify-between border-b-2 border-border px-6 py-4">
           <h3 className="text-base font-black">Upload Karya</h3>
           <button
             onClick={onClose}
-            className="border-border/40 text-muted-foreground hover:text-foreground hover:border-primary/30 flex h-8 w-8 items-center justify-center rounded-lg border transition-colors"
+            className="flex h-8 w-8 items-center justify-center border-2 border-border text-muted-foreground transition-all hover:border-primary hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -305,12 +300,12 @@ function UploadModal({ onClose }: { onClose: () => void }) {
             }}
             onClick={() => fileRef.current?.click()}
             className={cn(
-              'relative cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed transition-all',
+              'relative cursor-pointer overflow-hidden border-2 border-dashed transition-all',
               drag
-                ? 'border-primary/60 bg-primary/8'
+                ? 'border-primary bg-primary/8'
                 : preview
-                  ? 'border-emerald-500/30 bg-emerald-500/5'
-                  : 'border-border/40 bg-muted/8 hover:border-primary/30 hover:bg-primary/5'
+                  ? 'border-emerald-500 bg-emerald-500/5'
+                  : 'border-border bg-muted hover:border-primary hover:bg-primary/5'
             )}
           >
             <input
@@ -334,21 +329,21 @@ function UploadModal({ onClose }: { onClose: () => void }) {
                     setFile(null)
                     setPreview(null)
                   }}
-                  className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-lg bg-black/70 text-white/80 transition-colors hover:bg-black/90"
+                  className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center border-2 border-white/20 bg-black text-white/80 transition-colors hover:bg-primary"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
-                <div className="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2 py-1 text-[10px] font-semibold text-white/80">
+                <div className="absolute bottom-2 left-2 bg-black px-2 py-1 text-[10px] font-semibold text-white/80">
                   {file?.name} · {((file?.size ?? 0) / 1024 / 1024).toFixed(1)}MB
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center gap-2 py-10">
-                <Upload className="text-muted-foreground/30 h-8 w-8" />
-                <p className="text-muted-foreground/60 text-sm font-semibold">
+                <Upload className="h-8 w-8 text-muted-foreground/30" />
+                <p className="text-sm font-semibold text-muted-foreground/60">
                   Klik atau drag & drop gambar
                 </p>
-                <p className="text-muted-foreground/35 text-xs">JPG, PNG, WebP, GIF · Maks 8MB</p>
+                <p className="text-xs text-muted-foreground/35">JPG, PNG, WebP, GIF · Maks 8MB</p>
               </div>
             )}
           </div>
@@ -356,7 +351,7 @@ function UploadModal({ onClose }: { onClose: () => void }) {
           {/* Fields */}
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <label className="text-foreground/40 text-[10px] font-black tracking-widest uppercase">
+              <label className="text-[10px] font-black tracking-widest uppercase text-foreground/40">
                 Judul <span className="text-red-400">*</span>
               </label>
               <input
@@ -364,12 +359,12 @@ function UploadModal({ onClose }: { onClose: () => void }) {
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={100}
                 placeholder="Judul karya kamu"
-                className="border-border/50 placeholder:text-foreground/20 focus:border-primary/50 focus:ring-primary/10 w-full rounded-xl border bg-black/20 px-4 py-3 text-sm transition-all outline-none focus:ring-2"
+                className="w-full border-2 border-border bg-black/20 px-4 py-3 text-sm text-foreground placeholder:text-foreground/20 transition-all outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-foreground/40 text-[10px] font-black tracking-widest uppercase">
+              <label className="text-[10px] font-black tracking-widest uppercase text-foreground/40">
                 Kategori
               </label>
               <div className="flex flex-wrap gap-2">
@@ -379,10 +374,10 @@ function UploadModal({ onClose }: { onClose: () => void }) {
                     type="button"
                     onClick={() => setCategory(category === f.slug ? '' : f.slug)}
                     className={cn(
-                      'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all',
+                      'flex items-center gap-1.5 border-2 px-3 py-1.5 text-xs font-semibold transition-all',
                       category === f.slug
-                        ? 'border-primary/40 bg-primary/12 text-primary'
-                        : 'border-border/40 text-muted-foreground/60 hover:border-primary/25 hover:text-foreground'
+                        ? 'border-primary bg-primary/12 text-primary'
+                        : 'border-border text-muted-foreground/60 hover:border-primary hover:text-foreground'
                     )}
                   >
                     {f.emoji} {f.label}
@@ -392,7 +387,7 @@ function UploadModal({ onClose }: { onClose: () => void }) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-foreground/40 text-[10px] font-black tracking-widest uppercase">
+              <label className="text-[10px] font-black tracking-widest uppercase text-foreground/40">
                 Deskripsi
               </label>
               <textarea
@@ -401,25 +396,25 @@ function UploadModal({ onClose }: { onClose: () => void }) {
                 rows={2}
                 maxLength={300}
                 placeholder="Cerita di balik karya ini (opsional)"
-                className="border-border/50 placeholder:text-foreground/20 focus:border-primary/50 focus:ring-primary/10 w-full resize-none rounded-xl border bg-black/20 px-4 py-3 text-sm transition-all outline-none focus:ring-2"
+                className="w-full resize-none border-2 border-border bg-black/20 px-4 py-3 text-sm text-foreground placeholder:text-foreground/20 transition-all outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
               />
             </div>
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 rounded-xl border border-red-500/25 bg-red-500/8 px-4 py-3 text-sm text-red-400">
+            <div className="flex items-center gap-2 border-2 border-red-500/25 bg-red-500/8 px-4 py-3 text-sm text-red-400">
               <X className="h-4 w-4 flex-shrink-0" /> {error}
             </div>
           )}
 
-          <p className="text-muted-foreground/35 text-center text-[11px]">
+          <p className="text-center text-[11px] text-muted-foreground/35">
             Karya akan ditinjau admin sebelum tampil di galeri publik
           </p>
 
           <button
             onClick={handleSubmit}
             disabled={loading || !file || !title.trim()}
-            className="bg-primary shadow-primary/20 hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold text-white shadow-lg transition-all disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex w-full items-center justify-center gap-2 border-2 border-primary bg-primary py-3.5 text-sm font-bold text-white transition-all hover:bg-primary/90 hover:shadow-[4px_4px_0px_0px_#000000] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:shadow-none"
           >
             {loading ? (
               <>
@@ -492,13 +487,13 @@ export default function GalleryPage() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       {/* ── Header ── */}
       <div className="mb-8">
-        <p className="text-primary/40 mb-2 text-[9px] font-black tracking-[0.25em] uppercase">
+        <p className="mb-2 text-[9px] font-black tracking-[0.25em] uppercase text-primary/40">
           Komunitas
         </p>
         <h1 className="mb-1 text-3xl font-black tracking-tight sm:text-4xl">
           Galeri <span className="text-gradient">Karya</span>
         </h1>
-        <p className="text-muted-foreground/55 text-sm">
+        <p className="text-sm text-muted-foreground/55">
           Fanart, cosplay, dan karya kreatif dari anggota Soraku.
         </p>
       </div>
@@ -507,18 +502,18 @@ export default function GalleryPage() {
       <div className="mb-5 flex items-center gap-2.5">
         {/* Search */}
         <div className="relative max-w-sm flex-1">
-          <Search className="text-muted-foreground/35 pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2" />
+          <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-muted-foreground/35" />
           <input
             type="text"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Cari karya..."
-            className="border-border/50 bg-card/30 placeholder:text-muted-foreground/30 focus:border-primary/50 focus:ring-primary/10 w-full rounded-2xl border py-2.5 pr-4 pl-10 text-sm transition-all outline-none focus:ring-2"
+            className="w-full border-2 border-border bg-card py-2.5 pr-4 pl-10 text-sm text-foreground placeholder:text-muted-foreground/30 transition-all outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
           />
           {search && (
             <button
               onClick={() => handleSearch('')}
-              className="text-muted-foreground/40 hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+              className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground/40 transition-colors hover:text-foreground"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -528,7 +523,7 @@ export default function GalleryPage() {
         {/* Upload button — sejajar search */}
         <button
           onClick={() => setShowUpload(true)}
-          className="bg-primary shadow-primary/20 hover:shadow-primary/30 flex flex-shrink-0 items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5"
+          className="flex flex-shrink-0 items-center gap-2 border-2 border-primary bg-primary px-4 py-2.5 text-sm font-bold text-white transition-all hover:shadow-[4px_4px_0px_0px_#000000]"
         >
           <Upload className="h-4 w-4" />
           <span className="hidden sm:inline">Upload</span>
@@ -542,16 +537,16 @@ export default function GalleryPage() {
             key={f.slug}
             onClick={() => handleFilter(f.slug)}
             className={cn(
-              'flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all',
+              'flex items-center gap-1.5 border-2 px-3.5 py-1.5 text-xs font-semibold transition-all',
               activeFilter === f.slug
-                ? 'bg-primary shadow-primary/20 text-white shadow-md'
-                : 'border-border/50 text-muted-foreground/60 hover:border-primary/35 hover:text-foreground border hover:-translate-y-0.5'
+                ? 'border-primary bg-primary text-white shadow-[4px_4px_0px_0px_#000000]'
+                : 'border-border text-muted-foreground/60 hover:border-primary hover:text-foreground'
             )}
           >
             {f.emoji} {f.label}
           </button>
         ))}
-        <span className="text-muted-foreground/35 ml-auto flex items-center text-xs">
+        <span className="ml-auto flex items-center text-xs text-muted-foreground/35">
           {loading ? '...' : `${total.toLocaleString('id-ID')} karya`}
         </span>
       </div>
@@ -562,7 +557,7 @@ export default function GalleryPage() {
           {Array.from({ length: 12 }).map((_, i) => (
             <div
               key={i}
-              className="bg-muted/12 mb-3 animate-pulse break-inside-avoid rounded-2xl"
+              className="mb-3 animate-pulse break-inside-avoid border-2 border-border bg-muted"
               style={{ height: `${[180, 140, 160, 200, 150, 175][i % 6]}px` }}
             />
           ))}
@@ -570,12 +565,12 @@ export default function GalleryPage() {
       ) : items.length === 0 ? (
         <div className="py-20 text-center">
           <p className="mb-3 text-4xl">🖼️</p>
-          <p className="text-muted-foreground/50 text-sm">
+          <p className="text-sm text-muted-foreground/50">
             Belum ada karya {search ? `untuk "${search}"` : `di kategori ini`}.
           </p>
           <button
             onClick={() => setShowUpload(true)}
-            className="text-primary mt-5 inline-flex items-center gap-2 text-sm hover:underline"
+            className="mt-5 inline-flex items-center gap-2 text-sm text-primary hover:underline"
           >
             Upload karya pertama <Upload className="h-3.5 w-3.5" />
           </button>
@@ -585,7 +580,7 @@ export default function GalleryPage() {
           {items.map((item, idx) => (
             <div
               key={item.id}
-              className="group border-border/30 bg-card/20 hover:border-primary/30 mb-3 cursor-pointer break-inside-avoid overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/20"
+              className="group mb-3 cursor-pointer break-inside-avoid overflow-hidden border-2 border-border bg-card transition-all duration-300 hover:border-primary hover:shadow-[4px_4px_0px_0px_#000000]"
               onClick={() => setLightbox(item)}
             >
               {item.imageurl ? (
@@ -608,15 +603,15 @@ export default function GalleryPage() {
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     sizes="(max-width:640px)50vw,(max-width:1024px)33vw,25vw"
                   />
-                  {/* Hover overlay — seamless fade */}
-                  <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/50 to-transparent pb-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/60 to-transparent pb-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-white/80">
                       <ZoomIn className="h-3.5 w-3.5" /> Lihat
                     </div>
                   </div>
                   {/* Tag badge */}
                   {(item.tags ?? []).length > 0 && (
-                    <span className="absolute top-2 left-2 rounded-full border border-white/12 bg-black/40 px-2 py-0.5 text-[9px] font-semibold text-white/65 capitalize backdrop-blur-sm">
+                    <span className="absolute top-2 left-2 border-2 border-white/20 bg-black px-2 py-0.5 text-[9px] font-semibold capitalize text-white/65">
                       {(item.tags ?? [])[0]}
                     </span>
                   )}
@@ -639,7 +634,7 @@ export default function GalleryPage() {
                 </div>
               )}
               <div className="px-3 py-2.5">
-                <p className="text-foreground/80 truncate text-xs font-semibold">
+                <p className="truncate text-xs font-semibold text-foreground/80">
                   {item.title ?? 'Karya'}
                 </p>
               </div>
@@ -654,17 +649,17 @@ export default function GalleryPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/35 flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm transition-all disabled:pointer-events-none disabled:opacity-30"
+            className="flex items-center gap-1.5 border-2 border-border px-4 py-2 text-sm text-muted-foreground transition-all hover:border-primary hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
           >
             <ChevronLeft className="h-3.5 w-3.5" /> Sebelumnya
           </button>
-          <span className="text-muted-foreground/40 text-sm">
+          <span className="text-sm text-muted-foreground/40">
             {page} / {Math.ceil(total / 24)}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={page >= Math.ceil(total / 24)}
-            className="border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/35 flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm transition-all disabled:pointer-events-none disabled:opacity-30"
+            className="flex items-center gap-1.5 border-2 border-border px-4 py-2 text-sm text-muted-foreground transition-all hover:border-primary hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
           >
             Berikutnya <ChevronRight className="h-3.5 w-3.5" />
           </button>

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { db } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Play } from 'lucide-react'
 import { YouTubeIcon, XIcon } from '@/components/icons/custom-icons'
 
 export const dynamic = 'force-dynamic'
@@ -40,49 +40,45 @@ export default async function VTuberDetailPage({ params }: Props) {
   const socials = (vt.sociallinks ?? {}) as Record<string, string>
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       <Link
         href="/vtubers"
-        className="text-muted-foreground hover:text-foreground mb-8 inline-flex items-center gap-2 text-sm transition-colors"
+        className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> Kembali ke VTubers
       </Link>
 
-      <div className="glass-card overflow-hidden">
-        {/* Cover */}
-{vt.coverurl && (
-  <div className="relative h-48 w-full sm:h-64">
-    <Image src={vt.coverurl} alt={vt.name} width={1200} height={400} className="object-cover" />
-    <div className="from-card/90 absolute inset-0 bg-gradient-to-t to-transparent" />
-  </div>
-)}
+      <div className="overflow-hidden rounded-md border-2 border-black bg-surface shadow-[4px_4px_0px_#000]">
+        {vt.coverurl && (
+          <div className="relative h-48 w-full sm:h-64">
+            <Image src={vt.coverurl} alt={vt.name} fill className="object-cover" sizes="900px" />
+            <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent" />
+          </div>
+        )}
 
         <div className="p-6 sm:p-8">
           <div className="flex items-start gap-6">
-            {/* Avatar */}
-{vt.avatarurl && (
-  <div
-    className={`border-primary/30 relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl border-2 ${vt.coverurl ? '-mt-14' : ''}`}
-  >
-    <Image
-      src={vt.avatarurl}
-      alt={vt.charactername ?? vt.name}
-      width={24}
-      height={24}
-      className="object-cover"
-    />
-  </div>
-)}
+            {vt.avatarurl && (
+              <div className={`relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border-2 border-black bg-surface shadow-[2px_2px_0px_#000] ${vt.coverurl ? '-mt-14' : ''}`}>
+                <Image
+                  src={vt.avatarurl}
+                  alt={vt.charactername ?? vt.name}
+                  fill
+                  className="object-cover"
+                  sizes="96px"
+                />
+              </div>
+            )}
             <div className="min-w-0 flex-1">
-              <h1 className="text-2xl font-black tracking-tight">{vt.charactername ?? vt.name}</h1>
-              {vt.charactername && <p className="text-muted-foreground text-sm">CV: {vt.name}</p>}
+              <h1 className="text-2xl font-black tracking-tighter text-foreground">
+                {vt.charactername ?? vt.name}
+              </h1>
+              {vt.charactername && <p className="text-sm text-muted">CV: {vt.name}</p>}
               {vt.debutdate && (
-                <p className="text-muted-foreground/60 mt-1 text-xs">
-                  Debut: {formatDate(vt.debutdate)}
-                </p>
+                <p className="mt-1 text-xs text-muted">Debut: {formatDate(vt.debutdate)}</p>
               )}
               {vt.subscribercount && (
-                <p className="text-primary/80 mt-1 text-xs">
+                <p className="mt-1 text-xs font-bold text-primary">
                   {vt.subscribercount.toLocaleString('id-ID')} subscriber
                 </p>
               )}
@@ -90,33 +86,30 @@ export default async function VTuberDetailPage({ params }: Props) {
           </div>
 
           {vt.description && (
-            <p className="text-muted-foreground mt-6 text-sm leading-relaxed">{vt.description}</p>
+            <p className="mt-6 text-sm leading-relaxed text-muted">{vt.description}</p>
           )}
 
-          {/* Tags */}
           {vt.tags?.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
               {vt.tags.map((t: string) => (
-                <span key={t} className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs">
+                <span key={t} className="rounded-sm border border-black/30 bg-primary/10 px-2 py-1 text-[10px] font-bold text-primary">
                   {t}
                 </span>
               ))}
             </div>
           )}
 
-          {/* Live badge */}
           {vt.islive && vt.liveurl && (
             <a
               href={vt.liveurl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-red-500/15 px-4 py-2.5 text-sm font-bold text-red-400 transition-colors hover:bg-red-500/25"
+              className="mt-6 inline-flex items-center gap-2 rounded-md border-2 border-black bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-[3px_3px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_#000]"
             >
-              🔴 Sedang Live | Tonton Sekarang
+              <Play className="h-4 w-4 fill-white" /> Sedang Live — Tonton Sekarang
             </a>
           )}
 
-          {/* Social links */}
           {Object.keys(socials).length > 0 && (
             <div className="mt-6 flex items-center gap-3">
               {socials.youtube && (
@@ -124,7 +117,7 @@ export default async function VTuberDetailPage({ params }: Props) {
                   href={socials.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border-border bg-card/50 text-muted-foreground flex h-10 w-10 items-center justify-center rounded-xl border transition-colors hover:border-red-500/40 hover:text-red-400"
+                  className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-black bg-surface text-muted shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:text-red-500 hover:shadow-[1px_1px_0px_#000]"
                 >
                   <YouTubeIcon className="h-4 w-4" />
                 </a>
@@ -134,7 +127,7 @@ export default async function VTuberDetailPage({ params }: Props) {
                   href={socials.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border-border bg-card/50 text-muted-foreground hover:border-primary/40 hover:text-primary flex h-10 w-10 items-center justify-center rounded-xl border transition-colors"
+                  className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-black bg-surface text-muted shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:text-sky-400 hover:shadow-[1px_1px_0px_#000]"
                 >
                   <XIcon className="h-4 w-4" />
                 </a>

@@ -391,7 +391,6 @@ function HeroSection({ discord, isLoggedIn }: { discord: ReturnType<typeof useDi
         <div className="geo-circle absolute bottom-20 right-1/4 h-24 w-24 opacity-20" />
         <div className="absolute top-60 right-20 h-16 w-16 border-2 border-primary/10 rounded" style={{ transform: 'rotate(30deg)' }} />
       </div>
-      <div className="geo-pattern pointer-events-none absolute inset-0 opacity-30" />
 
       {/* Mobile */}
       <div className="relative flex min-h-[90svh] flex-col justify-center px-6 pt-20 pb-16 lg:hidden">

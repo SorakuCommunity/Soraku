@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     'soraku', 'anime', 'komunitas', 'indonesia', 'budaya jepang',
     'vtuber', 'belajar', 'berkembang', 'jepang',
     'indonesian anime', 'indonesian pop', 'indonesian culture',
-    'indonesian vtuber', 'indonesian anime community',
+    'indonesian vtuber',     'indonesian anime community',
   ],
   authors: [{ name: 'Soraku', url: APP_URL }],
   robots: { index: true, follow: true },

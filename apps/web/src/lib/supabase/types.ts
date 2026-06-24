@@ -145,6 +145,31 @@ export interface UserSession {
   issupporter: boolean
 }
 
+export type ForumCategory = 'general' | 'anime' | 'vtuber' | 'creative' | 'tech'
+
+export interface DbForumThread {
+  id: string
+  title: string
+  content: string | null
+  category: ForumCategory
+  authorid: string | null
+  ispinned: boolean
+  islocked: boolean
+  replycount: number
+  viewcount: number
+  lastactivity: string
+  createdat: string
+  updatedat: string
+}
+
+export interface DbForumReply {
+  id: string
+  threadid: string
+  authorid: string | null
+  content: string
+  createdat: string
+}
+
 export type NotifType = 'info' | 'success' | 'warning' | 'system'
 
 export interface DbNotification {

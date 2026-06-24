@@ -60,9 +60,7 @@ type NavItem =
 const NAV_ITEMS: NavItem[] = [
   { type: 'link', label: 'Home', href: '/', Icon: Home },
   { type: 'link', label: 'Community', href: '/community', Icon: Users },
-  { type: 'link', label: 'Showcase', href: '/showcase', Icon: Layers },
   { type: 'link', label: 'Events', href: '/events', Icon: Calendar },
-  { type: 'link', label: 'Leaderboard', href: '/leaderboard', Icon: Trophy },
   { type: 'link', label: 'About', href: '/about', Icon: Info },
   {
     type: 'group',
@@ -70,6 +68,8 @@ const NAV_ITEMS: NavItem[] = [
       label: 'More',
       Icon: Menu,
       children: [
+        { label: 'Showcase', href: '/showcase', Icon: Layers, desc: 'Community projects & works' },
+        { label: 'Leaderboard', href: '/leaderboard', Icon: Trophy, desc: 'Top contributors ranking' },
         { label: 'Blog', href: '/blog', Icon: BookOpen, desc: 'Articles & community reviews' },
         { label: 'Gallery', href: '/gallery', Icon: ImageIcon, desc: 'Fanart & member works' },
         { label: 'VTubers', href: '/vtubers', Icon: Tv2, desc: 'Community virtual creators' },
@@ -96,7 +96,7 @@ const NAV_ITEMS: NavItem[] = [
 const BOTTOM_NAV = [
   { label: 'Home', href: '/', Icon: Home },
   { label: 'Community', href: '/community', Icon: Users },
-  { label: 'Showcase', href: '/showcase', Icon: Layers },
+  { label: 'More', href: '#', Icon: Menu, more: true },
   { label: 'Events', href: '/events', Icon: Calendar },
   { label: 'Profile', href: '/profile/me', Icon: User, auth: true },
 ]
@@ -440,6 +440,18 @@ export function Navbar() {
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t-2 border-white/[0.06] bg-[#0B1120]/98 backdrop-blur-2xl lg:hidden">
         <div className="mx-auto flex max-w-lg items-center justify-around py-1">
           {BOTTOM_NAV.map((item) => {
+            if (item.more) {
+              return (
+                <button
+                  key="more"
+                  onClick={() => setMenuOpen(true)}
+                  className="flex flex-col items-center gap-0.5 px-4 py-1.5 text-muted-foreground/60 transition-colors"
+                >
+                  <item.Icon className="h-5 w-5" />
+                  <span className="text-[10px] font-semibold">{item.label}</span>
+                </button>
+              )
+            }
             if (item.auth && !user && item.href === '/profile/me') {
               return (
                 <Link

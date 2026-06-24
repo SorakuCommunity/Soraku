@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.7.0] - 24 Juni 2026
+
+### Added
+- AI Blog Generator (`/admin/blog/ai-generate`) — admin-only tool with 11 content generation modes (Article, SEO Title, SEO Desc, Excerpt, Tags, Slug, FAQ, Cover Prompt, Rewrite, Expand, Summarize)
+  - OpenAI-compatible API integration via `AI_API_KEY`/`AI_API_URL` env vars
+  - Output preview with per-field copy and "Save as Draft" to existing blog pipeline
+  - Sidebar link under Konten > AI Generator
+- Forum Community (`/community`) — real database-backed discussion board
+  - `forum_threads` and `forum_replies` tables (Drizzle schema + auto-migration + types)
+  - 10 seeded discussions across 5 categories (general, anime, vtuber, creative, tech)
+  - `GET /api/forum/threads` with category filter, pagination, pinned-first ordering
+  - `GET /api/forum/stats` for thread/reply counts
+  - Category filter tabs, pinned thread section, loading/error/empty states
+  - Note: "Thread Baru" & reply functionality deferred to future release
+- Complete SEO system
+  - `robots.txt` — allow public routes, block admin/api/draft/auth paths
+  - Enhanced `sitemap.xml` — +10 blog categories, +7 static pages (community, search, contact, etc.)
+  - `/blog/category/[slug]` — dynamic category pages filtering posts by tag
+  - `/search` — search page with URL query param support
+  - JSON-LD structured data (Article + BreadcrumbList schemas) on blog detail pages
+  - Canonical URLs, OpenGraph, Twitter cards on blog listing & detail
+  - `noindex,nofollow` on all admin routes via admin layout metadata
+
+### Changed
+- Version bumped to 1.7.0
+- Community page converted from static mock data to real API-backed forum
+
+### Fixed
+- All 7 new routes compile cleanly (verified build pass)
+
 ## [v1.6.0] - 13 Juni 2026
 
 ### Added

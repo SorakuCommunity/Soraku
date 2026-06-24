@@ -4,6 +4,10 @@ import { adminDb } from '@/lib/supabase/admin'
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.soraku.id'
 
+const CATEGORIES = ['anime', 'manga', 'cosplay', 'review', 'event', 'vtuber', 'gaming', 'panduan', 'musik', 'list']
+
+const EXTRA_STATIC = ['/search', '/community', '/contact', '/feedback', '/gallery', '/class', '/leaderboard']
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [
     { url: BASE, priority: 1.0 },
@@ -11,18 +15,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/blog`, priority: 0.9 },
     { url: `${BASE}/events`, priority: 0.9 },
     { url: `${BASE}/gallery`, priority: 0.8 },
-    { url: `${BASE}/vtubers`, priority: 0.7 }, // ← /agensi/vtuber lama
+    { url: `${BASE}/vtubers`, priority: 0.7 },
     { url: `${BASE}/agensi`, priority: 0.7 },
     { url: `${BASE}/premium`, priority: 0.7 },
     { url: `${BASE}/donate`, priority: 0.7 },
-    { url: `${BASE}/donate/leaderboard`, priority: 0.6 }, // ← /premium/donatur lama
+    { url: `${BASE}/donate/leaderboard`, priority: 0.6 },
   ].map((p) => ({
     ...p,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
   }))
 
-  // Blog posts
+  const categoryPages = CATEGORIES.map((cat) => ({
+    url: `${BASE}/blog/category/${cat}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }))
+
+  const extraStaticPages = EXTRA_STATIC.map((p) => ({
+    url: `${BASE}${p}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }))
+
   const { data: posts } = await adminDb()
     .from('posts')
     .select('slug,updatedat')
@@ -37,7 +54,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Events
   const { data: events } = await adminDb()
     .from('events')
     .select('slug,updatedat,startdate')
@@ -52,7 +68,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // VTubers
   const { data: vtubers } = await adminDb()
     .from('vtubers')
     .select('slug,createdat')
@@ -66,5 +81,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...blogPages, ...eventPages, ...vtuberPages]
+  return [...staticPages, ...categoryPages, ...extraStaticPages, ...blogPages, ...eventPages, ...vtuberPages]
 }

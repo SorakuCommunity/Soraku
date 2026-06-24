@@ -1,12 +1,11 @@
 export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Check, Star, Zap, Crown, Trophy } from 'lucide-react'
+import { Check, Star, Zap, Crown, Sparkles } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Premium | Soraku',
-  description:
-    'Dukung Soraku dengan membership VIP atau VVIP dan dapatkan benefit eksklusif.',
+  description: 'Dukung Soraku dengan membership VIP atau VVIP dan dapatkan benefit eksklusif.',
 }
 
 const TIERS = [
@@ -15,8 +14,9 @@ const TIERS = [
     icon: Star,
     price: 'Bebas',
     desc: 'Donasi sukarela via Trakteer',
-    color: 'border-amber-500/30 bg-amber-500/5',
-    iconColor: 'text-amber-400 bg-amber-500/10',
+    color: 'border-amber-500/50',
+    iconColor: 'text-amber-400',
+    bgColor: 'bg-amber-500/20',
     badge: '💙',
     benefits: [
       'Badge Donatur di profil',
@@ -25,7 +25,6 @@ const TIERS = [
     ],
     cta: 'Donasi via Trakteer',
     ctaHref: '/donate',
-    ctaStyle: 'border border-amber-500/40 bg-amber-500/8 text-amber-300 hover:bg-amber-500/15',
   },
   {
     name: 'VIP',
@@ -33,8 +32,9 @@ const TIERS = [
     price: 'Rp 25.000',
     period: '/bulan',
     desc: 'Membership bulanan untuk supporter setia',
-    color: 'border-primary/40 bg-primary/5',
-    iconColor: 'text-primary bg-primary/10',
+    color: 'border-primary',
+    iconColor: 'text-primary',
+    bgColor: 'bg-primary/20',
     badge: '💜',
     highlight: true,
     benefits: [
@@ -46,7 +46,6 @@ const TIERS = [
     ],
     cta: 'Mulai VIP',
     ctaHref: '#vip',
-    ctaStyle: 'bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20',
   },
   {
     name: 'VVIP',
@@ -54,136 +53,90 @@ const TIERS = [
     price: 'Rp 75.000',
     period: '/bulan',
     desc: 'Support tertinggi untuk community builder',
-    color: 'border-accent/40 bg-accent/5',
-    iconColor: 'text-accent bg-accent/10',
+    color: 'border-amber-500',
+    iconColor: 'text-amber-400',
+    bgColor: 'bg-amber-500/20',
     badge: '✨',
     benefits: [
       'Semua benefit VIP',
-      'Badge VVIP dengan glow emas',
-      'Custom role di Discord',
-      'Shoutout bulanan di sosmed Soraku',
-      'Akses beta fitur platform',
-      'Nama besar di halaman Top Donatur',
+      'Badge VVIP eksklusif',
+      'Role Discord khusus VVIP',
+      'Request konten prioritas',
+      'Mention spesial di livestream',
+      'Cooldown dikitasi 2 digit',
     ],
-    cta: 'Mulai VVIP',
+    cta: 'Jadi VVIP',
     ctaHref: '#vvip',
-    ctaStyle:
-      'bg-gradient-to-r from-amber-500 to-accent text-background font-black hover:opacity-90 shadow-md shadow-accent/20',
   },
 ]
 
 export default function PremiumPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-16 text-center">
-        <p className="text-primary/70 mb-3 text-xs font-bold tracking-widest uppercase">
-          Support Soraku
-        </p>
-        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-          Premium <span className="text-gradient">Membership</span>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <div className="mb-12 text-center">
+        <span className="mb-4 inline-flex items-center gap-2 rounded-md border-2 border-black bg-primary px-3 py-1.5 text-[10px] font-bold text-white shadow-[2px_2px_0px_#000]">
+          <Sparkles className="h-3 w-3" />
+          Membership
+        </span>
+        <h1 className="mt-4 text-3xl font-black tracking-tighter text-foreground sm:text-5xl">
+          Dukung <span className="text-primary">Soraku</span>
         </h1>
-        <p className="text-muted-foreground mx-auto mt-4 max-w-xl">
-          Soraku adalah komunitas non-profit. Setiap dukungan kamu membantu kami terus berkarya
-          untuk komunitas.
+        <p className="mx-auto mt-4 max-w-lg text-sm text-muted">
+          Dukung komunitas dengan membership dan dapatkan benefit eksklusif.
         </p>
-        <div className="mt-6 flex justify-center">
-          <Link
-            href="/donate/leaderboard"
-            className="text-muted-foreground hover:text-primary flex items-center gap-2 text-sm transition-colors"
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
+        {TIERS.map((tier) => (
+          <div
+            key={tier.name}
+            className={`relative flex flex-col rounded-md border-2 border-black bg-surface p-6 shadow-[4px_4px_0px_#000] ${
+              tier.highlight ? 'ring-2 ring-primary' : ''
+            }`}
           >
-            <Trophy className="h-4 w-4" /> Lihat Top Donatur →
-          </Link>
-        </div>
-      </div>
-
-      {/* Tiers */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {TIERS.map(
-          ({
-            name,
-            icon: Icon,
-            price,
-            period,
-            desc,
-            color,
-            iconColor,
-            badge,
-            highlight,
-            benefits,
-            cta,
-            ctaHref,
-            ctaStyle,
-          }) => (
-            <div
-              key={name}
-              className={`glass-card relative border p-7 ${color} ${highlight ? 'ring-primary/30 ring-2' : ''}`}
-            >
-              {highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary rounded-full px-4 py-1 text-xs font-bold text-white">
-                    Paling Populer
-                  </span>
-                </div>
-              )}
-
-              <div
-                className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl ${iconColor}`}
-              >
-                <Icon className="h-5 w-5" />
+            {tier.highlight && (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-sm border-2 border-black bg-primary px-3 py-0.5 text-[10px] font-bold text-white shadow-[2px_2px_0px_#000]">
+                TERPOPULER
+              </span>
+            )}
+            <div className="mb-4 flex items-center gap-3">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-md border-2 border-black ${tier.bgColor} shadow-[2px_2px_0px_#000]`}>
+                <tier.icon className={`h-5 w-5 ${tier.iconColor}`} />
               </div>
-
-              <div className="mb-1 flex items-center gap-2">
-                <span className="text-lg">{badge}</span>
-                <h2 className="text-xl font-black">{name}</h2>
+              <div>
+                <h3 className="text-lg font-black text-foreground">{tier.name}</h3>
+                <p className="text-xs text-muted">{tier.desc}</p>
               </div>
-              <p className="text-muted-foreground mb-4 text-sm">{desc}</p>
-
-              <div className="mb-6">
-                <span className="text-3xl font-black">{price}</span>
-                {period && <span className="text-muted-foreground text-sm">{period}</span>}
-              </div>
-
-              <ul className="mb-8 space-y-3">
-                {benefits.map((b) => (
-                  <li key={b} className="flex items-start gap-2.5 text-sm">
-                    <Check className="text-primary mt-0.5 h-4 w-4 flex-shrink-0" />
-                    <span className="text-muted-foreground">{b}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <a
-                href={ctaHref}
-                className={`block w-full rounded-xl px-4 py-3 text-center text-sm font-bold transition-all hover:-translate-y-0.5 ${ctaStyle}`}
-              >
-                {cta}
-              </a>
             </div>
-          )
-        )}
-      </div>
 
-      {/* FAQ note */}
-      <div className="glass-card mt-16 px-8 py-10 text-center">
-        <h2 className="mb-3 text-xl font-bold">100% Untuk Komunitas</h2>
-        <p className="text-muted-foreground mx-auto max-w-lg text-sm">
-          Semua donasi dan membership digunakan untuk biaya server, domain, event offline, dan
-          pengembangan platform. Soraku tidak mengambil keuntungan dari komunitas.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-4">
-          <Link href="/donate" className="text-primary text-sm hover:underline">
-            Donasi via Trakteer
-          </Link>
-          <span className="text-border">·</span>
-          <Link href="/donate/leaderboard" className="text-primary text-sm hover:underline">
-            Top Donatur
-          </Link>
-          <span className="text-border">·</span>
-          <Link href="/about" className="text-primary text-sm hover:underline">
-            Tentang Kami
-          </Link>
-        </div>
+            <div className="mb-6">
+              <span className="text-3xl font-black text-foreground">{tier.price}</span>
+              {tier.period && (
+                <span className="text-xs text-muted">{tier.period}</span>
+              )}
+            </div>
+
+            <ul className="mb-8 flex-1 space-y-3">
+              {tier.benefits.map((b) => (
+                <li key={b} className="flex items-start gap-2 text-xs text-foreground">
+                  <Check className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
+                  {b}
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href={tier.ctaHref}
+              className={`inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-black px-4 py-2.5 text-xs font-bold shadow-[3px_3px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_#000] ${
+                tier.highlight
+                  ? 'bg-primary text-white'
+                  : 'bg-surface text-foreground'
+              }`}
+            >
+              {tier.cta}
+            </Link>
+          </div>
+        ))}
       </div>
     </div>
   )

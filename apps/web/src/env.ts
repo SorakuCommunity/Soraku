@@ -54,6 +54,10 @@ export const env = createEnv({
     D_BLOG_WEBHOOK: z.string().optional(),
     D_FEEDBACK_WEBHOOK: z.string().optional(),
 
+    // AI
+    AI_API_KEY: z.string().optional(),
+    AI_API_URL: z.string().optional(),
+
     // Contact Emails (Public)
     CONTACT_EMAIL: z.string().email().optional(),
     ADMIN_EMAIL: z.string().email().optional(),
@@ -93,6 +97,8 @@ export const env = createEnv({
     D_REGISTRATION_WEBHOOK: process.env.D_REGISTRATION_WEBHOOK,
     D_BLOG_WEBHOOK: process.env.D_BLOG_WEBHOOK,
     D_FEEDBACK_WEBHOOK: process.env.D_FEEDBACK_WEBHOOK,
+    AI_API_KEY: process.env.AI_API_KEY,
+    AI_API_URL: process.env.AI_API_URL,
     CONTACT_EMAIL: process.env.CONTACT_EMAIL,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
 

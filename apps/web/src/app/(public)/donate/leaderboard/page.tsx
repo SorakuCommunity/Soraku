@@ -1,163 +1,123 @@
+export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Trophy, Crown, Heart } from 'lucide-react'
-import { db } from '@/lib/supabase/server'
-import { formatRupiah, formatDate } from '@/lib/utils'
-
-export const dynamic = 'force-dynamic'
+import { Crown, Medal, Trophy, ArrowLeft, Sparkles } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Leaderboard Donatur | Soraku',
-  description: 'Daftar donatur terbaik yang mendukung Soraku.',
+  title: 'Top Donatur | Soraku',
+  description: 'Para donatur yang telah mendukung Soraku.',
 }
 
-const TIER_STYLES: Record<string, { badge: string; glow: string; text: string }> = {
-  VVIP: {
-    badge: '✨ VVIP',
-    glow: 'shadow-lg shadow-amber-500/20 border-amber-500/40',
-    text: 'text-amber-400',
-  },
-  VIP: {
-    badge: '💜 VIP',
-    glow: 'shadow-md shadow-primary/15 border-primary/30',
-    text: 'text-primary',
-  },
-  DONATUR: { badge: '💙 Donatur', glow: '', text: 'text-blue-400' },
+type Donor = {
+  name: string
+  amount: number
+  message: string
+  tier: 'vvip' | 'vip' | 'donatur'
+  date: string
 }
 
-const PODIUM = [1, 0, 2]
-const PODIUM_HEIGHTS = ['h-24', 'h-32', 'h-20']
-const PODIUM_LABELS = ['🥈', '🥇', '🥉']
+const TOP_DONORS: Donor[] = [
+  { name: 'Kenn', amount: 500000, message: 'Semoga Soraku makin maju!', tier: 'vvip', date: '2026-05-01' },
+  { name: 'Raka', amount: 350000, message: 'Mantap Soraku!', tier: 'vvip', date: '2026-04-15' },
+  { name: 'Sasa', amount: 200000, message: 'Keep going gan!', tier: 'vip', date: '2026-04-10' },
+  { name: 'Rio', amount: 150000, message: 'Gas pol!', tier: 'vip', date: '2026-05-05' },
+  { name: 'Fajar', amount: 100000, message: 'Anime Jepang best!', tier: 'vip', date: '2026-03-20' },
+  { name: 'Bunga', amount: 100000, message: 'Semangat Soraku!', tier: 'vip', date: '2026-04-22' },
+  { name: 'Yoga', amount: 75000, message: 'Sip', tier: 'donatur', date: '2026-05-10' },
+  { name: 'Dita', amount: 50000, message: 'Mantap jiwa', tier: 'donatur', date: '2026-04-18' },
+  { name: 'Rizki', amount: 50000, message: 'Gasken', tier: 'donatur', date: '2026-03-25' },
+  { name: 'Nina', amount: 25000, message: 'Sukses selalu!', tier: 'donatur', date: '2026-05-02' },
+]
 
-export default async function TopDonaturPage() {
-  const { data } = await (await db())
-    .from('donatur')
-    .select('id,displayname,amount,tier,message,createdat')
-    .eq('ispublic', true)
-    .order('amount', { ascending: false })
-    .limit(50)
+const TIER_STYLES = {
+  vvip: { label: 'VVIP', border: 'border-amber-500', bg: 'bg-amber-500/20', icon: Crown, color: 'text-amber-400', shadow: 'shadow-[4px_4px_0px_rgba(251,191,36,0.3)]' },
+  vip: { label: 'VIP', border: 'border-primary', bg: 'bg-primary/20', icon: Medal, color: 'text-primary', shadow: 'shadow-[4px_4px_0px_rgba(37,99,235,0.3)]' },
+  donatur: { label: 'Donatur', border: 'border-muted', bg: 'bg-muted/20', icon: Trophy, color: 'text-muted', shadow: 'shadow-[3px_3px_0px_rgba(148,163,184,0.2)]' },
+}
 
-  const sorted = data ?? []
-  const top3 = sorted.slice(0, 3)
-  const rest = sorted.slice(3)
+export default function DonorLeaderboardPage() {
+  const sorted = [...TOP_DONORS].sort((a, b) => b.amount - a.amount)
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mb-12 text-center">
-        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10">
-          <Trophy className="h-8 w-8 text-amber-400" />
-        </div>
-        <p className="text-primary/70 mb-3 text-xs font-bold tracking-widest uppercase">
-          Hall of Fame
-        </p>
-        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-          Top <span className="text-gradient">Donatur</span>
+    <div className="mx-auto max-w-3xl px-4 py-8">
+      <Link
+        href="/donate"
+        className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" /> Kembali ke Donasi
+      </Link>
+
+      <div className="mb-8 text-center">
+        <span className="mb-4 inline-flex items-center gap-2 rounded-md border-2 border-black bg-primary px-3 py-1.5 text-[10px] font-bold text-white shadow-[2px_2px_0px_#000]">
+          <Sparkles className="h-3 w-3" />
+          Top Donatur
+        </span>
+        <h1 className="mt-4 text-3xl font-black tracking-tighter text-foreground sm:text-5xl">
+        Pahlawan <span className="text-primary">Soraku</span>
         </h1>
-        <p className="text-muted-foreground mx-auto mt-4 max-w-lg">
-           Terima kasih kepada para supporter setia yang membuat Soraku tetap hidup. 💙
+        <p className="mx-auto mt-4 max-w-lg text-sm text-muted">
+          Terima kasih untuk para donatur yang sudah mendukung komunitas Soraku.
         </p>
       </div>
 
       {/* Podium */}
-      {top3.length === 3 && (
-        <div className="mb-12 flex items-end justify-center gap-4">
-          {PODIUM.map((idx, i) => {
-            const d = top3[idx]
-            const style = TIER_STYLES[d.tier ?? 'DONATUR']
-            return (
-              <div key={d.id} className="flex flex-col items-center gap-3">
-                <div
-                  className={`relative flex h-14 w-14 items-center justify-center rounded-2xl text-xl font-black ${
-                    idx === 0 ? 'bg-amber-500/20 text-amber-400' : 'bg-primary/10 text-primary'
-                  }`}
-                >
-                  {d.displayname.charAt(0)}
-                  {idx === 0 && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <Crown className="h-5 w-5 text-amber-400" />
-                    </div>
-                  )}
-                </div>
-                <p className="max-w-[80px] truncate text-center text-xs font-bold">
-                  {d.displayname}
-                </p>
-                <p className={`text-xs font-medium ${style.text}`}>{formatRupiah(d.amount)}</p>
-                <div
-                  className={`flex w-20 items-center justify-center rounded-t-xl ${PODIUM_HEIGHTS[i]} ${
-                    idx === 0
-                      ? 'border border-amber-500/30 bg-gradient-to-t from-amber-600/40 to-amber-400/20'
-                      : idx === 1
-                        ? 'from-muted/60 to-muted/20 border-border border bg-gradient-to-t'
-                        : 'border border-amber-600/20 bg-gradient-to-t from-amber-700/30 to-amber-600/10'
-                  }`}
-                >
-                  <span className="text-xl">{PODIUM_LABELS[i]}</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Full list */}
-      <div className="space-y-3">
-        <h2 className="text-muted-foreground/60 mb-5 text-sm font-semibold tracking-widest uppercase">
-          Semua Donatur
-        </h2>
-        {sorted.map((d, i) => {
-          const style = TIER_STYLES[d.tier ?? 'DONATUR']
+      <div className="mb-8 grid grid-cols-3 gap-4">
+        {[1, 0, 2].map((idx) => {
+          const d = sorted[idx]
+          if (!d) return null
+          const t = TIER_STYLES[d.tier]
+          const heights = ['h-32', 'h-40', 'h-24']
           return (
-            <div key={d.id} className={`glass-card flex items-center gap-4 p-4 ${style.glow}`}>
-              <div className="text-muted-foreground/40 w-8 text-center text-sm font-black">
-                {i < 3 ? ['🥇', '🥈', '🥉'][i] : `${i + 1}`}
+            <div key={d.name} className="flex flex-col items-center justify-end">
+              <div className={`mb-2 flex h-10 w-10 items-center justify-center rounded-md border-2 border-black ${t.bg} ${t.shadow}`}>
+                <t.icon className={`h-5 w-5 ${t.color}`} />
               </div>
-              <div className="bg-primary/10 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl font-bold">
-                {d.displayname.charAt(0)}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-bold">{d.displayname}</p>
-                  <span className={`text-xs font-medium ${style.text}`}>{style.badge}</span>
-                </div>
-                {d.message && (
-                  <p className="text-muted-foreground/70 mt-0.5 text-xs italic">"{d.message}"</p>
-                )}
-                <p className="text-muted-foreground/50 mt-0.5 text-xs">{formatDate(d.createdat)}</p>
-              </div>
-              <div className="flex-shrink-0 text-right">
-                <p className={`text-sm font-black ${style.text}`}>{formatRupiah(d.amount)}</p>
+              <p className="text-sm font-bold text-foreground">{d.name}</p>
+              <p className="text-xs text-muted">Rp {d.amount.toLocaleString('id-ID')}</p>
+              <div className={`mt-2 w-full rounded-md border-2 border-black ${t.border} ${t.bg} ${heights[idx]} flex items-center justify-center`}>
+                <span className="text-2xl font-black text-foreground">#{idx + 1}</span>
               </div>
             </div>
           )
         })}
-        {sorted.length === 0 && (
-          <div className="py-12 text-center">
-            <p className="mb-3 text-3xl">💙</p>
-            <p className="text-muted-foreground">Belum ada donatur. Jadilah yang pertama!</p>
-          </div>
-        )}
       </div>
 
-      <div className="glass-card mt-12 px-8 py-8 text-center">
-        <Heart className="mx-auto mb-3 h-8 w-8 text-rose-400" />
-        <h2 className="mb-2 font-bold">Ingin Masuk Daftar Ini?</h2>
-        <p className="text-muted-foreground mb-5 text-sm">
-          Setiap donasi membantumu masuk ke halaman Top Donatur.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Link
-            href="/donate"
-            className="rounded-xl bg-rose-600 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-rose-700"
-          >
-            Donasi via Trakteer
-          </Link>
-          <Link
-            href="/premium"
-            className="border-border text-muted-foreground hover:border-primary/40 hover:text-foreground rounded-xl border px-6 py-3 text-sm font-medium transition-colors"
-          >
-            Premium Membership
-          </Link>
-        </div>
+      {/* List */}
+      <div className="rounded-md border-2 border-black bg-surface shadow-[4px_4px_0px_#000]">
+        {sorted.map((d, i) => {
+          const t = TIER_STYLES[d.tier]
+          return (
+            <div
+              key={d.name}
+              className={`flex items-center gap-4 px-5 py-4 ${i < sorted.length - 1 ? 'border-b-2 border-black' : ''}`}
+            >
+              <span className="w-6 text-center text-sm font-black text-muted">#{i + 1}</span>
+              <div className={`flex h-8 w-8 items-center justify-center rounded-md border-2 border-black ${t.bg}`}>
+                <t.icon className={`h-4 w-4 ${t.color}`} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-foreground">{d.name}</p>
+                <p className="text-xs text-muted line-clamp-1">{d.message}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold text-foreground">Rp {d.amount.toLocaleString('id-ID')}</p>
+                <span className={`rounded-sm border px-1.5 py-0.5 text-[9px] font-bold ${t.border} ${t.bg} ${t.color}`}>
+                  {t.label}
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* CTA */}
+      <div className="mt-8 text-center">
+        <Link
+          href="/donate"
+          className="inline-flex items-center gap-2 rounded-md border-2 border-black bg-primary px-6 py-3 text-sm font-bold text-white shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000]"
+        >
+          Ikut Donasi
+        </Link>
       </div>
     </div>
   )

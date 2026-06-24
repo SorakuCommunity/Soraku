@@ -31,6 +31,7 @@ export const ADMIN_NAV = [
   { href: '/admin/premium', label: 'Premium', icon: Sparkles, group: 'Subscription' },
   { href: '/admin/billing', label: 'Billing', icon: CreditCard, group: 'Subscription' },
   { href: '/admin/blog', label: 'Blog', icon: BookOpen, group: 'Konten' },
+  { href: '/admin/blog/ai-generate', label: 'AI Generator', icon: Sparkles, group: 'Konten' },
   { href: '/admin/events', label: 'Event', icon: Calendar, group: 'Konten' },
   { href: '/admin/gallery', label: 'Galeri', icon: ImageIcon, group: 'Konten' },
   { href: '/admin/partnerships', label: 'Partnership', icon: Handshake, group: 'Konten' },

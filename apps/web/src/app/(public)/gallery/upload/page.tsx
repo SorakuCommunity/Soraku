@@ -71,7 +71,6 @@ export default function GalleryUploadPage() {
     form.append('title', titleRef.current?.value ?? '')
     form.append('description', descRef.current?.value ?? '')
 
-    // Gabung kategori + tags
     const cat = categoryRef.current?.value ?? ''
     const rawTags = tagsRef.current?.value ?? ''
     const allTags = [cat, ...rawTags.split(',').map((t) => t.trim())].filter(Boolean).join(',')
@@ -82,7 +81,6 @@ export default function GalleryUploadPage() {
       const res = await fetch('/api/gallery/upload', { method: 'POST', body: form })
       setProgress(80)
 
-      // Handle non-JSON response (e.g. Vercel 413, Next.js HTML error)
       const contentType = res.headers.get('content-type') ?? ''
       if (!contentType.includes('application/json')) {
         console.error('[upload] non-JSON response:', res.status, res.statusText)
@@ -105,7 +103,6 @@ export default function GalleryUploadPage() {
       }
     } catch (err) {
       console.error('[upload] fetch error:', err)
-      // Distinguish network error vs other
       const message =
         err instanceof TypeError && err.message.includes('fetch')
           ? 'Koneksi gagal. Periksa internet kamu dan coba lagi.'
@@ -120,23 +117,23 @@ export default function GalleryUploadPage() {
   if (success) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <div className="glass-card rounded-3xl p-12">
+        <div className="border-2 border-border bg-card p-12">
           <CheckCircle className="mx-auto mb-4 h-14 w-14 text-green-400" />
           <h2 className="mb-2 text-2xl font-black">Upload Berhasil! 🎉</h2>
-          <p className="text-muted-foreground mb-8">
+          <p className="mb-8 text-muted-foreground">
             Karya kamu sudah masuk antrian review. Moderator akan memeriksa sebelum tampil di galeri
             publik.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <button
               onClick={() => setSuccess(false)}
-              className="bg-primary hover:bg-primary/90 rounded-xl px-6 py-3 text-sm font-bold text-white transition-colors"
+              className="border-2 border-primary bg-primary px-6 py-3 text-sm font-bold text-white transition-all hover:shadow-[4px_4px_0px_0px_#000000]"
             >
               Upload Lagi
             </button>
             <Link
               href="/gallery"
-              className="border-border text-muted-foreground hover:border-primary/40 hover:text-foreground rounded-xl border px-6 py-3 text-sm font-medium transition-colors"
+              className="border-2 border-border px-6 py-3 text-sm font-medium text-muted-foreground transition-all hover:border-primary hover:text-foreground"
             >
               Lihat Galeri
             </Link>
@@ -150,7 +147,7 @@ export default function GalleryUploadPage() {
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
       <Link
         href="/gallery"
-        className="text-muted-foreground hover:text-foreground mb-8 inline-flex items-center gap-2 text-sm transition-colors"
+        className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> Kembali ke Galeri
       </Link>
@@ -159,7 +156,7 @@ export default function GalleryUploadPage() {
         <h1 className="text-3xl font-black">
           Upload <span className="text-gradient">Karya</span>
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           Bagikan karya kreatifmu ke komunitas Soraku. Semua upload akan direview moderator.
         </p>
       </div>
@@ -168,10 +165,10 @@ export default function GalleryUploadPage() {
         {/* Drop zone */}
         <div
           className={cn(
-            'relative cursor-pointer rounded-2xl border-2 border-dashed transition-all',
+            'relative cursor-pointer border-2 border-dashed transition-all',
             dragOver
-              ? 'border-primary bg-primary/5 scale-[1.01]'
-              : 'border-border hover:border-primary/40'
+              ? 'scale-[1.01] border-primary bg-primary/5'
+              : 'border-border hover:border-primary'
           )}
           onDragOver={(e) => {
             e.preventDefault()
@@ -192,7 +189,7 @@ export default function GalleryUploadPage() {
               <img
                 src={preview}
                 alt="Preview"
-                className="max-h-72 w-full rounded-2xl object-cover"
+                className="max-h-72 w-full object-cover"
               />
               <button
                 type="button"
@@ -202,23 +199,23 @@ export default function GalleryUploadPage() {
                   setFile(null)
                   setError(null)
                 }}
-                className="bg-background/80 text-foreground hover:bg-background absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-xl backdrop-blur-sm transition-colors"
+                className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center border-2 border-border bg-background text-foreground transition-colors hover:bg-primary hover:text-white"
               >
                 <X className="h-4 w-4" />
               </button>
               {/* File info */}
-              <div className="bg-background/80 text-muted-foreground absolute bottom-3 left-3 rounded-lg px-2.5 py-1 text-xs backdrop-blur-sm">
+              <div className="absolute bottom-3 left-3 bg-black px-2.5 py-1 text-xs text-white/80">
                 {(file!.size / 1024 / 1024).toFixed(1)}MB
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center px-4 py-14 text-center">
-              <div className="bg-primary/10 text-primary mb-4 flex h-14 w-14 items-center justify-center rounded-2xl">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center border-2 border-primary bg-primary/10 text-primary">
                 <ImageIcon className="h-7 w-7" />
               </div>
               <p className="font-semibold">Drag & drop gambar di sini</p>
-              <p className="text-muted-foreground mt-1 text-sm">atau klik untuk pilih file</p>
-              <p className="text-muted-foreground/50 mt-3 text-xs">
+              <p className="mt-1 text-sm text-muted-foreground">atau klik untuk pilih file</p>
+              <p className="mt-3 text-xs text-muted-foreground/50">
                 PNG, JPG, WEBP, GIF · Maks. {MAX_SIZE_MB}MB
               </p>
             </div>
@@ -237,9 +234,9 @@ export default function GalleryUploadPage() {
 
         {/* Progress bar */}
         {loading && progress > 0 && (
-          <div className="bg-muted/30 relative h-1.5 w-full overflow-hidden rounded-full">
+          <div className="relative h-1.5 w-full overflow-hidden border-2 border-border bg-muted">
             <div
-              className="bg-primary h-full rounded-full transition-all duration-500"
+              className="h-full bg-primary transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -247,17 +244,17 @@ export default function GalleryUploadPage() {
 
         {/* Error */}
         {error && (
-          <div className="border-destructive/30 bg-destructive/8 text-destructive animate-in fade-in slide-in-from-top-1 flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm duration-150">
+          <div className="flex items-start gap-2.5 border-2 border-red-500/25 bg-red-500/8 px-4 py-3 text-sm text-red-400">
             <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Form fields */}
-        <div className="glass-card space-y-5 rounded-2xl p-6">
+        <div className="space-y-5 border-2 border-border bg-card p-6">
           <div>
             <label className="mb-1.5 block text-sm font-medium">
-              Judul Karya <span className="text-destructive">*</span>
+              Judul Karya <span className="text-red-400">*</span>
             </label>
             <input
               ref={titleRef}
@@ -265,19 +262,19 @@ export default function GalleryUploadPage() {
               type="text"
               placeholder="Nama karya kamu"
               disabled={loading}
-              className="border-border bg-card/50 placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-primary/20 w-full rounded-xl border px-4 py-2.5 text-sm transition-colors focus:ring-2 focus:outline-none disabled:opacity-50"
+              className="w-full border-2 border-border bg-black/20 px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:opacity-50"
             />
           </div>
 
           <div>
             <label className="mb-1.5 block text-sm font-medium">
-              Kategori <span className="text-destructive">*</span>
+              Kategori <span className="text-red-400">*</span>
             </label>
             <select
               ref={categoryRef}
               required
               disabled={loading}
-              className="border-border bg-card/50 focus:border-primary/50 focus:ring-primary/20 w-full rounded-xl border px-4 py-2.5 text-sm transition-colors focus:ring-2 focus:outline-none disabled:opacity-50"
+              className="w-full border-2 border-border bg-black/20 px-4 py-2.5 text-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:opacity-50"
             >
               <option value="">Pilih kategori</option>
               {CATEGORIES.map((c) => (
@@ -291,7 +288,7 @@ export default function GalleryUploadPage() {
           <div>
             <label className="mb-1.5 block text-sm font-medium">
               Tags{' '}
-              <span className="text-muted-foreground text-xs font-normal">
+              <span className="text-xs font-normal text-muted-foreground">
                 (pisahkan dengan koma)
               </span>
             </label>
@@ -300,33 +297,33 @@ export default function GalleryUploadPage() {
               type="text"
               placeholder="naruto, sasuke, fanart"
               disabled={loading}
-              className="border-border bg-card/50 placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-primary/20 w-full rounded-xl border px-4 py-2.5 text-sm transition-colors focus:ring-2 focus:outline-none disabled:opacity-50"
+              className="w-full border-2 border-border bg-black/20 px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:opacity-50"
             />
           </div>
 
           <div>
             <label className="mb-1.5 block text-sm font-medium">
               Deskripsi{' '}
-              <span className="text-muted-foreground text-xs font-normal">(opsional)</span>
+              <span className="text-xs font-normal text-muted-foreground">(opsional)</span>
             </label>
             <textarea
               ref={descRef}
               rows={3}
               placeholder="Ceritakan tentang karya ini..."
               disabled={loading}
-              className="border-border bg-card/50 placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-primary/20 w-full resize-none rounded-xl border px-4 py-2.5 text-sm transition-colors focus:ring-2 focus:outline-none disabled:opacity-50"
+              className="w-full resize-none border-2 border-border bg-black/20 px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:opacity-50"
             />
           </div>
         </div>
 
-        <div className="border-accent/20 bg-accent/5 text-accent/80 rounded-xl border px-4 py-3 text-sm">
+        <div className="border-2 border-accent/20 bg-accent/5 px-4 py-3 text-sm text-accent/80">
           💡 Karya kamu akan direview oleh moderator sebelum tampil di galeri publik.
         </div>
 
         <button
           type="submit"
           disabled={loading || !file}
-          className="bg-primary shadow-primary/20 hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 border-2 border-primary bg-primary px-4 py-3 text-sm font-bold text-white transition-all hover:shadow-[4px_4px_0px_0px_#000000] disabled:pointer-events-none disabled:opacity-50 disabled:hover:shadow-none"
         >
           {loading ? (
             <>

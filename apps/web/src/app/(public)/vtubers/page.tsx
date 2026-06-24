@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { YouTubeIcon, XIcon } from '@/components/icons/custom-icons'
 import { db } from '@/lib/supabase/server'
+import { Sparkles, Tv, Play } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,32 +22,30 @@ export default async function VTuberPage() {
     .order('createdat', { ascending: true })
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      {/* Header */}
+    <div className="mx-auto max-w-7xl px-4 py-8">
       <div className="mb-12 text-center">
-        <p className="text-primary/70 mb-3 text-xs font-bold tracking-widest uppercase">
-          Agensi · VTuber
-        </p>
-        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-          Virtual <span className="text-gradient">YouTuber</span>
+        <span className="mb-4 inline-flex items-center gap-2 rounded-md border-2 border-black bg-primary px-3 py-1.5 text-[10px] font-bold text-white shadow-[2px_2px_0px_#000]">
+          <Sparkles className="h-3 w-3" />
+          Virtual YouTuber
+        </span>
+        <h1 className="mt-4 text-3xl font-black tracking-tighter text-foreground sm:text-5xl">
+          Virtual <span className="text-primary">YouTuber</span>
         </h1>
-        <p className="text-muted-foreground mx-auto mt-4 max-w-lg">
-           Kenalan dengan VTuber dari Soraku, kreator virtual yang menghibur dan
-           menginspirasi.
+        <p className="mx-auto mt-4 max-w-lg text-sm text-muted">
+          Kenalan dengan VTuber dari Soraku, kreator virtual yang menghibur dan
+          menginspirasi.
         </p>
       </div>
 
-      {/* VTuber cards */}
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {(vtubers ?? []).map((v) => {
           const socials = (v.sociallinks ?? {}) as Record<string, string>
           return (
             <div
               key={v.id}
-              className="glass-card group overflow-hidden transition-transform duration-300 hover:-translate-y-1"
+              className="group overflow-hidden rounded-md border-2 border-black bg-surface shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000]"
             >
-              {/* Banner */}
-              <div className="from-primary/20 via-accent/10 relative h-32 bg-gradient-to-br to-violet-500/20">
+              <div className="relative h-32 bg-gradient-to-br from-primary/20 via-accent/10 to-violet-500/20">
                 {v.coverurl ? (
                   <Image
                     src={v.coverurl}
@@ -60,139 +59,77 @@ export default async function VTuberPage() {
                     <span className="text-5xl opacity-20">空</span>
                   </div>
                 )}
-                {/* Live badge */}
-                {v.islive && (
-                  <div className="absolute top-3 left-3">
-                    <span className="flex items-center gap-1 rounded-full bg-red-500/90 px-2.5 py-0.5 text-[11px] font-bold text-white">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> LIVE
-                    </span>
-                  </div>
-                )}
-                {/* Avatar */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+                <div className="absolute bottom-0 left-4 translate-y-1/2">
                   {v.avatarurl ? (
-                    <div className="border-background relative h-20 w-20 overflow-hidden rounded-2xl border-4 shadow-lg">
+                    <div className="relative h-16 w-16 overflow-hidden rounded-md border-2 border-black bg-surface shadow-[2px_2px_0px_#000]">
                       <Image
                         src={v.avatarurl}
                         alt={v.charactername ?? v.name}
                         fill
                         className="object-cover"
-                        sizes="80px"
+                        sizes="64px"
                       />
                     </div>
                   ) : (
-                    <div className="border-background from-primary/30 to-accent/30 flex h-20 w-20 items-center justify-center rounded-2xl border-4 bg-gradient-to-br text-3xl shadow-lg">
-                      ✨
+                    <div className="flex h-16 w-16 items-center justify-center rounded-md border-2 border-black bg-gradient-to-br from-primary/30 to-violet-500/30 text-2xl shadow-[2px_2px_0px_#000]">
+                      <Tv className="h-6 w-6 text-white" />
                     </div>
                   )}
                 </div>
+                {v.islive && (
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-flex items-center gap-1 rounded-sm border border-black bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-[1px_1px_0px_#000]">
+                      <Play className="h-2.5 w-2.5 fill-white" />
+                      LIVE
+                    </span>
+                  </div>
+                )}
               </div>
 
-              <div className="px-6 pt-14 pb-6 text-center">
-                {v.debutdate && (
-                  <p className="text-accent mb-1 text-xs font-bold tracking-widest uppercase">
-                    Debut {new Date(v.debutdate).getFullYear()}
+              <div className="p-4 pt-10">
+                <h3 className="text-sm font-bold text-foreground">
+                  <Link href={`/vtubers/${v.slug}`} className="hover:text-primary">
+                    {v.charactername ?? v.name}
+                  </Link>
+                </h3>
+                {v.charactername && (
+                  <p className="mt-0.5 text-[10px] text-muted">{v.name}</p>
+                )}
+                {v.description && (
+                  <p className="mt-2 line-clamp-2 text-[10px] leading-relaxed text-muted">
+                    {v.description}
                   </p>
                 )}
-                <h2 className="text-xl font-bold">{v.charactername ?? v.name}</h2>
-                {v.charactername && <p className="text-muted-foreground text-sm">{v.name}</p>}
-                <p className="text-muted-foreground/80 mt-3 line-clamp-3 text-sm leading-relaxed">
-                  {v.description}
-                </p>
-
-                {/* Subscriber count */}
-                {v.subscribercount && (
-                  <p className="text-muted-foreground/60 mt-2 text-xs">
-                    {new Intl.NumberFormat('id-ID').format(v.subscribercount)} subscriber
-                  </p>
-                )}
-
-                {/* Tags */}
-                <div className="mt-4 flex flex-wrap justify-center gap-1.5">
-                  {(v.tags ?? []).map((tag: string) => (
-                    <span
-                      key={tag}
-                      className="border-border text-muted-foreground rounded-full border px-2.5 py-0.5 text-xs"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Socials */}
-                <div className="mt-5 flex justify-center gap-2">
+                <div className="mt-3 flex items-center gap-2">
                   {socials.youtube && (
-                    <a
-                      href={socials.youtube}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/8 text-red-400 transition-colors hover:bg-red-500/15"
-                    >
+                    <a href={socials.youtube} target="_blank" rel="noopener noreferrer" className="text-muted hover:text-red-500">
                       <YouTubeIcon className="h-4 w-4" />
                     </a>
                   )}
                   {socials.twitter && (
-                    <a
-                      href={socials.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-sky-500/30 bg-sky-500/8 text-sky-400 transition-colors hover:bg-sky-500/15"
-                    >
+                    <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="text-muted hover:text-sky-400">
                       <XIcon className="h-4 w-4" />
                     </a>
                   )}
-                  {v.islive && v.liveurl && (
-                    <a
-                      href={v.liveurl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-red-700"
-                    >
-                      🔴 Tonton Live
-                    </a>
-                  )}
                 </div>
+                <Link
+                  href={`/vtubers/${v.slug}`}
+                  className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-sm border-2 border-black bg-surface px-3 py-1.5 text-[10px] font-bold text-foreground shadow-[2px_2px_0px_#000] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_#000]"
+                >
+                  Lihat Profil
+                </Link>
               </div>
             </div>
           )
         })}
-
-        {/* Coming soon card */}
-        <div className="glass-card border-primary/20 hover:border-primary/40 flex flex-col items-center justify-center border-2 border-dashed p-10 text-center transition-colors">
-          <span className="mb-4 text-4xl">🌸</span>
-          <p className="text-muted-foreground font-bold">VTuber Baru</p>
-          <p className="text-muted-foreground/60 mt-1 text-sm">Segera hadir!</p>
-        </div>
       </div>
 
-      {/* CTA Discord */}
-      <div className="glass-card mt-16 px-8 py-10 text-center">
-        <p className="text-primary/70 mb-3 text-xs font-bold tracking-widest uppercase">
-          Bergabung
-        </p>
-        <h2 className="text-2xl font-bold">Ikuti Live Stream Kami</h2>
-        <p className="text-muted-foreground mt-2">
-          Dapatkan notifikasi live stream dan konten terbaru dari VTuber Soraku.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <a
-            href="https://youtube.com/@chsoraku"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-xl bg-red-600 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
-          >
-            Subscribe YouTube
-          </a>
-          <a
-            href="https://discord.gg/qm3XJvRa6B"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-xl border border-indigo-500/40 bg-indigo-500/10 px-6 py-3 text-sm font-bold text-indigo-300 transition-colors hover:bg-indigo-500/20"
-          >
-            Gabung Discord
-          </a>
+      {(vtubers ?? []).length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20">
+          <Tv className="mb-4 h-16 w-16 text-muted" />
+          <p className="text-sm text-muted">Belum ada VTuber.</p>
         </div>
-      </div>
+      )}
     </div>
   )
 }

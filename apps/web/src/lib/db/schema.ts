@@ -85,3 +85,20 @@ export const follows = soraku.table('follows', {
     .references(() => users.id, { onDelete: 'cascade' }),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
 })
+
+export const forumThreads = soraku.table('forum_threads', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  title: text('title').notNull(),
+  content: text('content'),
+  category: text('category').notNull().default('general'),
+  authorid: uuid('authorid').references(() => users.id, { onDelete: 'set null' }),
+  ispinned: boolean('ispinned').default(false),
+  islocked: boolean('islocked').default(false),
+  replycount: integer('replycount').notNull().default(0),
+  viewcount: integer('viewcount').notNull().default(0),
+  lastactivity: timestamp('lastactivity', { withTimezone: true }).defaultNow(),
+  createdat: timestamp('createdat', { withTimezone: true }).defaultNow(),
+  updatedat: timestamp('updatedat', { withTimezone: true }).defaultNow(),
+})
