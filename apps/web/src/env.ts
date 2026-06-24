@@ -35,6 +35,9 @@ export const env = createEnv({
     BOT_WEBHOOK_URL: z.string().optional(),
     BOT_WEBHOOK_SECRET: z.string().optional(),
 
+    // Umami Analytics
+    UMAMI_API_TOKEN: z.string().optional(),
+
     // Tiktok
     TIKTOK_TOKEN: z.string().optional(),
 
@@ -80,6 +83,7 @@ export const env = createEnv({
     BOT_WEBHOOK_URL: process.env.BOT_WEBHOOK_URL,
     BOT_WEBHOOK_SECRET: process.env.BOT_WEBHOOK_SECRET,
     TIKTOK_TOKEN: process.env.TIKTOK_TOKEN,
+    UMAMI_API_TOKEN: process.env.UMAMI_API_TOKEN,
     XENDIT_KEY: process.env.XENDIT_KEY,
     XENDIT_WEBHOOK: process.env.XENDIT_WEBHOOK,
     TRAKTEER_SECRET: process.env.TRAKTEER_SECRET,

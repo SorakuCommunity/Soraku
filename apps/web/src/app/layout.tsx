@@ -27,24 +27,10 @@ export const metadata: Metadata = {
     description: 'Komunitas anime & budaya Jepang non-profit pop Indonesia.',
   },
   keywords: [
-    'soraku',
-    'anime',
-    'komunitas',
-    'indonesia',
-    'budaya jepang',
-    'vtuber',
-    'belajar',
-    'berkembang',
-    'jepang',
-    'indonesia',
-    'indonesian',
-    'indonesian anime',
-    'indonesian pop',
-    'indonesian culture',
-    'indonesian vtuber',
-    'indonesian anime community',
-    'indonesian pop culture',
-    'indonesian vtuber community',
+    'soraku', 'anime', 'komunitas', 'indonesia', 'budaya jepang',
+    'vtuber', 'belajar', 'berkembang', 'jepang',
+    'indonesian anime', 'indonesian pop', 'indonesian culture',
+    'indonesian vtuber', 'indonesian anime community',
   ],
   authors: [{ name: 'Soraku', url: APP_URL }],
   robots: { index: true, follow: true },
@@ -52,18 +38,14 @@ export const metadata: Metadata = {
     icon: '/favicon.ico',
     shortcut: '/favicon-16x16.png',
     apple: '/apple-touch-icon.png',
-    other: {
-      rel: 'apple-touch-icon',
-      sizes: '180x180',
-      url: '/apple-touch-icon.png'
-    }
-  }
+    other: { rel: 'apple-touch-icon', sizes: '180x180', url: '/apple-touch-icon.png' },
+  },
 }
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#1c1e22' },
-    { media: '(prefers-color-scheme: light)', color: '#f4f6f8' },
+    { media: '(prefers-color-scheme: dark)', color: '#0b1120' },
+    { media: '(prefers-color-scheme: light)', color: '#0b1120' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -71,10 +53,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="id" suppressHydrationWarning>
       <head>
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5TB7WK9M8"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5TB7WK9M8" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -85,12 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
-        {/* Umami Analytics */}
-        <Script
-          defer
-          src="https://cloud.umami.is/script.js"
-          data-website-id="ba55e75f-b8b7-4f68-807f-77f7073bc23f"
-        />
+        <Script defer src="https://cloud.umami.is/script.js" data-website-id="ba55e75f-b8b7-4f68-807f-77f7073bc23f" />
       </head>
       <body className="bg-background font-body min-h-screen antialiased">
         <Providers>{children}</Providers>

@@ -12,6 +12,57 @@ Gabungkan menjadi satu changelog untuk keseluruhan platform Soraku.
 
 ## [unreleased]
 
+## [v1.6.0] - 13 Juni 2026
+
+### Added
+- Full platform redesign: Hybrid Neo Brutalism Design System (apps/web)
+  - New color palette: Background #0B1120, Primary #2563EB, Surface #111827
+  - Thick borders (2px), offset shadows, high contrast, minimal rounding
+  - Geometric decorative elements (circles, diamonds, patterns)
+- Mobile Android-style bottom navigation (Home, Community, Showcase, Events, Profile)
+- Desktop sticky top navbar with Home, Community, Showcase, Events, Leaderboard, About
+- New landing page with 10 sections: Hero, Stats, Features, Events, Blog, Benefits, Discord, Partners, Social, CTA
+- New community page with discussions feed, featured groups, trending topics
+- New showcase page with project gallery grid and tag filtering
+- New leaderboard page with XP rankings and gamification stats
+- New wallet page for balance management
+- BrutalCard base component (forward-compatible alias for glass-card)
+
+### Changed
+- Completely redesigned globals.css — removed all glassmorphism, cyberpunk styles
+- Core UI components rewritten: button, card, badge, input with brutalist styling
+- Footer redesigned with brutalist card panels and English localization
+- All existing pages inherit brutalist styling through backward-compatible glass-card alias
+- Navbar items updated to English layout
+- Public layout padding adjusted for new bottom nav
+
+### Removed
+- All glassmorphism classes (glass-card-cyber, emerald, rose, etc.)
+- All cyberpunk glow effects and gradient border animations
+- btn-shine, btn-primary-gradient, btn-neon, btn-pulse classes
+
+## [v1.5.3] - 07 Mei 2026
+
+### Added
+- Umami Analytics integration (apps/web)
+  - Comprehensive analytics dashboard with Recharts (line, bar, pie charts)
+  - API route proxy `/api/admin/umami`
+  - Metrics: Pageviews, Visitors, Bounce Rate, Duration, Top Pages, Referrers, Browser, OS, Devices, Countries
+- ProfileSidebar component for profile section navigation
+- Section component for reusable page sections
+
+### Changed
+- Mobile navbar redesign: dropdown from top with grouped sections matching desktop (Fitur, Agensi, Komunitas, Informasi)
+- Static assets reorganized to `public/assets/` directory
+- Updated favicon and PWA manifest files
+
+### Fixed
+- JSX comment syntax errors in navbar.tsx
+- Duplicate `cn` function in ProfileSidebar
+- Stray closing tags in mobile drawer
+
+---
+
 ## [v1.5.2] - 26 April 2026
 
 ### Added

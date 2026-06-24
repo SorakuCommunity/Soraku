@@ -5,20 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  Eye,
-  EyeOff,
-  ArrowRight,
-  Check,
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  XCircle,
-} from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, Check, AlertCircle, CheckCircle2, Loader2, XCircle } from 'lucide-react'
 import { DiscordIcon, GoogleIcon } from '@/components/icons/custom-icons'
-import { cn } from '@/lib/utils'
 
-// ── Constants ─────────────────────────────────────────────────────────────────
 const BENEFITS = [
   { icon: '🎌', text: 'Akses ke semua konten komunitas' },
   { icon: '🗓️', text: 'Ikut event & gathering eksklusif' },
@@ -26,7 +15,6 @@ const BENEFITS = [
   { icon: '🏅', text: 'Badge & role member Soraku' },
 ]
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
 const isValidUsername = (v: string) => /^[a-z0-9_]+$/.test(v)
 
@@ -39,82 +27,51 @@ function getPasswordStrength(p: string): { score: 0 | 1 | 2 | 3; label: string; 
   if (/[^A-Za-z0-9]/.test(p)) score = Math.min(3, score + 1) as 0 | 1 | 2 | 3
   const map: Record<number, { label: string; color: string }> = {
     0: { label: '', color: '' },
-    1: { label: 'Lemah', color: 'bg-destructive' },
+    1: { label: 'Lemah', color: 'bg-red-500' },
     2: { label: 'Sedang', color: 'bg-yellow-500' },
     3: { label: 'Kuat', color: 'bg-green-500' },
   }
   return { score: score as 0 | 1 | 2 | 3, ...map[score] }
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null
   return (
-    <p className="text-destructive animate-in fade-in slide-in-from-top-1 mt-1.5 flex items-center gap-1.5 text-[11px] font-medium duration-150">
-      <AlertCircle className="h-3 w-3 flex-shrink-0" />
-      {msg}
+    <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-red-400">
+      <AlertCircle className="h-3 w-3 flex-shrink-0" />{msg}
     </p>
   )
 }
+
 function FieldOk({ msg }: { msg?: string }) {
   if (!msg) return null
   return (
-    <p className="animate-in fade-in mt-1.5 flex items-center gap-1.5 text-[11px] font-medium text-green-400 duration-150">
-      <CheckCircle2 className="h-3 w-3 flex-shrink-0" />
-      {msg}
+    <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-green-400">
+      <CheckCircle2 className="h-3 w-3 flex-shrink-0" />{msg}
     </p>
   )
 }
 
 function InputField({
-  type = 'text',
-  value,
-  onChange,
-  onBlur,
-  placeholder,
-  autoComplete,
-  error,
-  ok: okMsg,
-  suffix,
-  disabled,
-  prefix,
+  type = 'text', value, onChange, onBlur, placeholder, autoComplete, error, ok: okMsg, suffix, disabled, prefix,
 }: {
-  type?: string
-  value: string
-  onChange: (v: string) => void
-  onBlur?: () => void
-  placeholder?: string
-  autoComplete?: string
-  error?: string
-  ok?: string
-  suffix?: React.ReactNode
-  prefix?: React.ReactNode
-  disabled?: boolean
+  type?: string; value: string; onChange: (v: string) => void; onBlur?: () => void
+  placeholder?: string; autoComplete?: string; error?: string; ok?: string
+  suffix?: React.ReactNode; prefix?: React.ReactNode; disabled?: boolean
 }) {
+  const borderColor = error
+    ? 'border-red-500/40 focus:border-red-500'
+    : okMsg
+      ? 'border-green-500/40 focus:border-green-500'
+      : 'border-white/[0.12] focus:border-primary/40'
   return (
     <div>
       <div className="relative">
-        {prefix && <div className="absolute top-1/2 left-4 -translate-y-1/2">{prefix}</div>}
-        <input
-          type={type}
-          value={value}
-          disabled={disabled}
-          onChange={(e) => onChange(e.target.value)}
-          onBlur={onBlur}
-          placeholder={placeholder}
-          autoComplete={autoComplete}
-          className={cn(
-            'bg-card/50 w-full rounded-xl border py-3 text-sm outline-none',
-            'placeholder:text-muted-foreground/40 transition-all duration-150 focus:ring-1',
-            prefix ? 'pl-8' : 'pl-4',
-            suffix ? 'pr-11' : 'pr-4',
-            disabled && 'cursor-not-allowed opacity-60',
-            error
-              ? 'border-destructive/60 focus:border-destructive/70 focus:ring-destructive/15'
-              : okMsg
-                ? 'border-green-500/40 focus:border-green-500/50 focus:ring-green-500/10'
-                : 'border-border focus:border-primary/50 focus:ring-primary/20'
-          )}
+        {prefix && <div className="absolute top-1/2 left-3 -translate-y-1/2">{prefix}</div>}
+        <input type={type} value={value} disabled={disabled}
+          onChange={(e) => onChange(e.target.value)} onBlur={onBlur}
+          placeholder={placeholder} autoComplete={autoComplete}
+          className={`w-full rounded-sm border-2 bg-card py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground/40 transition-all focus:shadow-[2px_2px_0px_rgba(37,99,235,0.2)] ${prefix ? 'pl-8' : 'pl-4'} ${suffix ? 'pr-11' : 'pr-4'} ${disabled ? 'cursor-not-allowed opacity-60' : ''} ${borderColor}`}
         />
         {suffix && <div className="absolute top-1/2 right-3 -translate-y-1/2">{suffix}</div>}
       </div>
@@ -123,31 +80,18 @@ function InputField({
   )
 }
 
-// ── Password Strength Meter ───────────────────────────────────────────────────
 function StrengthMeter({ password }: { password: string }) {
   const { score, label, color } = getPasswordStrength(password)
   if (!password) return null
   return (
-    <div className="animate-in fade-in mt-2 space-y-1.5 duration-200">
+    <div className="mt-2 space-y-1.5">
       <div className="flex gap-1">
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className={cn(
-              'h-1 flex-1 rounded-full transition-all duration-300',
-              score >= i ? color : 'bg-border/50'
-            )}
-          />
+          <div key={i} className={`h-1.5 flex-1 rounded-sm transition-all duration-300 ${score >= i ? color : 'bg-white/[0.06]'}`} />
         ))}
       </div>
       {label && (
-        <p
-          className={cn('text-[11px] font-medium', {
-            'text-destructive': score === 1,
-            'text-yellow-400': score === 2,
-            'text-green-400': score === 3,
-          })}
-        >
+        <p className={`text-[11px] font-bold ${score === 1 ? 'text-red-400' : score === 2 ? 'text-yellow-400' : 'text-green-400'}`}>
           Keamanan: {label}
           {score === 1 && ' — tambah angka atau huruf kapital'}
           {score === 2 && ' — tambah simbol untuk lebih aman'}
@@ -157,72 +101,43 @@ function StrengthMeter({ password }: { password: string }) {
   )
 }
 
-// ── Username Availability Status ──────────────────────────────────────────────
 type AvailStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
 
 function UsernameStatus({ status, username }: { status: AvailStatus; username: string }) {
   if (!username || status === 'idle') return null
+  const color = status === 'available' ? 'text-green-400' : 'text-red-400'
   return (
-    <p
-      className={cn(
-        'animate-in fade-in mt-1.5 flex items-center gap-1.5 text-[11px] font-medium duration-150',
-        status === 'available'
-          ? 'text-green-400'
-          : status === 'taken' || status === 'invalid'
-            ? 'text-destructive'
-            : 'text-muted-foreground/50'
-      )}
-    >
+    <p className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-bold ${color}`}>
       {status === 'checking' && <Loader2 className="h-3 w-3 flex-shrink-0 animate-spin" />}
       {status === 'available' && <CheckCircle2 className="h-3 w-3 flex-shrink-0" />}
-      {(status === 'taken' || status === 'invalid') && (
-        <XCircle className="h-3 w-3 flex-shrink-0" />
-      )}
-      {status === 'checking'
-        ? 'Mengecek ketersediaan…'
-        : status === 'available'
-          ? 'Username tersedia!'
-          : status === 'taken'
-            ? 'Username sudah dipakai'
-            : 'Hanya huruf kecil, angka, underscore'}
+      {(status === 'taken' || status === 'invalid') && <XCircle className="h-3 w-3 flex-shrink-0" />}
+      {status === 'checking' ? 'Mengecek ketersediaan…'
+        : status === 'available' ? 'Username tersedia!'
+        : status === 'taken' ? 'Username sudah dipakai'
+        : 'Hanya huruf kecil, angka, underscore'}
     </p>
   )
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
 export default function RegisterPage() {
   const router = useRouter()
-
   const [showPass, setShowPass] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formError, setFormError] = useState('')
   const [step, setStep] = useState(1)
-
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [username, setUsername] = useState('')
   const [displayname, setDisplayname] = useState('')
-
-  // Touched state
-  const [touched, setTouched] = useState({
-    email: false,
-    password: false,
-    confirm: false,
-    username: false,
-  })
-
-  // Per-field errors
+  const [touched, setTouched] = useState({ email: false, password: false, confirm: false, username: false })
   const [emailErr, setEmailErr] = useState('')
   const [passwordErr, setPasswordErr] = useState('')
   const [confirmErr, setConfirmErr] = useState('')
-
-  // Username availability
   const [availStatus, setAvailStatus] = useState<AvailStatus>('idle')
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // ── Validators ──
   const validateEmail = (v: string) =>
     !v.trim() ? 'Email wajib diisi' : !isValidEmail(v) ? 'Format email tidak valid' : ''
   const validatePassword = (v: string) => {
@@ -233,39 +148,19 @@ export default function RegisterPage() {
   const validateConfirm = (v: string, p: string) =>
     !v ? 'Konfirmasi password wajib diisi' : v !== p ? 'Password tidak cocok' : ''
   const validateUsername = (v: string) =>
-    !v.trim()
-      ? 'Username wajib diisi'
-      : v.length < 3
-        ? 'Username minimal 3 karakter'
-        : v.length > 30
-          ? 'Username maksimal 30 karakter'
-          : !isValidUsername(v)
-            ? 'Hanya huruf kecil, angka, underscore'
-            : ''
+    !v.trim() ? 'Username wajib diisi'
+    : v.length < 3 ? 'Username minimal 3 karakter'
+    : v.length > 30 ? 'Username maksimal 30 karakter'
+    : !isValidUsername(v) ? 'Hanya huruf kecil, angka, underscore' : ''
 
-  // ── Live validation ──
-  useEffect(() => {
-    if (touched.email) setEmailErr(validateEmail(email))
-  }, [email, touched.email])
-  useEffect(() => {
-    if (touched.password) setPasswordErr(validatePassword(password))
-  }, [password, touched.password])
-  useEffect(() => {
-    if (touched.confirm) setConfirmErr(validateConfirm(confirm, password))
-  }, [confirm, password, touched.confirm])
+  useEffect(() => { if (touched.email) setEmailErr(validateEmail(email)) }, [email, touched.email])
+  useEffect(() => { if (touched.password) setPasswordErr(validatePassword(password)) }, [password, touched.password])
+  useEffect(() => { if (touched.confirm) setConfirmErr(validateConfirm(confirm, password)) }, [confirm, password, touched.confirm])
 
-  // ── Username availability check (debounce 600ms) ──
   useEffect(() => {
-    if (!username) {
-      setAvailStatus('idle')
-      return
-    }
+    if (!username) { setAvailStatus('idle'); return }
     const formatErr = validateUsername(username)
-    if (formatErr) {
-      setAvailStatus('invalid')
-      return
-    }
-
+    if (formatErr) { setAvailStatus('invalid'); return }
     setAvailStatus('checking')
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
@@ -273,277 +168,173 @@ export default function RegisterPage() {
         const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`)
         const data = await res.json()
         setAvailStatus(res.ok && data.data?.available ? 'available' : 'taken')
-      } catch {
-        setAvailStatus('idle')
-      }
+      } catch { setAvailStatus('idle') }
     }, 600)
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [username])
 
-  // ── Step 1 submit (validasi & next) ──
   const handleStep1 = () => {
     setTouched((p) => ({ ...p, email: true, password: true, confirm: true }))
-    const eErr = validateEmail(email)
-    const pErr = validatePassword(password)
-    const cErr = validateConfirm(confirm, password)
-    setEmailErr(eErr)
-    setPasswordErr(pErr)
-    setConfirmErr(cErr)
+    const eErr = validateEmail(email); const pErr = validatePassword(password); const cErr = validateConfirm(confirm, password)
+    setEmailErr(eErr); setPasswordErr(pErr); setConfirmErr(cErr)
     if (eErr || pErr || cErr) return
-    setFormError('')
-    setStep(2)
+    setFormError(''); setStep(2)
   }
 
-  // ── Step 2 submit (register) ──
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (step === 1) {
-      handleStep1()
-      return
-    }
-
+    if (step === 1) { handleStep1(); return }
     setTouched((p) => ({ ...p, username: true }))
     const uErr = validateUsername(username)
     if (uErr) return
     if (availStatus === 'taken' || availStatus === 'invalid') return
-    if (availStatus === 'checking') {
-      setFormError('Menunggu cek username selesai…')
-      return
-    }
-
-    setFormError('')
-    setLoading(true)
+    if (availStatus === 'checking') { setFormError('Menunggu cek username selesai…'); return }
+    setFormError(''); setLoading(true)
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          username: username.toLowerCase(),
-          ...(displayname.trim() ? { displayname: displayname.trim() } : {}),
-        }),
+        body: JSON.stringify({ email, password, username: username.toLowerCase(), ...(displayname.trim() ? { displayname: displayname.trim() } : {}) }),
       })
       const data = await res.json()
-      if (!res.ok || data.error) {
-        setFormError(data.error ?? 'Pendaftaran gagal. Coba lagi.')
-        return
-      }
-
+      if (!res.ok || data.error) { setFormError(data.error ?? 'Pendaftaran gagal. Coba lagi.'); return }
       trackTikTokRegistration()
-      // Auto-login setelah register
       const loginRes = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
-      if (loginRes.ok) {
-        router.push('/profile/me')
-        router.refresh()
-      } else {
-        router.push('/login?registered=1')
-      }
-    } catch {
-      setFormError('Gagal terhubung ke server. Coba lagi.')
-    } finally {
-      setLoading(false)
-    }
+      if (loginRes.ok) { router.push('/profile/me'); router.refresh() }
+      else { router.push('/login?registered=1') }
+    } catch { setFormError('Gagal terhubung ke server. Coba lagi.') }
+    finally { setLoading(false) }
   }
 
   const canStep1 = !emailErr && !passwordErr && !confirmErr && email && password && confirm
   const canStep2 = availStatus === 'available' && username
 
   return (
-    <div className="relative flex min-h-[calc(100vh-4rem)] items-stretch">
-      {/* Kiri: Benefits */}
-      <div className="from-accent/8 via-background to-background border-border/40 relative hidden flex-1 overflow-hidden border-r bg-gradient-to-br lg:flex lg:flex-col">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="animate-blob bg-accent/10 absolute -top-20 -right-20 h-80 w-80 rounded-full blur-[120px]" />
-          <div className="animate-blob animation-delay-3000 bg-primary/8 absolute bottom-10 left-0 h-72 w-72 rounded-full blur-[100px]" />
-        </div>
-        <div className="relative p-8">
+    <div className="relative flex min-h-[calc(100dvh-3.5rem)] items-stretch">
+      {/* Left: Benefits */}
+      <div className="relative hidden flex-1 border-r-2 border-white/[0.06] bg-card lg:flex lg:flex-col">
+        <div className="p-8">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="border-border/60 h-10 w-10 overflow-hidden rounded-xl border">
-              <Image
-                src="/logo.png"
-                alt="Soraku"
-                width={40}
-                height={40}
-                className="h-full w-full object-cover object-top"
-              />
+            <div className="overflow-hidden rounded-sm border-2 border-white/[0.12]">
+              <Image src="/logo.png" alt="Soraku" width={40} height={40} className="object-cover" />
             </div>
-            <span className="text-base font-black">Soraku</span>
-            <span className="text-muted-foreground/40 text-xs tracking-widest uppercase">
-              Community
-            </span>
+            <span className="text-base font-black text-foreground">Soraku</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">Community</span>
           </Link>
         </div>
-        <div className="relative flex flex-1 flex-col justify-center p-8">
-          <p className="text-primary/60 mb-2 text-xs font-bold tracking-widest uppercase">
-            Bergabung Sekarang
-          </p>
-          <h2 className="text-2xl leading-tight font-black tracking-tight">
-            Komunitas anime
-            <br />& budaya Jepang
-            <br />
-            terbesar di Indonesia
+        <div className="flex flex-1 flex-col justify-center p-8">
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-primary/60">Bergabung Sekarang</p>
+          <h2 className="text-2xl leading-tight font-black tracking-tight text-foreground">
+            Komunitas anime<br />& budaya Jepang<br />terbesar di Indonesia
           </h2>
           <ul className="mt-8 space-y-3.5">
             {BENEFITS.map((b) => (
               <li key={b.text} className="flex items-center gap-3">
-                <span className="bg-primary/15 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl text-sm">
+                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-sm border-2 border-primary/20 bg-primary/10 text-sm">
                   {b.icon}
                 </span>
-                <span className="text-muted-foreground text-sm">{b.text}</span>
+                <span className="text-sm text-muted-foreground">{b.text}</span>
               </li>
             ))}
           </ul>
-          <div className="border-border/40 bg-card/40 mt-8 flex items-center gap-3 rounded-2xl border p-4">
-            <div className="bg-primary/20 text-primary flex h-10 w-10 items-center justify-center rounded-xl text-lg font-black">
-              空
-            </div>
+          <div className="mt-8 flex items-center gap-3 rounded-sm border-2 border-white/[0.06] bg-white/[0.02] p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-sm border-2 border-primary/20 bg-primary/10 text-lg font-black text-primary">空</div>
             <div>
-              <p className="text-sm font-semibold">Gratis selamanya</p>
-              <p className="text-muted-foreground/60 text-xs">Non-profit · Est. 2023</p>
+              <p className="text-sm font-bold text-foreground">Gratis selamanya</p>
+              <p className="text-xs text-muted-foreground/60">Non-profit · Est. 2023</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Kanan: Form */}
+      {/* Right: Form */}
       <div className="relative flex flex-1 items-center justify-center px-4 py-12 sm:px-8 lg:max-w-[480px]">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden lg:hidden">
-          <div className="animate-blob bg-accent/7 absolute -top-16 left-0 h-64 w-64 rounded-full blur-3xl" />
-          <div className="animate-blob animation-delay-2000 bg-primary/5 absolute right-0 bottom-0 h-56 w-56 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative w-full max-w-sm">
+        <div className="w-full max-w-sm">
           {/* Step indicator */}
           <div className="mb-8 flex items-center gap-2">
             {['Akun', 'Profil'].map((s, i) => (
               <div key={s} className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    'flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-black transition-all',
-                    step > i + 1
-                      ? 'bg-green-500 text-white'
-                      : step === i + 1
-                        ? 'bg-primary text-white'
-                        : 'bg-muted/60 text-muted-foreground/50'
-                  )}
-                >
+                <div className={`flex h-6 w-6 items-center justify-center rounded-sm text-[11px] font-black transition-all border-2 ${
+                  step > i + 1
+                    ? 'border-green-500 bg-green-500 text-white'
+                    : step === i + 1
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-white/[0.12] bg-white/[0.03] text-muted-foreground/50'
+                }`}>
                   {step > i + 1 ? <Check className="h-3.5 w-3.5" /> : i + 1}
                 </div>
-                <span
-                  className={cn(
-                    'text-xs font-semibold',
-                    step === i + 1 ? 'text-foreground' : 'text-muted-foreground/50'
-                  )}
-                >
+                <span className={`text-xs font-bold ${step === i + 1 ? 'text-foreground' : 'text-muted-foreground/50'}`}>
                   {s}
                 </span>
-                {i === 0 && <div className="bg-border/60 mx-1 h-px w-8" />}
+                {i === 0 && <div className="mx-1 h-px w-8 bg-white/[0.12]" />}
               </div>
             ))}
           </div>
 
-          <h1 className="text-2xl font-black tracking-tight">
+          <h1 className="text-2xl font-black tracking-tight text-foreground">
             {step === 1 ? 'Buat Akun Baru' : 'Lengkapi Profil'}
           </h1>
           <p className="text-muted-foreground mt-1.5 text-sm">
-            {step === 1
-              ? 'Daftar ke Soraku — gratis!'
-              : 'Username unikmu di komunitas Soraku'}
+            {step === 1 ? 'Daftar ke Soraku — gratis!' : 'Username unikmu di komunitas Soraku'}
           </p>
 
-          {/* OAuth — hanya step 1 */}
+          {/* OAuth — step 1 only */}
           {step === 1 && (
             <>
               <div className="mt-6 flex flex-col gap-2.5">
-                <a
-                  href="/api/auth/discord"
-                  className="flex items-center justify-center gap-3 rounded-xl border border-indigo-500/30 bg-indigo-500/8 px-4 py-3 text-sm font-semibold text-indigo-300 transition-all hover:-translate-y-0.5 hover:border-indigo-400/50 hover:bg-indigo-500/15"
+                <a href="/api/auth/discord"
+                  className="flex items-center justify-center gap-3 rounded-sm border-2 border-indigo-500/30 bg-indigo-500/10 px-4 py-2.5 text-sm font-bold text-indigo-400 shadow-[2px_2px_0px_rgba(99,102,241,0.2)] hover:bg-indigo-500/20 hover:shadow-[3px_3px_0px_rgba(99,102,241,0.3)] transition-all"
                 >
-                  <DiscordIcon className="h-5 w-5" />
-                  Daftar dengan Discord
+                  <DiscordIcon className="h-5 w-5" /> Daftar dengan Discord
                 </a>
-                <a
-                  href="/api/auth/google"
-                  className="border-border text-muted-foreground hover:border-primary/40 hover:bg-primary/5 flex items-center justify-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-all hover:-translate-y-0.5"
+                <a href="/api/auth/google"
+                  className="flex items-center justify-center gap-3 rounded-sm border-2 border-white/[0.12] px-4 py-2.5 text-sm font-bold text-muted-foreground shadow-[2px_2px_0px_rgba(37,99,235,0.08)] hover:border-primary/30 hover:text-foreground hover:shadow-[3px_3px_0px_rgba(37,99,235,0.15)] transition-all"
                 >
-                  <GoogleIcon className="h-5 w-5" />
-                  Daftar dengan Google
+                  <GoogleIcon className="h-5 w-5" /> Daftar dengan Google
                 </a>
               </div>
               <div className="my-5 flex items-center gap-3">
-                <div className="border-border/50 flex-1 border-t" />
-                <span className="text-muted-foreground/40 text-xs font-medium">atau email</span>
-                <div className="border-border/50 flex-1 border-t" />
+                <div className="flex-1 border-t-2 border-white/[0.06]" />
+                <span className="text-[10px] font-bold uppercase text-muted-foreground/40">atau email</span>
+                <div className="flex-1 border-t-2 border-white/[0.06]" />
               </div>
             </>
           )}
 
-          {/* Form-level error */}
           {formError && (
-            <div className="border-destructive/30 bg-destructive/8 animate-in fade-in slide-in-from-top-2 mb-4 flex items-start gap-2.5 rounded-xl border px-4 py-3 duration-200">
-              <AlertCircle className="text-destructive mt-0.5 h-4 w-4 flex-shrink-0" />
-              <p className="text-destructive text-sm">{formError}</p>
+            <div className="mb-4 flex items-start gap-2.5 rounded-sm border-2 border-red-500/30 bg-red-500/8 px-4 py-3">
+              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-400" />
+              <p className="text-sm text-red-400">{formError}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             {step === 1 ? (
               <>
-                {/* Email */}
                 <div>
-                  <label className="text-muted-foreground/60 mb-1.5 block text-xs font-semibold tracking-widest uppercase">
-                    Email
-                  </label>
-                  <InputField
-                    type="email"
-                    autoComplete="email"
-                    placeholder="kamu@example.com"
+                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Email</label>
+                  <InputField type="email" autoComplete="email" placeholder="kamu@example.com"
                     value={email}
-                    onChange={(v) => {
-                      setEmail(v)
-                      setFormError('')
-                    }}
-                    onBlur={() => {
-                      setTouched((p) => ({ ...p, email: true }))
-                      setEmailErr(validateEmail(email))
-                    }}
+                    onChange={(v) => { setEmail(v); setFormError('') }}
+                    onBlur={() => { setTouched((p) => ({ ...p, email: true })); setEmailErr(validateEmail(email)) }}
                     error={touched.email ? emailErr : undefined}
                     ok={touched.email && !emailErr && email ? 'Email valid' : undefined}
                   />
                 </div>
 
-                {/* Password */}
                 <div>
-                  <label className="text-muted-foreground/60 mb-1.5 block text-xs font-semibold tracking-widest uppercase">
-                    Password
-                  </label>
-                  <InputField
-                    type={showPass ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    placeholder="Min 8 karakter"
+                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Password</label>
+                  <InputField type={showPass ? 'text' : 'password'} autoComplete="new-password" placeholder="Min 8 karakter"
                     value={password}
-                    onChange={(v) => {
-                      setPassword(v)
-                      setFormError('')
-                    }}
-                    onBlur={() => {
-                      setTouched((p) => ({ ...p, password: true }))
-                      setPasswordErr(validatePassword(password))
-                    }}
+                    onChange={(v) => { setPassword(v); setFormError('') }}
+                    onBlur={() => { setTouched((p) => ({ ...p, password: true })); setPasswordErr(validatePassword(password)) }}
                     error={touched.password ? passwordErr : undefined}
                     suffix={
-                      <button
-                        type="button"
-                        onClick={() => setShowPass((p) => !p)}
-                        className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-                      >
+                      <button type="button" onClick={() => setShowPass((p) => !p)} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors">
                         {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     }
@@ -551,149 +342,87 @@ export default function RegisterPage() {
                   <StrengthMeter password={password} />
                 </div>
 
-                {/* Confirm password */}
                 <div>
-                  <label className="text-muted-foreground/60 mb-1.5 block text-xs font-semibold tracking-widest uppercase">
-                    Konfirmasi Password
-                  </label>
-                  <InputField
-                    type={showConfirm ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    placeholder="Ulangi password"
+                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Konfirmasi Password</label>
+                  <InputField type={showConfirm ? 'text' : 'password'} autoComplete="new-password" placeholder="Ulangi password"
                     value={confirm}
-                    onChange={(v) => {
-                      setConfirm(v)
-                      setFormError('')
-                    }}
-                    onBlur={() => {
-                      setTouched((p) => ({ ...p, confirm: true }))
-                      setConfirmErr(validateConfirm(confirm, password))
-                    }}
+                    onChange={(v) => { setConfirm(v); setFormError('') }}
+                    onBlur={() => { setTouched((p) => ({ ...p, confirm: true })); setConfirmErr(validateConfirm(confirm, password)) }}
                     error={touched.confirm ? confirmErr : undefined}
                     ok={touched.confirm && !confirmErr && confirm ? 'Password cocok' : undefined}
                     suffix={
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirm((p) => !p)}
-                        className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-                      >
+                      <button type="button" onClick={() => setShowConfirm((p) => !p)} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors">
                         {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     }
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={!canStep1}
-                  className={cn(
-                    'shadow-primary/20 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white shadow-lg transition-all',
-                    canStep1
-                      ? 'bg-primary hover:-translate-y-0.5'
-                      : 'bg-primary/50 cursor-not-allowed'
-                  )}
+                <button type="submit" disabled={!canStep1}
+                  className={`flex w-full items-center justify-center gap-2 rounded-sm border-2 px-4 py-2.5 text-sm font-bold shadow-[3px_3px_0px_rgba(37,99,235,0.3)] transition-all ${
+                    canStep1 ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary/30 bg-primary/30 text-white/60 cursor-not-allowed'
+                  }`}
                 >
-                  Lanjut
-                  <ArrowRight className="h-4 w-4" />
+                  Lanjut <ArrowRight className="h-4 w-4" />
                 </button>
               </>
             ) : (
               <>
-                {/* Username */}
                 <div>
-                  <label className="text-muted-foreground/60 mb-1.5 block text-xs font-semibold tracking-widest uppercase">
-                    Username
-                  </label>
-                  <InputField
-                    type="text"
-                    autoComplete="username"
-                    placeholder="contoh: anon_weebs"
+                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Username</label>
+                  <InputField type="text" autoComplete="username" placeholder="contoh: anon_weebs"
                     value={username}
-                    onChange={(v) => {
-                      setUsername(v.toLowerCase().replace(/[^a-z0-9_]/g, ''))
-                      setFormError('')
-                    }}
+                    onChange={(v) => { setUsername(v.toLowerCase().replace(/[^a-z0-9_]/g, '')); setFormError('') }}
                     onBlur={() => setTouched((p) => ({ ...p, username: true }))}
-                    error={
-                      touched.username && validateUsername(username)
-                        ? validateUsername(username)
-                        : undefined
-                    }
-                    ok={availStatus === 'available' ? undefined : undefined}
+                    error={touched.username && validateUsername(username) ? validateUsername(username) : undefined}
                     prefix={<span className="text-muted-foreground/40 text-sm font-medium">@</span>}
                   />
                   <UsernameStatus status={availStatus} username={username} />
-                  <p className="text-muted-foreground/35 mt-1 text-[11px]">
-                    Huruf kecil, angka, underscore. Tidak bisa diubah setelah daftar.
-                  </p>
+                  <p className="mt-1 text-[11px] text-muted-foreground/35">Huruf kecil, angka, underscore. Tidak bisa diubah setelah daftar.</p>
                 </div>
 
-                {/* Nama tampilan */}
                 <div>
-                  <label className="text-muted-foreground/60 mb-1.5 block text-xs font-semibold tracking-widest uppercase">
-                    Nama Tampilan{' '}
-                    <span className="text-muted-foreground/30 normal-case">(opsional)</span>
+                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                    Nama Tampilan <span className="font-normal normal-case text-muted-foreground/30">(opsional)</span>
                   </label>
-                  <InputField
-                    type="text"
-                    placeholder="Nama yang tampil ke orang lain"
+                  <InputField type="text" placeholder="Nama yang tampil ke orang lain"
                     value={displayname}
                     onChange={(v) => setDisplayname(v.slice(0, 50))}
                   />
                   {displayname && (
-                    <p className="text-muted-foreground/30 mt-1 text-right text-[11px] tabular-nums">
-                      {displayname.length}/50
-                    </p>
+                    <p className="mt-1 text-right text-[11px] tabular-nums text-muted-foreground/30">{displayname.length}/50</p>
                   )}
                 </div>
 
-                {/* Summary akun */}
-                <div className="border-border/30 bg-muted/10 divide-border/20 divide-y rounded-xl border">
+                {/* Summary */}
+                <div className="rounded-sm border-2 border-white/[0.06] bg-white/[0.02] divide-y-2 divide-white/[0.06]">
                   <div className="flex items-center justify-between px-4 py-2.5">
-                    <span className="text-muted-foreground/40 text-xs">Email</span>
-                    <span className="text-foreground/70 max-w-[180px] truncate text-xs font-medium">
-                      {email}
-                    </span>
+                    <span className="text-[10px] font-bold text-muted-foreground/40">Email</span>
+                    <span className="max-w-[180px] truncate text-xs font-medium text-foreground/70">{email}</span>
                   </div>
                   <div className="flex items-center justify-between px-4 py-2.5">
-                    <span className="text-muted-foreground/40 text-xs">Password</span>
-                    <span className="text-muted-foreground/40 text-xs">
-                      {'•'.repeat(Math.min(password.length, 10))}
-                    </span>
+                    <span className="text-[10px] font-bold text-muted-foreground/40">Password</span>
+                    <span className="text-xs text-muted-foreground/40">{'•'.repeat(Math.min(password.length, 10))}</span>
                   </div>
                 </div>
 
                 <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setStep(1)
-                      setFormError('')
-                    }}
-                    className="border-border/50 text-muted-foreground hover:border-border hover:text-foreground flex items-center gap-1.5 rounded-xl border px-4 py-3 text-xs font-medium transition-all"
+                  <button type="button" onClick={() => { setStep(1); setFormError('') }}
+                    className="flex items-center gap-1.5 rounded-sm border-2 border-white/[0.12] px-4 py-2.5 text-xs font-bold text-muted-foreground shadow-[2px_2px_0px_rgba(37,99,235,0.08)] hover:border-white/[0.2] hover:text-foreground transition-all"
                   >
                     ← Kembali
                   </button>
-                  <button
-                    type="submit"
-                    disabled={loading || !canStep2}
-                    className={cn(
-                      'shadow-primary/20 flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white shadow-lg transition-all',
+                  <button type="submit" disabled={loading || !canStep2}
+                    className={`flex flex-1 items-center justify-center gap-2 rounded-sm border-2 px-4 py-2.5 text-sm font-bold shadow-[3px_3px_0px_rgba(37,99,235,0.3)] transition-all ${
                       !loading && canStep2
-                        ? 'bg-primary hover:-translate-y-0.5'
-                        : 'bg-primary/50 cursor-not-allowed'
-                    )}
+                        ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
+                        : 'border-primary/30 bg-primary/30 text-white/60 cursor-not-allowed'
+                    }`}
                   >
                     {loading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Mendaftar…
-                      </>
+                      <><Loader2 className="h-4 w-4 animate-spin" /> Mendaftar&hellip;</>
                     ) : (
-                      <>
-                        Daftar Sekarang
-                        <ArrowRight className="h-4 w-4" />
-                      </>
+                      <>Daftar Sekarang <ArrowRight className="h-4 w-4" /></>
                     )}
                   </button>
                 </div>
@@ -702,23 +431,17 @@ export default function RegisterPage() {
           </form>
 
           {step === 1 && (
-            <p className="text-muted-foreground/50 mt-5 text-center text-xs leading-relaxed">
+            <p className="mt-5 text-center text-xs leading-relaxed text-muted-foreground/50">
               Dengan mendaftar kamu setuju dengan{' '}
-              <Link href="/terms" className="text-primary/70 hover:text-primary">
-                Syarat & Ketentuan
-              </Link>{' '}
+              <Link href="/terms" className="font-bold text-primary/70 hover:text-primary">Syarat & Ketentuan</Link>{' '}
               dan{' '}
-              <Link href="/privacy" className="text-primary/70 hover:text-primary">
-                Kebijakan Privasi
-              </Link>{' '}
+              <Link href="/privacy" className="font-bold text-primary/70 hover:text-primary">Kebijakan Privasi</Link>{' '}
               Soraku.
             </p>
           )}
           <p className="text-muted-foreground mt-4 text-center text-sm">
             Sudah punya akun?{' '}
-            <Link href="/login" className="text-primary font-semibold hover:underline">
-              Masuk
-            </Link>
+            <Link href="/login" className="font-bold text-primary hover:underline">Masuk</Link>
           </p>
         </div>
       </div>
