@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
 import { ArrowLeft, BookOpen, Eye, Clock } from 'lucide-react'
 import { db } from '@/lib/supabase/server'
 import { formatRelativeTime } from '@/lib/utils'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,7 +40,7 @@ function PostCard({ post }: { post: CategoryPost }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group flex flex-col overflow-hidden rounded-md border-2 border-black bg-surface shadow-[3px_3px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_#000]"
+      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
     >
       <div className="relative h-40 overflow-hidden bg-gradient-to-br from-primary/20 to-violet-500/15">
         {post.coverurl ? (
@@ -55,18 +56,16 @@ function PostCard({ post }: { post: CategoryPost }) {
       <div className="flex flex-1 flex-col p-4">
         <div className="flex flex-wrap gap-1">
           {post.tags?.slice(0, 2).map((t) => (
-            <span key={t} className="rounded-sm border border-black/30 bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary">
-              {t}
-            </span>
+            <Badge key={t} variant="secondary" className="text-[9px]">{t}</Badge>
           ))}
         </div>
-        <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-tight text-foreground group-hover:text-primary">
+        <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
           {post.title}
         </h3>
-        <p className="mt-1 line-clamp-2 text-[10px] text-muted">{post.excerpt}</p>
-        <div className="mt-auto flex items-center gap-3 pt-3 text-[9px] text-muted">
-          <span className="flex items-center gap-1"><Clock className="h-2.5 w-2.5" />{formatRelativeTime(post.publishedat)}</span>
-          <span className="flex items-center gap-1"><Eye className="h-2.5 w-2.5" />{post.viewcount}</span>
+        <p className="mt-1 line-clamp-2 text-[12px] text-muted-foreground">{post.excerpt}</p>
+        <div className="mt-auto flex items-center gap-3 pt-3 text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatRelativeTime(post.publishedat)}</span>
+          <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{post.viewcount}</span>
         </div>
       </div>
     </Link>
@@ -89,12 +88,12 @@ export default async function CategoryPage({ params }: Props) {
       <div className="mx-auto max-w-6xl px-4 py-8">
         <Link
           href="/blog"
-          className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted hover:text-foreground"
+          className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" /> Kembali ke Blog
         </Link>
         <div className="flex flex-col items-center justify-center py-20">
-          <p className="text-sm text-muted">Gagal memuat artikel.</p>
+          <p className="text-sm text-muted-foreground">Gagal memuat artikel.</p>
         </div>
       </div>
     )
@@ -116,10 +115,10 @@ export default async function CategoryPage({ params }: Props) {
   const categoryName = slug.charAt(0).toUpperCase() + slug.slice(1)
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="mx-auto max-w-6xl px-4 py-8 lg:px-6">
       <Link
         href="/blog"
-        className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted hover:text-foreground"
+        className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> Kembali ke Blog
       </Link>
@@ -128,7 +127,7 @@ export default async function CategoryPage({ params }: Props) {
         <h1 className="text-3xl font-black tracking-tighter text-foreground sm:text-4xl">
           Kategori: <span className="text-primary">{categoryName}</span>
         </h1>
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-2 text-sm text-muted-foreground">
           Artikel dengan tag {slug}.
         </p>
       </div>
@@ -141,8 +140,8 @@ export default async function CategoryPage({ params }: Props) {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20">
-          <BookOpen className="mb-4 h-16 w-16 text-muted" />
-          <p className="text-sm text-muted">Belum ada artikel dalam kategori ini.</p>
+          <BookOpen className="mb-4 h-16 w-16 text-muted-foreground/30" />
+          <p className="text-sm text-muted-foreground">Belum ada artikel dalam kategori ini.</p>
         </div>
       )}
     </div>

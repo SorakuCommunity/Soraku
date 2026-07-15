@@ -4,7 +4,7 @@ import { Wallet, ArrowRight, Plus, History } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Wallet',
-  description: 'Soraku wallet — manage your balance and transactions.',
+  description: 'Soraku wallet - manage your balance and transactions.',
 }
 
 export default function WalletPage() {

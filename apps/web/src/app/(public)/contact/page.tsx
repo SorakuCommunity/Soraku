@@ -1,173 +1,365 @@
-import type { Metadata } from 'next'
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { Mail, MapPin, ExternalLink, MessageCircle, AlertTriangle } from 'lucide-react'
-import { DiscordIcon } from '@/components/icons/custom-icons'
+import { Mail, Handshake, Mic, LifeBuoy, Send, MessageCircle, Clock } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 
-export const metadata: Metadata = {
-  title: 'Kontak | Soraku',
-  description: 'Hubungi Soraku. Email, lokasi, dan Discord server.',
-}
-
-const CONTACTS = [
+const CONTACT_CHANNELS = [
   {
-    icon: Mail,
-    color: 'text-primary',
-    bg: 'bg-primary/20',
-    border: 'border-primary',
-    label: 'Contact Center',
-    value: 'contact@soraku.id',
-    href: 'mailto:contact@soraku.id',
-    desc: 'Untuk sponsor, partner, dan pertanyaan umum.',
+    Icon: Mail,
+    label: 'Business Inquiry',
+    value: 'business@soraku.id',
+    href: 'mailto:business@soraku.id',
+    description: 'For partnerships, collaborations, and business development opportunities.',
   },
   {
-    icon: Mail,
-    color: 'text-amber-400',
-    bg: 'bg-amber-500/20',
-    border: 'border-amber-500',
-    label: 'Admin Center',
-    value: 'admin@soraku.id',
-    href: 'mailto:admin@soraku.id',
-    desc: 'Untuk pertanyaan teknis, OTP, dan hal admin.',
+    Icon: Handshake,
+    label: 'Partnership',
+    value: 'partnership@soraku.id',
+    href: 'mailto:partnership@soraku.id',
+    description: 'Strategic alliances, sponsorships, and joint venture inquiries.',
   },
   {
-    icon: DiscordIcon,
-    color: 'text-[#5865F2]',
-    bg: 'bg-[#5865F2]/20',
-    border: 'border-[#5865F2]',
-    label: 'Discord Server',
-    value: 'Gabung Discord',
-    href: 'https://discord.gg/qm3XJvRa6B',
-    desc: 'Cara tercepat untuk ngobrol langsung dengan tim dan komunitas.',
-    external: true,
+    Icon: Mic,
+    label: 'Media',
+    value: 'media@soraku.id',
+    href: 'mailto:media@soraku.id',
+    description: 'Press releases, media coverage, and content licensing requests.',
   },
   {
-    icon: MapPin,
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-500/20',
-    border: 'border-emerald-500',
-    label: 'Lokasi',
-    value: 'Indonesia',
-    desc: 'Komunitas online, anggota tersebar di seluruh Indonesia.',
+    Icon: LifeBuoy,
+    label: 'Support',
+    value: 'support@soraku.id',
+    href: 'mailto:support@soraku.id',
+    description: 'Technical assistance, account support, and general troubleshooting.',
   },
 ]
 
+const SUBJECT_OPTIONS = ['General', 'Business', 'Partnership', 'Media', 'Support']
+
+function ContactForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: 'General',
+    message: '',
+  })
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setStatus('submitting')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      if (res.ok) {
+        setStatus('success')
+        setFormData({ name: '', email: '', subject: 'General', message: '' })
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  return (
+    <Card className="w-full max-w-2xl">
+      <CardHeader className="text-center">
+        <CardTitle>Send a Message</CardTitle>
+        <CardDescription>We'll get back to you as soon as possible.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                placeholder="Your name"
+                disabled={status === 'submitting'}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="your@email.com"
+                disabled={status === 'submitting'}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="subject">Subject</Label>
+            <select
+              id="subject"
+              name="subject"
+              value={formData.subject}
+              onChange={handleChange}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={status === 'submitting'}
+            >
+              {SUBJECT_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="message">Message</Label>
+            <Textarea
+              id="message"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              required
+              placeholder="Tell us about your project or inquiry..."
+              className="min-h-[150px]"
+              disabled={status === 'submitting'}
+            />
+          </div>
+          <Button type="submit" className="w-full" size="lg" disabled={status === 'submitting'}>
+            {status === 'submitting' ? 'Sending...' : status === 'success' ? 'Message Sent!' : 'Send Message'}
+          </Button>
+          {status === 'success' && (
+            <p className="text-center text-sm text-green-500">Thank you! We&apos;ll get back to you soon.</p>
+          )}
+          {status === 'error' && (
+            <p className="text-center text-sm text-red-500">Something went wrong. Please try again.</p>
+          )}
+        </form>
+      </CardContent>
+    </Card>
+  )
+}
+
+function HeroSection() {
+  return (
+    <section className="relative overflow-hidden px-4 pb-20 pt-24 sm:px-6 sm:pt-32 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] animate-pulse rounded-full bg-primary/10 blur-[120px]" />
+        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] animate-pulse rounded-full bg-primary/5 blur-[120px]" style={{ animationDelay: '2s' }} />
+        <div className="absolute left-1/2 top-1/2 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted blur-[80px]" />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl">
+        <div className="mx-auto max-w-4xl text-center">
+          <Badge variant="secondary" className="mb-6">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary mr-2" />
+            Let&apos;s start a conversation
+          </Badge>
+
+          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
+            Contact <span className="text-primary">Us</span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg lg:text-xl">
+            We&apos;d love to hear from you. Whether you have a question, a project idea,
+            or just want to say hello, reach out and let&apos;s start a conversation.
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ContactChannelsSection() {
+  return (
+    <section className="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-12 text-center">
+          <Badge variant="secondary" className="mb-4 text-xs">Channels</Badge>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            Reach Out Directly
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">
+            Choose the channel that best fits your needs. We monitor all channels during business hours.
+          </p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {CONTACT_CHANNELS.map((channel) => (
+            <Card key={channel.label} className="group hover:border-primary/30 hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <channel.Icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">{channel.label}</h3>
+                    <p className="text-sm text-muted-foreground">{channel.value}</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">{channel.description}</p>
+                <a
+                  href={channel.href}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+                >
+                  Send Email <Send className="h-4 w-4" />
+                </a>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function BusinessHoursSection() {
+  return (
+    <section className="px-4 py-16 sm:px-6 sm:py-24 lg:px-8 border-y border-border">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-12 text-center">
+          <Badge variant="secondary" className="mb-4 text-xs">Availability</Badge>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            Business Hours
+          </h2>
+        </div>
+        <div className="mx-auto max-w-md">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/50">
+              <div className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-muted-foreground" />
+                <span className="font-medium text-foreground">Monday - Friday</span>
+              </div>
+              <span className="text-sm text-muted-foreground">09:00 - 18:00 WIB</span>
+            </div>
+            <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/50">
+              <div className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-muted-foreground" />
+                <span className="font-medium text-foreground">Saturday</span>
+              </div>
+              <span className="text-sm text-muted-foreground">Closed</span>
+            </div>
+            <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/50">
+              <div className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-muted-foreground" />
+                <span className="font-medium text-foreground">Sunday</span>
+              </div>
+              <span className="text-sm text-muted-foreground">Closed</span>
+            </div>
+          </div>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Response time: Typically within 24 hours during business days.
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function FAQSection() {
+  const faqs = [
+    {
+      q: 'How long does it take to get a response?',
+      a: 'We typically respond within 24 hours during business days. For urgent matters, please mark your email as urgent.',
+    },
+    {
+      q: 'Can I schedule a meeting with the team?',
+      a: 'Yes! For business inquiries and partnerships, we can schedule a call. Please use the Business Inquiry channel.',
+    },
+    {
+      q: 'Do you offer internships or volunteer positions?',
+      a: 'Yes, we occasionally offer internship and volunteer opportunities. Check our Careers page or contact us directly.',
+    },
+    {
+      q: 'What information should I include in my message?',
+      a: 'Please include your name, organization (if applicable), the nature of your inquiry, and any relevant details or links.',
+    },
+  ]
+
+  return (
+    <section className="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-12 text-center">
+          <Badge variant="secondary" className="mb-4 text-xs">FAQ</Badge>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            Frequently Asked Questions
+          </h2>
+        </div>
+        <div className="mx-auto max-w-3xl space-y-4">
+          {faqs.map((faq, i) => (
+            <Card key={i} className="overflow-hidden">
+              <CardContent className="pt-5 pb-5">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-bold">
+                    {i + 1}
+                  </span>
+                  <h3 className="font-semibold text-foreground">{faq.q}</h3>
+                </div>
+                <p className="mt-3 ml-11 text-sm text-muted-foreground">{faq.a}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function CTASection() {
+  return (
+    <section className="px-4 py-20 sm:px-6 sm:py-32 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 to-transparent">
+          <CardContent className="pt-8 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-24 text-center">
+            <MessageCircle className="mx-auto mb-4 h-8 w-8 text-primary" />
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+              Ready to Start a Project?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
+              Whether you need a product built, want to join our community, or explore partnership opportunities, we are ready.
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button size="lg" asChild>
+                <Link href="/about">About Soraku <Send className="h-4 w-4 ml-2" /></Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/careers">Explore Careers</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/contact">Contact Business Team <Handshake className="h-4 w-4 ml-2" /></Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  )
+}
+
 export default function ContactPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-12 text-center">
-        <p className="mb-3 text-[10px] font-bold tracking-widest text-primary uppercase">
-          Hubungi Kami
-        </p>
-        <h1 className="text-3xl font-black tracking-tighter text-foreground sm:text-5xl">
-          Kontak
-        </h1>
-        <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-muted">
-          Kami ingin sekali mendengar kabar dari kalian! Ada pertanyaan, masukan, atau cuma mau say
-          hi? Jangan ragu buat menghubungi kami.
-        </p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Info cards */}
-        <div className="space-y-4">
-          {CONTACTS.map((c) => (
-            <div
-              key={c.label}
-              className="rounded-md border-2 border-black bg-surface p-5 shadow-[3px_3px_0px_#000]"
-            >
-              <div className="flex items-start gap-4">
-                <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md border-2 border-black ${c.bg}`}>
-                  <c.icon className={`h-5 w-5 ${c.color}`} />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-foreground">{c.label}</h3>
-                  {c.href ? (
-                    <a
-                      href={c.href}
-                      target={c.external ? '_blank' : undefined}
-                      rel={c.external ? 'noopener noreferrer' : undefined}
-                      className="mt-0.5 inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline"
-                    >
-                      {c.value}
-                      {c.external && <ExternalLink className="h-3 w-3" />}
-                    </a>
-                  ) : (
-                    <p className="mt-0.5 text-sm font-bold text-foreground">{c.value}</p>
-                  )}
-                  <p className="mt-1 text-xs text-muted">{c.desc}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Feedback link */}
-          <Link
-            href="/feedback"
-            className="flex items-center gap-4 rounded-md border-2 border-black bg-surface p-5 shadow-[3px_3px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_#000]"
-          >
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md border-2 border-amber-500 bg-amber-500/20">
-              <MessageCircle className="h-5 w-5 text-amber-400" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-foreground">Kirim Masukan</h3>
-              <p className="mt-0.5 text-xs text-muted">
-                Sampaikan saran, laporan bug, atau request konten.
-              </p>
-            </div>
-          </Link>
-        </div>
-
-        {/* Map */}
-        <div className="overflow-hidden rounded-md border-2 border-black bg-surface shadow-[3px_3px_0px_#000]">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63466.67783929384!2d106.74138094999999!3d-6.208763!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e3469d%3A0x5371bf0fdad786a2!2sJakarta%2C%20Daerah%20Khusus%20Ibukota%20Jakarta!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
-            width="100%"
-            height="100%"
-            style={{ border: 0, minHeight: '400px' }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Lokasi Soraku"
-          />
-        </div>
-      </div>
-
-      {/* Info section */}
-      <div className="mt-8 rounded-md border-2 border-black bg-surface p-6 shadow-[4px_4px_0px_#000] sm:p-8">
-        <h2 className="mb-4 text-lg font-black text-foreground">Info & Saran</h2>
-        <div className="space-y-4 text-sm leading-relaxed text-muted">
-          <p>
-            Kalau kalian punya request spesial, kayak update konten anime terbaru, rekomendasi game
-            yang seru, atau tips buat nge-boost pengalaman main kalian, jangan malu-malu buat ngasih
-            tahu! Kami selalu siap buat bikin konten yang kalian pengen dan kasih info paling
-            up-to-date.
-          </p>
-
-          <div className="rounded-md border-2 border-amber-500/50 bg-amber-500/10 p-4 shadow-[2px_2px_0px_#000]">
-            <p className="mb-2 flex items-center gap-2 text-xs font-bold text-amber-400">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              Perhatian!
-            </p>
-            <ul className="space-y-2 text-xs text-muted">
-              <li>Pastikan informasi yang kamu masukkan benar dan lengkap agar kami bisa merespons dengan cepat.</li>
-              <li>Hindari penggunaan informasi sensitif atau pribadi yang tidak relevan. Kami menghargai privasi kamu.</li>
-              <li>Jika tidak ada balasan dalam 1 hari, silakan hubungi lewat Discord server kami.</li>
-            </ul>
-          </div>
-
-          <div className="flex justify-center">
-            <a
-              href="https://discord.gg/qm3XJvRa6B"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-md border-2 border-black bg-[#5865F2] px-6 py-3 text-sm font-bold text-white shadow-[4px_4px_0px_#000] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000]"
-            >
-              <DiscordIcon className="h-4 w-4" /> Gabung Discord Soraku
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <main className="min-h-screen bg-background">
+      <HeroSection />
+      <ContactChannelsSection />
+      <ContactForm />
+      <BusinessHoursSection />
+      <FAQSection />
+      <CTASection />
+    </main>
   )
 }

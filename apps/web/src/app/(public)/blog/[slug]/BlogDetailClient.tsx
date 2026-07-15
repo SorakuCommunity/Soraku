@@ -380,7 +380,7 @@ export default function BlogDetailClient({
     fetch(`/api/blog/${slug}/views`, { method: 'POST' }).catch(() => {})
   }, [slug])
 
-  // Load like status — only if logged in (to persist per user)
+  // Load like status - only if logged in (to persist per user)
   useEffect(() => {
     fetch(`/api/blog/${slug}/like`)
       .then((r) => r.json())
@@ -525,7 +525,7 @@ export default function BlogDetailClient({
         </div>
       </div>
 
-      {/* Comments — collapsible */}
+      {/* Comments - collapsible */}
       <div className="mt-8 space-y-4">
         <button
           onClick={() => setCommOpen((o) => !o)}
@@ -550,7 +550,7 @@ export default function BlogDetailClient({
 
         {commOpen && (
           <div className="space-y-4">
-            {/* Form — require login */}
+            {/* Form - require login */}
             {isLoggedIn ? (
               <div className="glass-card space-y-3 rounded-2xl p-4">
                 <div className="border-border/40 bg-muted/10 flex w-fit gap-1 rounded-xl border p-1">

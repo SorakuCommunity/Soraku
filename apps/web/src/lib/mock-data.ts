@@ -8,7 +8,7 @@ export const MOCK_POSTS: BlogPost[] = [
   {
     id: '1',
     slug: 'review-solo-leveling-s2',
-    title: 'Review: Solo Leveling Season 2 — Apakah Sesuai Ekspektasi?',
+    title: 'Review: Solo Leveling Season 2 - Apakah Sesuai Ekspektasi?',
     excerpt:
       'Season kedua Solo Leveling hadir dengan animasi yang lebih memukau. Bubu review lengkap di sini.',
     cover_url: null,
@@ -57,7 +57,7 @@ export const MOCK_POSTS: BlogPost[] = [
     id: '5',
     slug: 'rekomendasi-manga-slice-of-life',
     title: 'Rekomendasi Manga Slice of Life yang Wajib Dibaca',
-    excerpt: 'Capek sama isekai? Coba baca manga slice of life ini — dijamin bikin hati hangat.',
+    excerpt: 'Capek sama isekai? Coba baca manga slice of life ini - dijamin bikin hati hangat.',
     cover_url: null,
     tags: ['manga', 'rekomendasi', 'slice-of-life'],
     published_at: '2026-02-14T11:00:00Z',
@@ -67,7 +67,7 @@ export const MOCK_POSTS: BlogPost[] = [
   {
     id: '6',
     slug: 'event-recap-animeku-jakarta-2026',
-    title: 'Recap: Animeku Jakarta 2026 — Seru Banget!',
+    title: 'Recap: Animeku Jakarta 2026 - Seru Banget!',
      excerpt:
        'Soraku hadir di Animeku Jakarta 2026! Lihat keseruan dan momen terbaik di sini.',
     cover_url: null,
@@ -82,7 +82,7 @@ export const MOCK_EVENTS: Event[] = [
   {
     id: 'e1',
     slug: 'nonton-bareng-online-maret-2026',
-    title: 'Nonton Bareng Online — Maret 2026',
+    title: 'Nonton Bareng Online - Maret 2026',
     description:
       'Nobar online bareng komunitas Soraku! Bulan ini kita nonton finale season terbaru bersama-sama di Discord. Sesi tanya jawab setelah nobar.',
     cover_url: null,
@@ -96,7 +96,7 @@ export const MOCK_EVENTS: Event[] = [
   {
     id: 'e2',
     slug: 'gathering-jakarta-april-2026',
-    title: 'Gathering Offline Jakarta — April 2026',
+    title: 'Gathering Offline Jakarta - April 2026',
     description:
       'Gathering offline perdana 2026! Ketemu langsung sesama member Soraku di Jakarta. Ada games, lomba cosplay mini, dan sharing session.',
     cover_url: null,
@@ -159,7 +159,7 @@ export const MOCK_GALLERY: GalleryItem[] = [
   },
   {
     id: 'g3',
-    title: 'Digital Art — Rem Re:Zero',
+    title: 'Digital Art - Rem Re:Zero',
     image_url: '',
     category: 'digital',
     tags: ['rezero', 'rem'],

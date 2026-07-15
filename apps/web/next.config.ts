@@ -11,6 +11,20 @@ const withMDX = createMDX({
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
 
+  async redirects() {
+    return [
+      { source: '/ecosystem', destination: '/about', permanent: true },
+      { source: '/resources', destination: '/docs/resources', permanent: true },
+    ]
+  },
+
+  async rewrites() {
+    return [
+      // Public User Profile: /@username -> internal /u/[username]
+      { source: '/@:username', destination: '/u/:username' },
+    ]
+  },
+
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
 
   images: {

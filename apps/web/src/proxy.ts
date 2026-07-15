@@ -28,8 +28,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser()
   const { pathname, searchParams, origin } = request.nextUrl
 
-  // ── OAuth error redirect — Supabase mengirim error params ke Site URL (/) ──
-  // Contoh: /?error=invalid_request&error_code=bad_oauth_callback&...
+  // ── OAuth error redirect ──
   if (pathname === '/') {
     const hasOauthError = ['error', 'error_code', 'error_description'].some((p) =>
       searchParams.has(p)
@@ -43,36 +42,9 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // ── Permanent redirects — deprecated routes ──────────────────────────────
-
-  if (pathname === '/social' || pathname.startsWith('/social/')) {
-    return NextResponse.redirect(new URL('/', request.url), 301)
-  }
-  if (pathname === '/agensi/vtuber' || pathname.startsWith('/agensi/vtuber/')) {
-    return NextResponse.redirect(
-      new URL(pathname.replace('/agensi/vtuber', '/vtubers'), request.url),
-      301
-    )
-  }
-  if (pathname === '/premium/donatur' || pathname.startsWith('/premium/donatur/')) {
-    return NextResponse.redirect(new URL('/donate/leaderboard', request.url), 301)
-  }
-  if (pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(
-      new URL(pathname.replace('/dashboard', '/profile/me'), request.url),
-      301
-    )
-  }
-
-  // ── Auth guards ──────────────────────────────────────────────────────────
-
-  // /* — harus login
-  if (pathname.startsWith('/profile/me') && !user) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
+  // ── Auth guards ──
 
   // /admin/* — harus OWNER / MANAGER / ADMIN
-  // Pakai maybeSingle() agar tidak crash jika row belum ada
   if (pathname.startsWith('/admin')) {
     if (!user) return NextResponse.redirect(new URL('/login', request.url))
 
@@ -84,18 +56,22 @@ export async function proxy(request: NextRequest) {
         .eq('id', user.id)
         .maybeSingle()
 
-      // Kalau row belum ada → fallback ke USER → forbidden
       if (!['OWNER', 'MANAGER', 'ADMIN'].includes(data?.role ?? '')) {
-        return NextResponse.redirect(new URL('/profile/me', request.url))
+        return NextResponse.redirect(new URL('/', request.url))
       }
     } catch {
-      return NextResponse.redirect(new URL('/profile/me', request.url))
+      return NextResponse.redirect(new URL('/', request.url))
     }
   }
 
-  // /login /register — sudah login → redirect ke dashboard
+  // /login /register — sudah login → redirect ke home
   if ((pathname === '/login' || pathname === '/register') && user) {
-    return NextResponse.redirect(new URL('/profile/me', request.url))
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+
+  // /settings/* — harus login
+  if (pathname.startsWith('/settings') && !user) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   return response

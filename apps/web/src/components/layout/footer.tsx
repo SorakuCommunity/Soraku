@@ -3,71 +3,88 @@ import Image from 'next/image'
 import { Mail } from 'lucide-react'
 import {
   DiscordIcon,
-  InstagramIcon,
-  FacebookIcon,
-  TikTokIcon,
+  GitHubIcon,
   XIcon,
+  LinkedInIcon,
+  InstagramIcon,
   YouTubeIcon,
 } from '@/components/icons/custom-icons'
 
-const MailIcon = Mail
+const SOCIAL_LINKS = [
+  { href: 'https://discord.gg/qm3XJvRa6B', Icon: DiscordIcon, label: 'Discord' },
+  { href: 'https://github.com/soraku', Icon: GitHubIcon, label: 'GitHub' },
+  { href: 'https://twitter.com/@AppSora', Icon: XIcon, label: 'X' },
+  { href: 'https://linkedin.com/company/soraku', Icon: LinkedInIcon, label: 'LinkedIn' },
+  { href: 'https://www.instagram.com/soraku.moe', Icon: InstagramIcon, label: 'Instagram' },
+  { href: 'https://youtube.com/@soraku', Icon: YouTubeIcon, label: 'YouTube' },
+]
+
+const ECOSYSTEM_LINKS = [
+  { label: 'Soraku Studio', tagline: 'Creative Agency', href: '#' },
+  { label: 'Rynex', tagline: 'Enterprise Solutions', href: '#' },
+  { label: 'Soraku Community', tagline: 'Community Platform', href: '#' },
+]
+
+const COMPANY_LINKS = [
+  { label: 'About', href: '/about' },
+  { label: 'Careers', href: '/careers' },
+  { label: 'News', href: '/blog' },
+  { label: 'Contact', href: '/contact' },
+]
+
+const RESOURCE_LINKS = [
+  { label: 'Documentation', href: '/docs' },
+  { label: 'Downloads', href: '/docs/resources' },
+  { label: 'Brand Assets', href: '/docs/brand' },
+  { label: 'Media Kit', href: '/docs/resources' },
+  { label: 'Status', href: '#' },
+]
+
+const LEGAL_LINKS = [
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms of Service', href: '/tos' },
+  { label: 'License', href: '/license' },
+  { label: 'Security', href: '/security' },
+  { label: 'Cookie Policy', href: '/cookie' },
+]
+
+const BOTTOM_LEGAL = [
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms', href: '/tos' },
+  { label: 'License', href: '/license' },
+  { label: 'Status', href: '#' },
+]
 
 const CONTACT_EMAILS = {
   contact: 'contact@soraku.id',
   admin: 'admin@soraku.id',
 }
 
-const SOCIAL_LINKS = [
-  { href: 'https://discord.gg/qm3XJvRa6B', Icon: DiscordIcon, label: 'Discord' },
-  { href: 'https://www.tiktok.com/@soraku.id', Icon: TikTokIcon, label: 'TikTok' },
-  { href: 'https://www.facebook.com/share/1HQs9ZZeCw/', Icon: FacebookIcon, label: 'Facebook' },
-  { href: 'https://www.instagram.com/soraku.moe', Icon: InstagramIcon, label: 'Instagram' },
-  { href: 'https://twitter.com/@AppSoraa', Icon: XIcon, label: 'X' },
-  { href: 'https://youtube.com/@chsoraku', Icon: YouTubeIcon, label: 'YouTube' },
-]
-
-const QUICK_LINKS = [
-  { label: 'Events', href: '/events' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'Gallery', href: '/gallery' },
-  { label: 'VTubers', href: '/vtubers' },
-  { label: 'Premium', href: '/premium' },
-  { label: 'Donate', href: '/donate' },
-]
-
-const INFO_LINKS = [
-  { label: 'About', href: '/about' },
-  { label: 'Recruitment', href: '/requirements' },
-  { label: 'Feedback', href: '/feedback' },
-  { label: 'Privacy', href: '/privacy' },
-  { label: 'Terms', href: '/tos' },
-  { label: 'License', href: '/license' },
-]
-
-const GROUP_LINKS = [
-  { label: 'Facebook Group', href: 'https://www.facebook.com/groups/2080754095772347/' },
-  { label: 'WhatsApp Channel', href: 'https://whatsapp.com/channel/0029VbBNBA29MF93HdPSMu3E' },
-  { label: 'LinkedIn', href: '#' },
-]
-
 export function Footer() {
   return (
-    <footer className="border-t-2 border-white/[0.06] bg-[#0B1120] pb-24 lg:pb-0">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        {/* Desktop */}
-        <div className="hidden gap-10 sm:grid sm:grid-cols-12 lg:gap-14">
-          <div className="sm:col-span-5 lg:col-span-4">
-            <div className="mb-4">
-              <p className="mb-3 text-xs font-semibold text-muted-foreground">Built with tea by</p>
-              <Link href="/" className="group inline-flex items-center gap-3">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded border-2 border-white/10 bg-[#0B1120]">
-                  <Image src="/assets/brand/logo.png" alt="Soraku" width={48} height={48} className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-110" />
-                </div>
-                <span className="text-xl font-black text-foreground transition-colors group-hover:text-primary">Soraku</span>
-              </Link>
-            </div>
-            <p className="mb-6 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Soraku is a global platform blending Japanese pop culture, project-based learning, and creative economy into one integrated ecosystem.
+    <footer className="dark border-t border-border bg-background">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 relative before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_50%_0%,rgba(59,130,246,0.04)_0%,transparent_70%)]">
+        {/* Desktop: 4-column */}
+        <div className="hidden gap-12 lg:grid lg:grid-cols-12">
+          {/* Col 1 — Brand */}
+          <div className="lg:col-span-4">
+            <Link href="/" className="group mb-4 inline-flex items-center gap-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded border border-border">
+                <Image
+                  src="/assets/brand/logo.png"
+                  alt="Soraku"
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
+              <div>
+                <span className="text-base font-bold text-foreground">Soraku</span>
+                <p className="text-[11px] text-muted-foreground/60">Technology Ecosystem</p>
+              </div>
+            </Link>
+            <p className="mb-6 max-w-xs text-sm leading-relaxed text-muted-foreground/70">
+              Building meaningful technology through creativity, engineering, and community.
             </p>
             <div className="flex flex-wrap items-center gap-2">
               {SOCIAL_LINKS.map(({ href, Icon, label }) => (
@@ -77,22 +94,60 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={label}
-                  className="flex h-9 w-9 items-center justify-center rounded border-2 border-white/10 bg-white/[0.02] text-muted-foreground/60 transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+                  className="flex h-8 w-8 items-center justify-center rounded border border-border text-muted-foreground/50 transition-colors hover:border-primary/30 hover:text-primary"
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-3.5 w-3.5" />
                 </a>
               ))}
             </div>
+            <div className="mt-6 space-y-2">
+              <a
+                href="mailto:contact@soraku.id"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                contact@soraku.id
+              </a>
+              <br />
+              <a
+                href="mailto:admin@soraku.id"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                admin@soraku.id
+              </a>
+            </div>
           </div>
 
-          <div className="sm:col-span-2 lg:col-span-2">
-            <p className="mb-4 text-xs font-black tracking-[0.15em] text-muted-foreground uppercase">
-              Platform
+          {/* Col 2 — Ecosystem */}
+          <div className="lg:col-span-2">
+            <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              Ecosystem
             </p>
-            <ul className="space-y-2.5">
-              {QUICK_LINKS.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-sm text-muted-foreground/70 transition-colors hover:text-primary">
+            <ul className="space-y-4">
+              {ECOSYSTEM_LINKS.map((l) => (
+                <li key={l.label}>
+                  <Link href={l.href} className="group block text-sm transition-colors hover:text-primary">
+                    <span className="font-medium text-foreground">{l.label}</span>
+                    <span className="block text-xs text-muted-foreground/50">{l.tagline}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 3 — Company */}
+          <div className="lg:col-span-2">
+            <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              Company
+            </p>
+            <ul className="space-y-3">
+              {COMPANY_LINKS.map((l) => (
+                <li key={l.label}>
+                  <Link
+                    href={l.href}
+                    className="text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+                  >
                     {l.label}
                   </Link>
                 </li>
@@ -100,112 +155,248 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="sm:col-span-2 lg:col-span-3">
-            <p className="mb-4 text-xs font-black tracking-[0.15em] text-muted-foreground uppercase">
-              Information
+          {/* Col 4 — Resources */}
+          <div className="lg:col-span-2">
+            <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              Resources
             </p>
-            <ul className="space-y-2.5">
-              {INFO_LINKS.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-sm text-muted-foreground/70 transition-colors hover:text-primary">
+            <ul className="space-y-3">
+              {RESOURCE_LINKS.map((l) => (
+                <li key={l.label}>
+                  <Link
+                    href={l.href}
+                    className="text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+                  >
                     {l.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div className="sm:col-span-3 lg:col-span-3">
-            <p className="mb-4 text-xs font-black tracking-[0.15em] text-muted-foreground uppercase">
-              Community
-            </p>
-            <ul className="space-y-2.5">
-              {GROUP_LINKS.map((l) => (
-                <li key={l.href}>
-                  <a href={l.href} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground/70 transition-colors hover:text-primary">
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 border-t border-white/[0.06] pt-4">
-              <p className="mb-3 text-xs font-black tracking-[0.15em] text-muted-foreground uppercase">
-                Contact
-              </p>
-              <div className="space-y-2">
-                <a href={`mailto:${CONTACT_EMAILS.contact}`} className="flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary">
-                  <MailIcon className="h-4 w-4" />
-                  {CONTACT_EMAILS.contact}
-                </a>
-                <a href={`mailto:${CONTACT_EMAILS.admin}`} className="flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary">
-                  <MailIcon className="h-4 w-4" />
-                  {CONTACT_EMAILS.admin}
-                </a>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Mobile */}
-        <div className="space-y-8 sm:hidden">
+        {/* Tablet: 2-column */}
+        <div className="hidden sm:grid sm:grid-cols-2 sm:gap-10 lg:hidden">
           <div>
-            <p className="mb-2 text-xs text-muted-foreground">Built with tea by</p>
             <Link href="/" className="group mb-4 inline-flex items-center gap-3">
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded border-2 border-white/10 bg-[#0B1120]">
-                <Image src="/assets/brand/logo.png" alt="Soraku" width={48} height={48} className="h-full w-full object-cover object-top" />
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded border border-border">
+                <Image
+                  src="/assets/brand/logo.png"
+                  alt="Soraku"
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover object-top"
+                />
               </div>
-              <span className="text-xl font-black text-foreground">Soraku</span>
+              <div>
+                <span className="text-base font-bold text-foreground">Soraku</span>
+                <p className="text-[11px] text-muted-foreground/60">Technology Ecosystem</p>
+              </div>
             </Link>
-            <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
-              A global platform blending Japanese pop culture, project-based learning, and creative economy.
+            <p className="mb-6 max-w-xs text-sm leading-relaxed text-muted-foreground/70">
+              Building meaningful technology through creativity, engineering, and community.
             </p>
             <div className="flex flex-wrap items-center gap-2">
               {SOCIAL_LINKS.map(({ href, Icon, label }) => (
-                <a key={href} href={href} target="_blank" rel="noopener noreferrer" title={label}
-                  className="flex h-9 w-9 items-center justify-center rounded border-2 border-white/10 bg-white/[0.02] text-muted-foreground/60 transition-all hover:border-primary/30 hover:text-primary">
-                  <Icon className="h-4 w-4" />
+                <a
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={label}
+                  className="flex h-8 w-8 items-center justify-center rounded border border-border text-muted-foreground/50 transition-colors hover:border-primary/30 hover:text-primary"
+                >
+                  <Icon className="h-3.5 w-3.5" />
                 </a>
               ))}
             </div>
+            <div className="mt-6 space-y-2">
+              <a
+                href="mailto:contact@soraku.id"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                contact@soraku.id
+              </a>
+              <br />
+              <a
+                href="mailto:admin@soraku.id"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                admin@soraku.id
+              </a>
+            </div>
           </div>
-
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="mb-3 text-xs font-black tracking-[0.15em] text-muted-foreground uppercase">Platform</p>
-              <ul className="space-y-2">
-                {QUICK_LINKS.map((l) => (
-                  <li key={l.href}>
+              <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">Ecosystem</p>
+              <ul className="space-y-4">
+                {ECOSYSTEM_LINKS.map((l) => (
+                  <li key={l.label}>
+                    <Link href={l.href} className="group block text-sm transition-colors hover:text-primary">
+                      <span className="font-medium text-foreground">{l.label}</span>
+                      <span className="block text-xs text-muted-foreground/50">{l.tagline}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">Company</p>
+              <ul className="space-y-3">
+                {COMPANY_LINKS.map((l) => (
+                  <li key={l.label}>
                     <Link href={l.href} className="text-sm text-muted-foreground/70 transition-colors hover:text-primary">{l.label}</Link>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="space-y-4">
-              <p className="text-xs font-black tracking-[0.15em] text-muted-foreground uppercase">Contact</p>
-              <div className="space-y-2">
-                <a href={`mailto:${CONTACT_EMAILS.contact}`} className="flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary">
-                  <MailIcon className="h-4 w-4" />
-                  {CONTACT_EMAILS.contact}
-                </a>
-                <a href={`mailto:${CONTACT_EMAILS.admin}`} className="flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary">
-                  <MailIcon className="h-4 w-4" />
-                  {CONTACT_EMAILS.admin}
-                </a>
-              </div>
+            <div>
+              <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">Resources</p>
+              <ul className="space-y-3">
+                {RESOURCE_LINKS.map((l) => (
+                  <li key={l.label}>
+                    <Link href={l.href} className="text-sm text-muted-foreground/70 transition-colors hover:text-primary">{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
 
-        {/* Bottom */}
-        <div className="mt-10 border-t border-white/[0.06] pt-6">
-          <div className="flex flex-col items-center justify-center gap-2 text-xs text-muted-foreground/60 sm:flex-row">
-            <p>&copy; 2026</p>
-            <span className="hidden sm:inline">&middot;</span>
-            <Link href="/" className="flex items-center gap-1 font-bold text-primary transition-colors hover:text-accent">
-              Soraku
+        {/* Mobile: single-column */}
+        <div className="space-y-10 sm:hidden">
+          <div>
+            <Link href="/" className="group mb-4 inline-flex items-center gap-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded border border-border">
+                <Image
+                  src="/assets/brand/logo.png"
+                  alt="Soraku"
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
+              <div>
+                <span className="text-base font-bold text-foreground">Soraku</span>
+                <p className="text-[11px] text-muted-foreground/60">Technology Ecosystem</p>
+              </div>
             </Link>
-            <span className="hidden sm:inline">&middot;</span>
-            <p>All rights reserved.</p>
+            <p className="mb-6 max-w-xs text-sm leading-relaxed text-muted-foreground/70">
+              Building meaningful technology through creativity, engineering, and community.
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              {SOCIAL_LINKS.map(({ href, Icon, label }) => (
+                <a
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={label}
+                  className="flex h-8 w-8 items-center justify-center rounded border border-border text-muted-foreground/50 transition-colors hover:border-primary/30 hover:text-primary"
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                </a>
+              ))}
+            </div>
+            <div className="mt-6 space-y-2">
+              <a
+                href="mailto:contact@soraku.id"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                contact@soraku.id
+              </a>
+              <br />
+              <a
+                href="mailto:admin@soraku.id"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                admin@soraku.id
+              </a>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">Ecosystem</p>
+              <ul className="space-y-4">
+                {ECOSYSTEM_LINKS.map((l) => (
+                  <li key={l.label}>
+                    <Link href={l.href} className="group block text-sm transition-colors hover:text-primary">
+                      <span className="font-medium text-foreground">{l.label}</span>
+                      <span className="block text-xs text-muted-foreground/50">{l.tagline}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">Company</p>
+              <ul className="space-y-3">
+                {COMPANY_LINKS.map((l) => (
+                  <li key={l.label}>
+                    <Link href={l.href} className="text-sm text-muted-foreground/70 transition-colors hover:text-primary">{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">Resources</p>
+              <ul className="space-y-3">
+                {RESOURCE_LINKS.map((l) => (
+                  <li key={l.label}>
+                    <Link href={l.href} className="text-sm text-muted-foreground/70 transition-colors hover:text-primary">{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">Legal</p>
+              <ul className="space-y-3">
+                {LEGAL_LINKS.map((l) => (
+                  <li key={l.label}>
+                    <Link href={l.href} className="text-sm text-muted-foreground/70 transition-colors hover:text-primary">{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="space-y-2 border-t border-border pt-6">
+            <a
+              href={`mailto:${CONTACT_EMAILS.contact}`}
+              className="flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              {CONTACT_EMAILS.contact}
+            </a>
+            <a
+              href={`mailto:${CONTACT_EMAILS.admin}`}
+              className="flex items-center gap-2 text-sm text-muted-foreground/70 transition-colors hover:text-primary"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              {CONTACT_EMAILS.admin}
+            </a>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 text-xs text-muted-foreground/60 sm:flex-row">
+          <div className="text-center sm:text-left">
+            <p>&copy; 2026 Soraku. Technology Ecosystem.</p>
+            <p className="mt-0.5">Made with care for creators, developers, and innovators.</p>
+          </div>
+          <div className="flex items-center gap-4">
+            {BOTTOM_LEGAL.map((l) => (
+              <Link
+                key={l.label}
+                href={l.href}
+                className="transition-colors hover:text-primary"
+              >
+                {l.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

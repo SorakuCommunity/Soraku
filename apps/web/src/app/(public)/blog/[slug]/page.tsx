@@ -118,13 +118,13 @@ export default async function BlogDetailPage({ params }: Props) {
       />
       <Link
         href="/blog"
-        className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted hover:text-foreground"
+        className="mb-6 inline-flex items-center gap-2 text-xs font-bold text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> Kembali ke Blog
       </Link>
 
       {/* Cover */}
-      <div className="relative mb-6 h-52 overflow-hidden rounded-md border-2 border-black bg-gradient-to-br from-primary/20 to-violet-500/15 shadow-[4px_4px_0px_#000] sm:h-72">
+      <div className="relative mb-6 h-52 overflow-hidden rounded-lg border border-border bg-gradient-to-br from-primary/20 to-violet-500/15 shadow-sm sm:h-72">
         {post.coverurl ? (
           <Image
             src={post.coverurl}
@@ -139,12 +139,12 @@ export default async function BlogDetailPage({ params }: Props) {
             <BookOpen className="h-16 w-16 text-primary/20" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-surface/80 to-transparent" />
-        <div className="absolute right-3 bottom-3 flex items-center gap-1.5 rounded-sm border-2 border-black bg-surface px-2.5 py-1.5 text-[10px] font-bold text-foreground shadow-[2px_2px_0px_#000]">
+        <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
+        <div className="absolute right-3 bottom-3 flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-[10px] font-bold text-foreground shadow-sm">
           <Eye className="h-3 w-3" />
           <span>{(post.viewcount ?? 0).toLocaleString()} views</span>
         </div>
-        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-sm border-2 border-black bg-surface px-2.5 py-1.5 text-[10px] font-bold text-foreground shadow-[2px_2px_0px_#000]">
+        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-[10px] font-bold text-foreground shadow-sm">
           <Clock className="h-3 w-3" />
           {readMins} min baca
         </div>
@@ -154,24 +154,24 @@ export default async function BlogDetailPage({ params }: Props) {
       <h1 className="text-3xl leading-tight font-black tracking-tighter text-foreground sm:text-4xl">{post.title}</h1>
 
       {/* Author + date */}
-      <div className="mt-4 flex items-center gap-3 border-b-2 border-black pb-5">
+      <div className="mt-4 flex items-center gap-3 border-b border-border pb-5">
         {author?.avatarurl ? (
           <Image
             src={author.avatarurl}
             alt={authorName}
             width={36}
             height={36}
-            className="rounded-md border-2 border-black"
+            className="rounded-lg border border-border"
             unoptimized
           />
         ) : (
-          <div className="flex h-9 w-9 items-center justify-center rounded-md border-2 border-black bg-primary/20 text-sm font-black text-primary shadow-[2px_2px_0px_#000]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-primary/20 text-sm font-black text-primary shadow-sm">
             {authorName.charAt(0).toUpperCase()}
           </div>
         )}
         <div>
           <p className="text-sm font-bold text-foreground">{authorName}</p>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-muted-foreground">
             {post.publishedat ? formatDate(post.publishedat) : ''} · {readMins} min baca
           </p>
         </div>

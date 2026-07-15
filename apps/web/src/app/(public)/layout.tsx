@@ -1,11 +1,11 @@
-import Navbar from '@/components/layout/navbar'
+import Navbar from '@/components/layout/public-navbar'
 import { Footer } from '@/components/layout/footer'
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen pt-14 pb-16 lg:pb-0">{children}</main>
+      <main className="min-h-screen pt-16">{children}</main>
       <Footer />
     </>
   )

@@ -7,15 +7,16 @@ import {
   MessageCircle,
   Eye,
   Bookmark,
-  Share2,
   Layers,
   ArrowRight,
   TrendingUp,
   Clock,
   Filter,
-  Grid3X3,
-  List,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 
 const TAGS = [
   'All',
@@ -29,18 +30,6 @@ const TAGS = [
   'Music',
   'Open Source',
 ]
-
-const TAG_BORDER: Record<string, string> = {
-  'Web Dev': 'border-blue-500',
-  Mobile: 'border-emerald-500',
-  'AI/ML': 'border-purple-500',
-  Design: 'border-pink-500',
-  Creative: 'border-orange-500',
-  Tools: 'border-cyan-500',
-  Games: 'border-rose-500',
-  Music: 'border-amber-500',
-  'Open Source': 'border-indigo-500',
-}
 
 const TAG_GRADIENT: Record<string, string> = {
   'Web Dev': 'from-blue-600 to-blue-950',
@@ -214,55 +203,42 @@ export default function ShowcasePage() {
     setSaved((prev) => ({ ...prev, [i]: !prev[i] }))
   }
 
+  const filtered = activeTag === 'All' ? PROJECTS : PROJECTS.filter((p) => p.tag === activeTag)
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <p className="mb-2 text-xs font-bold tracking-widest text-primary/70 uppercase">
+        <Badge variant="secondary" className="mb-3 text-xs">
+          <Layers className="h-3 w-3 mr-1.5" />
           Showcase
-        </p>
-        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-          Built by the <span className="text-gradient">Community</span>
+        </Badge>
+        <h1 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl">
+          Built by the <span className="text-primary">Community</span>
         </h1>
         <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-          Discover innovative projects created by our community members. From
-          web apps to game mods, explore what people are building.
+          Discover innovative projects created by our community members. From web apps to game mods,
+          explore what people are building.
         </p>
       </div>
 
-      {/* Tabs & View Toggle */}
+      {/* Tabs */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex gap-2">
-          <button
+          <Button
+            size="sm"
+            variant={activeTab === 'Trending' ? 'default' : 'outline'}
             onClick={() => setActiveTab('Trending')}
-            className={`rounded-md border-2 px-4 py-2 text-xs font-bold transition-all ${
-              activeTab === 'Trending'
-                ? 'border-primary bg-primary text-primary-foreground shadow-[2px_2px_0px_rgba(37,99,235,0.3)]'
-                : 'border-white/10 text-muted-foreground hover:border-primary/40 hover:text-primary'
-            }`}
           >
-            <TrendingUp className="mr-1.5 inline h-3.5 w-3.5" />
-            Trending
-          </button>
-          <button
+            <TrendingUp className="h-3.5 w-3.5" /> Trending
+          </Button>
+          <Button
+            size="sm"
+            variant={activeTab === 'Latest' ? 'default' : 'outline'}
             onClick={() => setActiveTab('Latest')}
-            className={`rounded-md border-2 px-4 py-2 text-xs font-bold transition-all ${
-              activeTab === 'Latest'
-                ? 'border-primary bg-primary text-primary-foreground shadow-[2px_2px_0px_rgba(37,99,235,0.3)]'
-                : 'border-white/10 text-muted-foreground hover:border-primary/40 hover:text-primary'
-            }`}
           >
-            <Clock className="mr-1.5 inline h-3.5 w-3.5" />
-            Latest
-          </button>
-        </div>
-        <div className="hidden items-center gap-1 sm:flex">
-          <button className="rounded-md border-2 border-primary bg-primary p-1.5 text-primary-foreground">
-            <Grid3X3 className="h-4 w-4" />
-          </button>
-          <button className="rounded-md border-2 border-white/10 p-1.5 text-muted-foreground hover:border-primary/40 hover:text-primary">
-            <List className="h-4 w-4" />
-          </button>
+            <Clock className="h-3.5 w-3.5" /> Latest
+          </Button>
         </div>
       </div>
 
@@ -274,11 +250,12 @@ export default function ShowcasePage() {
             <button
               key={tag}
               onClick={() => setActiveTag(tag)}
-              className={`rounded-sm border-2 px-2.5 py-1 text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
+              className={cn(
+                'rounded-md border px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all shrink-0',
                 tag === activeTag
                   ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-white/10 text-muted-foreground hover:border-primary/40 hover:text-primary'
-              }`}
+                  : 'border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
+              )}
             >
               {tag}
             </button>
@@ -288,44 +265,36 @@ export default function ShowcasePage() {
 
       {/* Projects Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {PROJECTS.map((p, i) => (
-          <div
-            key={i}
-            className="group rounded-md border-2 border-white/[0.07] bg-card shadow-[4px_4px_0px_rgba(37,99,235,0.12)] transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[6px_6px_0px_rgba(37,99,235,0.2)]"
-          >
+        {filtered.map((p, i) => (
+          <Card key={i} hover className="group overflow-hidden">
             {/* Thumbnail */}
             <div
-              className={`relative flex h-36 items-center justify-center rounded-t-md bg-gradient-to-br ${TAG_GRADIENT[p.tag] ?? 'from-primary/20 to-primary/5'}`}
+              className={cn(
+                'relative flex h-36 items-center justify-center bg-gradient-to-br',
+                TAG_GRADIENT[p.tag] ?? 'from-primary/20 to-primary/5'
+              )}
             >
               <Layers className="h-10 w-10 text-white/30" />
-              <span
-                className={`absolute top-3 left-3 rounded-sm border-2 bg-card px-2.5 py-1 text-xs font-bold ${TAG_BORDER[p.tag] ?? 'border-white/20'} text-foreground`}
-              >
+              <Badge className="absolute top-3 left-3 bg-card/90 text-foreground backdrop-blur-sm">
                 {p.tag}
-              </span>
+              </Badge>
             </div>
 
             {/* Content */}
-            <div className="p-4">
+            <CardContent className="p-4">
               <h3 className="mb-0.5 text-base font-black text-foreground transition-colors group-hover:text-primary">
                 {p.title}
               </h3>
-              <p className="mb-2 text-xs text-muted-foreground/60">
-                by {p.author}
-              </p>
-              <p className="mb-4 line-clamp-2 text-xs text-muted-foreground">
-                {p.description}
-              </p>
+              <p className="mb-2 text-xs text-muted-foreground/60">by {p.author}</p>
+              <p className="mb-4 line-clamp-2 text-xs text-muted-foreground">{p.description}</p>
 
               {/* Stats */}
-              <div className="flex items-center gap-3 text-xs text-muted-foreground/50">
+              <div className="flex items-center gap-3 text-xs text-muted-foreground/60">
                 <button
                   onClick={() => toggleLike(i)}
                   className="flex cursor-pointer items-center gap-1 transition-colors hover:text-red-400"
                 >
-                  <Heart
-                    className={`h-3.5 w-3.5 ${liked[i] ? 'fill-red-500 text-red-500' : ''}`}
-                  />
+                  <Heart className={cn('h-3.5 w-3.5', liked[i] && 'fill-red-500 text-red-500')} />
                   {p.likes + (liked[i] ? 1 : 0)}
                 </button>
                 <span className="flex items-center gap-1">
@@ -338,33 +307,28 @@ export default function ShowcasePage() {
                   onClick={() => toggleSave(i)}
                   className="ml-auto flex cursor-pointer items-center gap-1 transition-colors hover:text-primary"
                 >
-                  <Bookmark
-                    className={`h-3.5 w-3.5 ${saved[i] ? 'fill-primary text-primary' : ''}`}
-                  />
+                  <Bookmark className={cn('h-3.5 w-3.5', saved[i] && 'fill-primary text-primary')} />
                   {p.saves + (saved[i] ? 1 : 0)}
                 </button>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
       {/* CTA */}
-      <div className="mt-12 rounded-md border-2 border-primary/20 bg-primary/5 p-8 text-center shadow-[4px_4px_0px_rgba(37,99,235,0.15)]">
+      <div className="mt-12 rounded-lg border border-primary/20 bg-primary/5 p-8 text-center">
         <Layers className="mx-auto mb-3 h-8 w-8 text-primary" />
-        <h2 className="mb-2 text-xl font-black text-foreground">
-          Showcase Your Work
-        </h2>
+        <h2 className="mb-2 text-xl font-black text-foreground">Showcase Your Work</h2>
         <p className="mb-5 text-sm text-muted-foreground">
-          Share your projects, get feedback, and inspire the community. Every
-          project starts with a single commit.
+          Share your projects, get feedback, and inspire the community. Every project starts with a
+          single commit.
         </p>
-        <Link
-          href="/register"
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-[3px_3px_0px_rgba(37,99,235,0.3)] transition-all hover:translate-x-[-1px] hover:translate-y-[-1px]"
-        >
-          Submit Project <ArrowRight className="h-4 w-4" />
-        </Link>
+        <Button asChild>
+          <Link href="/register">
+            Submit Project <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
       </div>
     </div>
   )
